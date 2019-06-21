@@ -1,7 +1,11 @@
 # Data
 anne'scode/
 zarchive/
-LENA_eval_2019*/
+LENA_eval_201901/
+LENA_eval_201902/
+LENA_eval_201906/gold
+LENA_eval_201906/lena
+
 .DS_Store
 
 # History files
