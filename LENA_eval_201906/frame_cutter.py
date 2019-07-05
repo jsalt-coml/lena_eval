@@ -34,8 +34,11 @@ def cutter(path_to_rttm, frame_length, output_file, prefix):
 #    else:
 #        print("Something went wrong while reading the wav file %s. Can not get total duration..." % wav_path)
 #        sys.exit(1)
-
-    tot_dur_s = 120
+#IMPORTANT, ADAPT TO CORPUS
+    if basename[0][0]=="C":
+        tot_dur_s = 60
+    else:
+        tot_dur_s = 120
 
     frame_length_s = float(frame_length)/1000.0
  
@@ -108,12 +111,14 @@ def single_activity_cutter(basename, output, frame_length_s, dur_s, onset_s, cur
     # Get the output label (we want a full match or nothing)
 
     for i in range(0, n_frames):
+        onset_s = round(onset_s,2)
         output.write("SPEAKER %s 1 %s %s <NA> <NA> %s <NA>\n" % \
                      (basename, onset_s + frame_length_s * i,
                       str(frame_length_s), curr_activity))
 
     if (not np.isclose(onset_s + frame_length_s * n_frames, onset_s+dur_s+diff_s, rtol=1e-05, atol=1e-08, equal_nan=False)) and (onset_s + frame_length_s * n_frames < tot_dur_s):
-        output.write("SPEAKER %s 1 %s %s <NA> <NA> %s <NA>\n" % \
+       onset_s = round(onset_s,2)
+       output.write("SPEAKER %s 1 %s %s <NA> <NA> %s <NA>\n" % \
                      (basename, onset_s + frame_length_s * n_frames,
                       str(frame_length_s), curr_activity))
 
@@ -137,6 +142,7 @@ def aggregate_overlap(path_to_rttm, output_file):
             while k < len(lines):       # Loop through the whole file
                 line_k = lines[k].split()
                 onset_k, dur_k, act_k = line_k[3], line_k[4], line_k[7]
+                onset_k = round(float(onset_k),2)
                 frame_activity = [act_k]
                 j = k + 1
                 while j < len(lines):   # Loop through the activities that have the same onset
@@ -158,6 +164,7 @@ def aggregate_overlap(path_to_rttm, output_file):
 
             if len(frame_activity) >= 2 and 'SIL' in frame_activity:
                 frame_activity.remove("SIL")
+            onset_k = round(onset_k,2)
             output.write("SPEAKER %s 1 %s %s <NA> <NA> %s <NA>\n" % \
                          (basename, onset_k, dur_k, '/'.join(frame_activity)))
 

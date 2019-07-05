@@ -1,0 +1,375 @@
+---
+title: "lena_analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+gold_folder = "gold/"
+lena_folder = "lena/"
+corpora = c("BER", "ROW", "SOD","WAR","TSI")
+
+
+# Output labels
+# Keys = input labels, Values = output labels
+gold_dict_map = list(
+C1="OCH",
+C2="OCH",
+#C1="CHI",
+#C2="CHI",
+CHI="CHI",
+EE1="SIL",
+FA1="FEM",
+FA2="FEM",
+FA3="FEM",
+FA4="FEM",
+FA5="FEM",
+FA6="FEM",
+FA7="FEM",
+FA8="FEM",
+FAE="SIL",
+FC1="OCH",
+#FC1="CHI",
+MA1="MAL",
+MA2="MAL",
+MA3="MAL",
+MA4="MAL",
+MA5="MAL",
+MAE="SIL",
+MC1="MAL",
+MC2="MAL",
+MC3="MAL",
+MI1="OCH", #is this infant??? then it should go to OCH
+MOT="FEM", #this used to say MAL
+UC1="OCH",
+UC2="OCH",
+UC3="OCH",
+UC4="OCH",
+UC5="OCH",
+UC6="OCH",
+# UC1="CHI",
+# UC2="CHI",
+# UC3="CHI",
+# UC4="CHI",
+# UC5="CHI",
+# UC6="CHI",
+SIL="SIL"
+)
+
+lena_dict_map = list(
+CHF="CHF",
+CHN="CHN",
+CXF="CXF",
+CXN="CXN",
+FAF="FAF",
+FAN="FAN",
+MAF="MAF",
+MAN="MAN",
+NOF="SIL",
+NON="SIL",
+OLF="OLF",
+OLN="OLN",
+SIL="SIL",
+TVF="SIL",
+TVN="SIL"
+)
+  
+label_mapper <- function(input_label, dict_map){
+  # Given input label (multiple or not), returns output label
+  # Ex : FA1/UC6 -> CHI/FEM (overlap)
+  # UC1/UC2 -> CHI (overlap between two speakers belonging to the same class)
+  # CXN -> CHN (only one speaker)
+  output_labels = dict_map[strsplit(toString(input_label), "/")[[1]]]
+  output_labels = unique(unname(unlist(output_labels)))
+  if(length(output_labels) != 1) {
+    output_labels = sort(output_labels[output_labels!="SIL"])
+  }
+  return(paste(output_labels,collapse="/"))
+}
+
+
+```
+
+## Going from eaf's to rttm's (ACLEW) -- NOT FINISHED, GET MARVIN'S INPUT
+
+https://github.com/srvk/DiViMe/blob/master/utils/adjust_timestamps.py
+
+or perhaps
+
+https://github.com/srvk/DiViMe/blob/master/utils/eafAAS2rttm_folder.sh
+
+
+## Going from textgrid to rttm's (TSI) NEED TO FINISH THIS
+
+This chunk takes Camila's text grids, removes the tiers that do not contain speech, corrects some typos and inconsistencies, and generates one rttm per annotated 1-minute file.
+
+https://github.com/aclew/utils/blob/master/textgrid2rttm.py
+
+Then, we need to change the naming convention from the one that had child_sib_mother to just child:
+
+https://github.com/srvk/DiViMe/blob/master/utils/change_tsi_lena_names.py
+
+
+## Going from LENA's .its to rttm's: tsi
+
+
+For the tsi files, took from shared folder with Camila called tsi_its, containing a lot more its than the ones we have annotation for, and sitting on top of that folder (ie above its subfolder) I did the following to get the right name:
+
+```{bash ,eval=F}
+grep "LENA" tsi_key_info.csv | while read -r line; do itsname=`echo $line | cut -f 5 -d ","` ; newname=`echo $line | cut -f 11 -d ","` ;  cp its/$itsname.its ${newname}.its ; done
+```
+
+Notice there is one file for C18 that is supposed to have a LENA file, but the its is missing from the shared folder. We don´t have annotation for a second C18 day however. So it may be an error and there is in fact not a second LENA file for this child.∫
+
+Then move the newly named its files into lena/TSI and run the following is used to generate a huge rttm that has the whole day.
+
+```{bash ,eval=F}
+./its2rttm.sh lena/TSI/
+```
+
+Finally, for TSI, we use the golds to generate the corresponding sections in LENA's rttms.
+
+```{bash ,eval=F}
+for j in gold/*.rttm ; do mv $j $j.unsorted ; done
+for j in gold/*.rttm.unsorted ; do sorted=`echo $j | sed "s/.unsorted//"`  ; awk  '{printf("%s %s %s %.2f %.2f %s %s %s %s %s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)}' $j |  sort -n -k4 > $sorted ; done
+
+for j in lena/*.rttm ; do mv $j $j.unsorted ; done
+for j in lena/*.rttm.unsorted ; do sorted=`echo $j | sed "s/.unsorted//"` ; sort -n -k4 $j > $sorted ; done
+
+./extract_tsi.sh
+ 
+```
+
+
+Error: 
+awk: fatal: cannot open file `lena/TSI/C18_20170718.rttm' for reading (No such file or directory)
+
+arises due to this file:
+gold/oldname/C18_C17_M11_20170718_45240.rttm
+C18 20170718 45240
+
+Moved that file and the other C18 20170718 file into a folder called gives_error
+
+Then script freezes when starting the second C24 day? No, is it perhaps due to C24_C23_M14_20170712_41640.rttm? Moved this file to gives error.
+
+fatal: cannot open file `lena/TSI/C24_20170719.rttm'
+
+moved all C24 second day to gives_error folder
+
+## Going from LENA's .its to rttm's: ACLEW
+
+I'm not sure how those three steps were done for the ACLEW files. The next script used the wav files' names, generated in "Going from eaf's to rttm's", to extract sections of the .its files for ACLEW.
+
+
+```{python ,eval=F}
+ cut_lena.py
+ 
+```
+
+
+## Create csv's with pyannote.metrics
+
+```{bash pyannote, eval=F}
+
+source activate pyannote-lena 
+
+# pip install pyannote-metrics # only needed first time
+
+# After having activated pyannote-lena environment
+## Map the labels
+## You can change the mapping in labels_mapper.py
+## The -o option indicates if overlapping classes need to be aggregated as being "OVL"
+
+python labels_mapper.py -p lena/ -m lena
+python labels_mapper.py -p gold/ -m gold -o
+
+## Evaluate lena performances (should not be run in the frontnode)
+# With -t being the task (identification, diarization or detection)
+# -m being the list of metrics
+python compute_metrics.py -ref gold/mapped/ -hyp lena/mapped/ -t diarization -m diaer coverage homogeneity completeness purity
+
+
+```
+
+## Generate frame-based rttms
+
+These contain the same info as the lena and gold rttms, but each line represents a 100 ms frame, and all frames are accounted for (whereas in standard rttms silence is not tagged). The following lines can be ran on a terminal (because they give an error here, not sure why).
+
+```{bash runpy, eval=F}
+rm -r -f */frame/
+python frame_cutter.py --i lena/mapped/
+mkdir lena/frame/
+mv lena/mapped/*_cutted.rttm lena/frame/
+wc -l lena/frame/*.rttm
+
+python frame_cutter.py --i gold/mapped/
+mkdir gold/frame/
+mv gold/mapped/*_cutted.rttm gold/frame/
+wc -l gold/frame/*.rttm
+
+```
+
+## generate confusion matrices
+
+```{r gencm}
+
+# We define the levels for one-hot encoding
+# The lena levels represent the columns of the confusion matrix
+# The gold levels represent the rows of the confusion matrix 
+lena_levels <- sort(unique(as.vector(unlist(lena_dict_map))))
+#gold_levels <- sort(c("CHI", "CHI/FEM", "CHI/FEM/MAL", "CHI/MAL", "FEM", "FEM/MAL", "MAL", "SIL"))
+basic=c(levels(factor(unlist(gold_dict_map))))
+twoway=threeway=NULL
+for(i in basic[-5]) for(j in basic[-5]) if(i!=j) twoway=c(twoway,paste0(i,"/",j))
+for(i in basic[-5]) for(j in basic[-5]) for(k in basic[-5]) if(i!=j & j!=k & i != k) threeway=c(threeway,paste0(i,"/",j,"/",k))
+ gold_levels<- sort(c(basic,twoway,threeway))
+ 
+# Let's start by listing the files
+
+confusion_all <- matrix(0, nrow=length(gold_levels), ncol=length(lena_levels))
+colnames(confusion_all) <- lena_levels
+rownames(confusion_all) <- gold_levels
+i=0
+for(corpus in corpora){#corpus="ROW"
+  
+  # List filenames
+  filenames = list.files(paste0(lena_folder,"frame"), pattern = "*.rttm")
+  if(corpus=="TSI") corpus_filenames = filenames[substr(filenames,1,1) == "C"] else corpus_filenames = filenames[substr(filenames,1,3) == corpus]
+  
+  # Create confusion matrices
+  confusion_corp <- matrix(0, nrow=length(gold_levels), ncol=length(lena_levels))
+  colnames(confusion_corp) <- lena_levels
+  rownames(confusion_corp) <- gold_levels
+  
+  for(filename in corpus_filenames){
+    lena_path = paste(lena_folder,"frame", filename, sep="/")
+    gold_path = paste(gold_folder,"frame", filename, sep="/")
+    
+    # The LENA always exist
+    lena = read.csv(lena_path, header=FALSE, sep = " ")[c(4,5,8)]
+    names(lena) <- c("onset", "duration", "label")
+    lena["label"] <- sapply(lena[["label"]], label_mapper, dict_map=lena_dict_map)
+    
+    if(file.exists(gold_path)){
+      gold = read.csv(gold_path, header=FALSE, sep = " ")[c(4,5,8)]
+      names(gold) <- c("onset", "duration", "label")
+      gold["label"] = sapply(gold[["label"]], label_mapper,dict_map=gold_dict_map)
+    } else {
+      gold = lena # we make a copy to have the same N of lines
+      gold["label"] = "SIL"
+    }
+    # Fasten your seat belts !
+    # The idea is to one-hot encode the labels.
+    # Since they are time-aligned, we can compute the confusion matrix by a simple matrix multiplication.
+    # We must add a fake factor since model.matrix drops the first factor
+    gold = factor(gold[["label"]], levels = c("",gold_levels)) 
+    lena = factor(lena[["label"]], levels = c("",lena_levels))
+    
+    gold_mat = model.matrix(~gold)[,-1]
+    lena_mat = model.matrix(~lena)[,-1]
+
+    if(nrow(lena_mat) != nrow(gold_mat)){
+      print(paste0(filename, " has a different number of rows its lena version, and its gold one."))
+    }
+    
+    confusion_file = t(gold_mat) %*% lena_mat
+    confusion_corp = confusion_corp + confusion_file
+    # i=i+1
+    # if(i==5){
+    #   break
+    # }
+  }
+  print(corpus)
+  print(confusion_corp)
+  write.table(confusion_corp,file=paste0(corpus,"_cm.txt"))
+  confusion_all = confusion_all + confusion_corp
+  print(paste0("Nb frames : ", sum(rowSums(confusion_corp)))) # nb frames
+}
+print("All")
+print(confusion_all)
+write.table(confusion_all,file=paste0("all_cm.txt"))
+
+```
+
+
+
+
+## Generate CTC & CVC
+
+Logic is:
+
+- Do the following for the LENA & Gold and pair the output values
+- Read in each rttm
+- Sort it so that it's ordered in time
+- Get CHI's CVC
+- Label vocs as counting towards CTC or not, then sum the yes's
+
+```{r cvtc}
+
+lena_folder="lena/mapped/"
+gold_folder="gold/mapped/"
+
+filenames = list.files(lena_folder, pattern = "*.rttm$")
+
+cvtc=NULL
+for(filename in filenames){
+  
+    lena_path = paste(lena_folder, filename, sep="/")
+    gold_path = paste(gold_folder, filename, sep="/")
+    
+    # The LENA always exist
+    lena = read.csv(lena_path, header=FALSE, sep = " ")[c(4,5,8)]
+    names(lena) <- c("onset", "duration", "label") 
+    
+    #the gold doesn't always (empty = no speech)
+    if(file.exists(gold_path)){
+      gold = read.csv(gold_path, header=FALSE, sep = " ")[c(4,5,8)]
+      names(gold) <- c("onset", "duration", "label")
+      gold["label"] = sapply(gold[["label"]], label_mapper,dict_map=gold_dict_map)
+    } else {
+      gold = lena # we make a copy to have the same N of lines
+      gold["label"] = "SIL"
+    }
+    
+    #sort by onset
+   lena=lena[order(lena[,"onset"]),]
+   gold=gold[order(gold[,"onset"]),]
+   
+   #add ctc def
+   lena$label=as.character(lena$label)
+   #calc inter turn interval
+   lena$iti=lena[,"onset"]-c(NA,lena[-dim(lena)[1],"onset"])
+   #get previous seg type
+   lena$prev_label=c(NA,lena[-dim(lena)[1],"label"])
+   #label as a child-adult or adult-child turn
+   lena$turn_n=ifelse(lena$label %in% c("CHN","FAN","MAN") & lena$prev_label %in% c("CHN","FAN","MAN") & lena$iti < 5, 1,0)
+   lena$turn_nf=ifelse(lena$label %in% c("CHN","FAN","MAN","CHF","FAF","MAF") & lena$prev_label %in% c("CHN","FAN","MAN","CHF","FAF","MAF") & lena$iti < 5, 1,0)
+   
+   #add ctc def
+   gold$label=as.character(gold$label)
+   #calc inter turn interval
+   gold$iti=gold[,"onset"]-c(NA,gold[-dim(gold)[1],"onset"])
+   #get previous seg type
+   gold$prev_label=c(NA,gold[-dim(gold)[1],"label"])
+   #label as a child-adult or adult-child turn
+   gold$turn=ifelse(gold$label %in% c("CHI","FEM","MAL") & gold$prev_label %in% c("CHI","FEM","MAL") & gold$iti < 5, 1,0)
+   
+   #create paired data
+   cvtc=rbind(cvtc, cbind(filename,                         sum(lena$label=="CHN"),sum(lena$label=="CHF"),sum(gold$label=="CHI"), #CVC
+  sum(lena$turn_n,na.rm=T),sum(lena$turn_nf,na.rm=T),sum(gold$turn,na.rm=T), #CTC
+  sum(lena$label=="CXN"),sum(lena$label=="CXF"),sum(gold$label=="OCH"), #other chi voc
+ sum(lena$label=="FAN"),sum(lena$label=="FAF"),sum(gold$label=="FEM"), #fem voc                               
+ sum(lena$label=="MAN"),sum(lena$label=="MAF"),sum(gold$label=="MAL") #mal voc  
+    ))
+}
+colnames(cvtc)<-c("filename","CVC_n","CVC_nf","CVC_gold",
+                  "CTC_n","CTC_nf","CTC_gold",
+                  "OCH_n","OCH_nf","OCH_gold",
+                  "FEM_n","FEM_nf","FEM_gold",
+                  "MAL_n","MAL_nf","MAL_gold"
+                  )
+write.table(cvtc,file="cvtc.txt")
+  
+
+```

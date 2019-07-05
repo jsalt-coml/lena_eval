@@ -3,8 +3,11 @@ anne'scode/
 zarchive/
 LENA_eval_201901/
 LENA_eval_201902/
-LENA_eval_201906/gold
-LENA_eval_201906/lena
+LENA_eval_201906/gold/
+LENA_eval_201906/lena/
+LENA_eval_201906/*.csv
+LENA_eval_201906/*.png
+
 
 .DS_Store
 

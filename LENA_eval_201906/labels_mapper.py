@@ -4,11 +4,11 @@ import numpy as np
 
 # Must arrive in [SIL, CHI, FEM, MAL]
 gold_dict = {
-    'C1': 'CHI',
-    'C2': 'CHI',
+    'C1': 'OCH',
+    'C2': 'OCH',
     'CHI': 'CHI',
     'CHI*': 'CHI',
-    'EE1': 'SIL',
+    'EE1': 'ELE',
     'FA1': 'FEM',
     'FA2': 'FEM',
     'FA3': 'FEM',
@@ -17,25 +17,25 @@ gold_dict = {
     'FA6': 'FEM',
     'FA7': 'FEM',
     'FA8': 'FEM',
-    'FAE': 'SIL',
-    'FC1': 'CHI',
+    'FAE': 'ELE',
+    'FC1': 'OCH',
     'MA1': 'MAL',
     'MA2': 'MAL',
     'MA3': 'MAL',
     'MA4': 'MAL',
     'MA5': 'MAL',
-    'MAE': 'SIL',
-    'MC1': 'CHI',
-    'MC2': 'CHI',
-    'MC3': 'CHI',
-    'MI1': 'FEM', # not sure for this one
+    'MAE': 'ELE',
+    'MC1': 'OCH',
+    'MC2': 'OCH',
+    'MC3': 'OCH',
+    'MI1': 'OCH', # not sure for this one
     'MOT*': 'FEM',
-    'UC1': 'CHI',
-    'UC2': 'CHI',
-    'UC3': 'CHI',
-    'UC4': 'CHI',
-    'UC5': 'CHI',
-    'UC6': 'CHI'
+    'UC1': 'OCH',
+    'UC2': 'OCH',
+    'UC3': 'OCH',
+    'UC4': 'OCH',
+    'UC5': 'OCH',
+    'UC6': 'OCH'
 }
 
 # Must arrive in [SIL, CHI, FEM, MAL, OVL]
@@ -43,7 +43,7 @@ lena_dict = {
     'CHF': 'SIL',
     'CHN': 'CHI',
     'CXF': 'SIL',
-    'CXN': 'CHI',
+    'CXN': 'OCH',
     'FAF': 'SIL',
     'FAN': 'FEM',
     'MAF': 'SIL',
@@ -53,8 +53,8 @@ lena_dict = {
     'OLF': 'SIL',
     'OLN': 'OVL',
     'SIL': 'SIL',
-    'TVF': 'SIL',
-    'TVN': 'SIL',
+    'TVN': 'TVN',
+    'TVF': 'TVF',
 }
 
 

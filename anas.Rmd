@@ -1,340 +1,25 @@
 ---
 title: "LENA Evaluation"
 author: "Alejandrina Cristia"
-date: "12/15/2018"
-output: pdf_document
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: 3
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-thisdir=c("LENA_eval_201902")
+thisdir=c("LENA_eval_201906/")
 library(lme4)
 library(sm)
 library(scales)
 library(ggpubr)
 library(ggplot2)
+library(car)
 
-dodiv=function(x) x/sum(x)
 
-```
+dodiv=function(x) x/sum(x, na.rm=T)
 
-## Basic stats
-
-To start with, we read the confusion matrices in. In all cases, the columns are the LENA-returned labels, and the rows are the reference/what human annotators said. In the reference, CHI stands for any child; FEM for any female adult, MAL for any mal adult. Overlaps within class (CHI with another CHI) are treated as if it was a sample of the pure class. Overlaps across human voices of different classes are marked with / -- that is CHI/FEM indicates frames for which there is overlap across a child and a female adult. We've generated one confusion matrix per subcorpus, plus one for the whole corpora (including the 5 subcorpora). Numbers in these original matrices refer to 100 ms frames.
-
-```{r read-cm}
-nr=15
-myskip=1
-ber=read.table(paste0(thisdir,"/confusion_matrices_CHI.txt"),header=T,skip=myskip,nrows=nr)
-myskip=myskip+nr+3
-war=read.table(paste0(thisdir,"/confusion_matrices_CHI.txt"),header=T,skip=myskip,nrows=nr)
-myskip=myskip+nr+3
-row=read.table(paste0(thisdir,"/confusion_matrices_CHI.txt"),header=T,skip=myskip,nrows=nr)
-myskip=myskip+nr+3
-sod=read.table(paste0(thisdir,"/confusion_matrices_CHI.txt"),header=T,skip=myskip,nrows=nr)
-myskip=myskip+nr+3
-tsi=read.table(paste0(thisdir,"/confusion_matrices_CHI.txt"),header=T,skip=myskip,nrows=nr)
-myskip=90
-all=read.table(paste0(thisdir,"/confusion_matrices_CHI.txt"),header=T,skip=myskip,nrows=nr)
-
-sumref=rowSums(all)
-
-doprecision=function(dat){
-  line=cbind(dat["CHI","CHN"]/sum(dat[,"CHN"]),
-   dat["FEM","FAN"]/sum(dat[,"FAN"]),
-   dat["MAL","MAN"]/sum(dat[,"MAN"]),
-   sum(dat["SIL","SIL"])/sum(dat[,"SIL"]))
-  line
-}
-dorecall=function(dat){
-  line=cbind(dat["CHI","CHN"]/sum(dat["CHI",]),
-   dat["FEM","FAN"]/sum(dat["FEM",]),
-   dat["MAL","MAN"]/sum(dat["MAL",]),
-   sum(dat["SIL",c("CHF","FAF","MAF","OLN","OLF","SIL")])/sum(dat["SIL",]))
-  line
-}
-pr=NULL
-pr=rbind(cbind(doprecision(ber),dorecall(ber)),
-                cbind(doprecision(war),dorecall(war)),
-                cbind(doprecision(row),dorecall(row)),
-                cbind(doprecision(sod),dorecall(sod)),
-                cbind(doprecision(tsi),dorecall(tsi)))
-rownames(pr)<-c("ber","war","row","sod","tsi")
-colnames(pr)<-c("CHN.p","FAN.p","MAN.p","SIL.p","CHI.r","FEM.r","MAL.r","SIL.r")
-pr=pr*100
-
-```
-
-
-### Prevalence of tags within human annotation
-
-How much data has been annotated as being of each of the categories? Remember that each frame is 100 ms; so we divide by 10 to have seconds, and by 60 to have minutes.
-
-```{r}
-
-n_min_human=rowSums(all)/10/60
-
-barplot(n_min_human,las=2)
-```
-
-
-### Prevalence of tags within LENA annotation
-
-How much data has been automatically tagged as being of each of the categories? Remember that each frame is 100 ms; so we divide by 10 to have seconds, and by 60 to have minutes.
-
-```{r}
-
-n_min_lena=colSums(all)/10/60
-
-barplot(n_min_lena,las=2)
-```
-
-
-## Confusion matrices
-
-
-### Precision massive ana
-
-Here we just plot the most fine-grained analysis, it is precision because we divide by the sum of the columns --> the LENA categories
-
-```{r}
-
-prop_cat=data.frame(apply(all,2,dodiv)*100) #generates precision because columns
-stack(all)->stall
-colnames(stall)<-c("n","lena")
-stall$human=rownames(all)
-stall$pr=stack(prop_cat)$values
-  
-ggplot(data = stall, mapping = aes(y = stall$human, x=stall$lena)) + 
-  geom_tile(aes(fill= rescale(stall$pr)), colour = "white") +
-  geom_text(aes(label = paste(round(stall$pr),"%")), vjust = -1,size=2) + 
-  geom_text(aes(label = stall$n), vjust = 1,size=2) + 
-  scale_fill_gradient(low = "white", high = "purple", name = "Proportion") +
-  xlab("LENA") + ylab("Human")
-```
-
-### Recall massive ana
-
-Here we just plot the most fine-grained analysis, it is precision because we divide by the sum of the rows --> the human categories
-
-```{r}
-
-prop_cat=data.frame(apply(all,1,dodiv)*100) #generates recall because rows
-stall$pr=stack(prop_cat)$values
-  
-ggplot(data = stall, mapping = aes(y = stall$human, x=stall$lena)) + 
-  geom_tile(aes(fill= rescale(stall$pr)), colour = "white") +
-  geom_text(aes(label = paste(round(stall$pr),"%")), vjust = -1,size=2) + 
-  geom_text(aes(label = stall$n), vjust = 1,size=2) + 
-  scale_fill_gradient(low = "white", high = "purple", name = "Proportion") +
-  xlab("LENA") + ylab("Human")
-```
-
-### Overlap
-
-To simplify the discussion, I'd like to first deal with the problem of overlap. It transpires that overlaps are rare, affecting `r round(sum(sumref[grep("/",rownames(all))])/sum(sumref)*100)`% of frames. LENA's accuracy for detecting these overlaps can be conveyed by asking what proportion of frames with overlap get a LENA overlap label (`r colSums(all[grep("/",rownames(all)),grep("OL",colnames(all))])/sum(all[grep("/",rownames(all)),])*100 ` for OLF and OLN respectively); versus what proportion of frames that do not have an overlap in the referent nonetheless get a LENA overlap label (`r colSums(all[grep("/",rownames(all),invert=T),grep("OL",colnames(all))])/sum(all[grep("/",rownames(all),invert=T),])*100 ` for OLF and OLN respectively). My reading of these results is that the overlap detection system is not very good in that it only catches 24% of the cases of overlap (and also false-alarms 9% of non-overlaps as if they were overlaps). Nonetheless, since overlap is overall rare, we'll set aside overlap in the reference completely, by removing from consideration frames with overlap. 
-
-**QUESTION**: In what follows, we could take them into account in the denominator (because they still exist) or we could remove them from consideration altogether (remove lines from confusion matrix in which there is overlap; remove LENA's overlap-label columns). --> **decision**: take them into account.
-
-Before we proceed, we simplify the overlap rows.
-
-```{r}
-
-ol=all[grep("/",row.names(all),invert=T),]
-ol=rbind(ol,colSums(all[grep("/",row.names(all)),]))
-row.names(ol)[dim(ol)[1]]<-"overlap"
-
-```
-
-### Silence
-
-Next, we check LENA's accuracy to label silence as something other than voice. The absent of live human voices is extremely prevalent, with  `r round(sum(sumref[grep("SIL",rownames(ol))])/sum(sumref)*100)`% of frames containing no human vocalization, what we call silence. 
-
-LENA has many categories that apply in this space (electronics, noise, silence) but since these were not separately categorized in our human annotation, we collapsed across all of them into one large category that we call silence.
-
-Here, we would like to check, among the frames the human annotator also did not detect any voice for, what proportion were labeled as silence/TV/noise/FUZ by LENA ("silent frames" in the referent `r ol[grep("SIL",rownames(ol)),grep("SIL",colnames(ol))]/sum(ol[grep("SIL",rownames(ol)),])*100 `); versus what proportion of frames that do have some voice in the referent nonetheless get a LENA SILENCE label (`r sum(ol[grep("SIL",rownames(ol),invert=T),grep("SIL",colnames(ol))])/sum(ol[grep("SIL",rownames(ol),invert=T),])*100 `). My reading of these results is that the silence detection system does not over-apply these non-voice labels when the voice is present -- in only 7% of cases where there is a voice present, did the system return one of these labels. However, it fails to return a "SILENCE" label for the vast majority of frames that truly do not contain voice (62% of frames that are truly silent according to the human annotation failed to get a silent-like LENA label).
-
-
-
-### Voice confusions
-
-As can be imagined by the description above, a lot of frames get some LENA voicing label -- that is, LENA returns a label of child or adult for many frames. Is the actual label that is applied appropriate? To assess this, we provide the simplified confusion matrices below.
-
-For this first one, I calculated the percentages shown in the table taking as total the columns -- meaning that this shows *precision*. For instance, out of all the frames where the LENA returned a CHN label, 65% did actually contain a child voice, 11% contained the voice of a female adult or male according tot he human annotator, and 25% did not have any voice (according to the human annotator). 
-
-
-% is Precision
-
-```{r precision}
-prop_cat=data.frame(t(apply(ol,2,dodiv)*100)) #generates precision because columns
-stack(ol)->stol
-colnames(stol)<-c("n","lena")
-stol$human=rownames(ol)
-stol$pr=stack(prop_cat)$values
-  
-ggplot(data = stol, mapping = aes(y = stol$human, x=stol$lena)) + 
-  geom_tile(aes(fill= rescale(stol$pr)), colour = "white") +
-  geom_text(aes(label = paste(round(stol$pr),"%")), vjust = -1,size=2) + 
-  geom_text(aes(label = stol$n), vjust = 2,size=2) + 
-  scale_fill_gradient(low = "white", high = "purple", name = "Proportion") +
-  xlab("LENA") + ylab("Human")
-```
-
-
-
-My interpretation of these results is that frame containing LENA's CHN and FAN do, more often than not, contain audio corresponding to those categories. CHF and MAF very seldom contain child/male adult material respectively. FAF and MAN are more intermediate in performance: FAF more often contains silence than female adult voice, but it still contains female voice a good third of the time. MAN contains a male voice 46% of the time, with 52% of the time actually consisting of silence or female voice.
-
-For this next matrix, I calculated the percentages shown in the table taking as total the rows -- meaning that this shows *recall*. For instance, out of all the frames that had a child voice (that did not overlap with others according to human annotators), 53% were labeled CHN by LENA; 23% were labeled OLN; 13% were labeled SIL. 
-
-% is Recall
-
-```{r recall}
-prop_cat=data.frame(t(apply(ol,1,dodiv)*100)) #generates recall because rows
-stack(ol)->stol
-colnames(stol)<-c("n","lena")
-stol$human=rownames(ol)
-stol$pr=stack(prop_cat)$values
-  
-ggplot(data = stol, mapping = aes(y = stol$human, x=stol$lena)) + 
-  geom_tile(aes(fill= rescale(stol$pr)), colour = "white") +
-  geom_text(aes(label = paste(round(stol$pr),"%")), vjust = -1,size=2) + 
-  geom_text(aes(label = stol$n), vjust = 2,size=2) + 
-  scale_fill_gradient(low = "white", high = "purple", name = "Proportion") +
-  xlab("LENA") + ylab("Human")
-```
-
-
-My interpretation of these results is that LENA did a fairly good job of labeling child frames as such; however, the performance of both female and male adult voices is lower: 30-32% are labeled as the "right" category, with the rest being labeled as other categories.
-
-## Diarization analyses
-
-While confusion matrices are useful to understand patterns of errors, it is sometimes desirable to have indices of performance that are more specific to the task of diarization. To this end, we use a number of metrics provided by pyannote.metrics.
-
-```{r}
-read.csv("LENA_eval_201902/lena_only_N/diaer_lena_report.csv")->py
-summary(py)
-
-#there seems to be an issue with DER and FA (values above what is possible) --> force-correcting them
-py$false.alarm.1[py$false.alarm.1>100 & !is.na(py$false.alarm.1)]<-100
-py$diarization.error.rate[py$diarization.error.rate>300 & !is.na(py$diarization.error.rate)]<-300
-
-#other fixes and addtions
-py=subset(py,X!="TOTAL")
-py$cor=substr(py$X,1,3)
-py$cor[grep("[0-9]",py$cor)]<-"tsi"
-py$cor=factor(py$cor)
-
-py$child=substr(py$X,1,8)
-py$child[py$cor=="tsi"]=substr(py$X[py$cor=="tsi"],1,3)
-
-# add in age info
-spreadsheet = read.csv("LENA_eval_201902/ACLEW_list_of_corpora.csv", header=TRUE, sep = ",")
-spreadsheet$child=paste0(spreadsheet$labname,"_",ifelse(nchar(spreadsheet$aclew_id)==3,paste0("0",spreadsheet$aclew_id),spreadsheet$aclew_id))
-spreadsheet = spreadsheet[,c("child","age_mo_round")]
-colnames(spreadsheet) = c("child","age")
-spreadsheet_tsi = read.csv("LENA_eval_201902/tsi_key_info.csv", header=TRUE, sep = ",")
-spreadsheet_tsi = spreadsheet_tsi[c("child","age")]
-age_id = rbind(spreadsheet, spreadsheet_tsi)
-py=merge(py,age_id,by.x="child",by.y="child",all.x=T)
-```
-
-*Variable explanation:*
-
-- "X": filename                      
-- "diarization.error.rate": sum of false.alarm.1, missed.detection.1, and confusion.1 
-- "total": total duration of voiced frames (counting overlapping speech repeatedly if necessary), in seconds
-- "correct": duration of diarization that is correct, in seconds               
-- "correct.1": percentage of duration that is correct              
-- "false.alarm": duration of segments where the system said there was speech, whereas in fact there was not      
-- "false.alarm.1": percentage of duration with false alarms          
-- "missed.detection": duration of segments where there was speech but the system missed it      
-- "missed.detection.1": percentage of duration with missed speech     
-- "confusion": duration of segments assigned to the wrong speaker             
-- "confusion.1": percentage of duration with assignment to the wrong speaker
-- cor: corpus ID
-- child: child ID
-
-### Performance as a function of corpus
-
-One of our questions was whether LENA performed better for corpora of NAE than non-NAE, saliently ROW (British English) and Tsimane (not English at all).
-
-First an analysis with all clips, second an analysis excluding clips that do not contain speech.
-
-For DER - remember that higher is worse:
-
-```{r der}
-
-
-colfill<-c(2:(2+length(levels(py$cor)))) 
-names(colfill)<-levels(py$cor)
-doanas<-function(py,dv){
-  if(dv=="diarization.error.rate" ){
-  print(summary(lmer(py[,dv]~cor+age+(1|child),data=py)))
-  sm.density.compare(py[!is.na(py[,dv]),dv],py[!is.na(py[,dv]),"cor"] ,main=dv)
-  legend("topright", levels(py$cor), fill=colfill)
-  title(main=paste("All clips,",dv))
-  }
-
-  #note that the other two metrics are undefined when there is no speech, so we only show clips with some speech
-  print(summary(lmer(py[,dv]~cor+age+(1|child),data=py,subset=c(total>0))))
-  sm.density.compare(py[py$total>0 & !is.na(py[py$total>0,dv]),dv],py$cor[py$total>0 & !is.na(py[py$total>0,dv])] )
-  legend("topright", levels(py$cor), fill=colfill)
-   title(main=paste("Clips WITH some speech,",dv))
- 
-  plot(py[,dv]~jitter(age),data=py,col=alpha(colfill[py$cor],.2),pch=ifelse(py$total>0,20,3),ylab=dv)
-}
-
-doanas(py,"diarization.error.rate")
-
-```
-
-For false alarm - remember that higher is worse:
-
-```{r fa}
-doanas(py,"false.alarm.1")
-```
-
-For misses - remember that higher is worse:
-
-```{r mi}
-doanas(py,"missed.detection.1")
-```
-
-For voice confusion - remember that higher is worse:
-
-```{r confused}
-doanas(py,"confusion.1")
-```
-
-
-Conversely, we can look at correct  - now higher is better:
-
-```{r cor}
-doanas(py,"correct.1")
-```
-
-
-In conclusion, none of the diarization metrics reveals effects of corpus or age.
-
-## Correlations between precision, accuracy, and diarization metrics
-
-In this section, we want to illustrate the relationship between precision, accuracy, and diarization metrics. To avoid complicating things, we do it at the level of the corpora. 
-
-We expect silence precision and recall to relate to false alarm and misses; and we expect precision and recall in the speaker lables to relate to  confusions across speakers. Precision is in black, recall in red.  We actually do not find this (although it may be because we have few corpora and thus few independent points). 
-
-```{r}
-avgmetrics<-function(py,dv)  aggregate(py[,dv],list(py$cor),mean,na.rm=T)
-
-metrics=cbind(avgmetrics(py,"diarization.error.rate")$x,
-              avgmetrics(py,"false.alarm.1")$x,
-              avgmetrics(py,"missed.detection.1")$x,
-              avgmetrics(py,"confusion.1")$x)
-colnames(metrics)<-c("der","fa","m","c")
-rownames(metrics)<-c("ber","war","row","sod","tsi")
-metrics=cbind(pr,metrics)
-metrics=as.data.frame(metrics)
-metrics$avg.p=rowMeans(metrics[,c("CHN.p","FAN.p","MAN.p")])
-metrics$avg.r=rowMeans(metrics[,c("CHI.r","FEM.r","MAL.r")])
 
 triplechart=function(dv){
   layout(matrix(c(1:3), 1, 3, byrow = TRUE), 
@@ -375,122 +60,443 @@ triplechart_onecol=function(dv){
  abline(lm(metrics[,paste0(dv)]~metrics$c),col=mycol)
 }
 
-# SILENCE
-triplechart("SIL")
+avgmetrics<-function(py,dv)  aggregate(py[,dv],list(py$cor),mean,na.rm=T)
 
-# average confusion 
-triplechart("avg")
 
-# each term separately
-for(thisdv in c("CHN.p","FAN.p","MAN.p","CHI.r","FEM.r","MAL.r")) triplechart_onecol(thisdv)
+#"CHN.p","FAN.p","MAN.p","CHI.r","FEM.r","MAL.r"
+getpr<-function(db){
+  prec=data.frame(apply(db,2,dodiv)*100) #generates precision because cols
+  rec=data.frame(apply(db,1,dodiv)*100) #generates recall because rows
+  CHN.p=prec["CHI","CHN"]
+  FAN.p=prec["FEM","FAN"]
+  MAN.p=prec["MAL","MAN"]
+  CHI.r=rec["CHN","CHI"]
+  FEM.r=rec["FAN","FEM"]
+  MAL.r=rec["MAN","MAL"]
+  c(CHN.p,FAN.p,MAN.p,CHI.r,FEM.r,MAL.r)
+}
+
+
 ```
 
-What I might conclude from these analyses is that the accuracies from the confusion matrix  and the diarization metrics are not correlated in a simple way, and therefore all of these metrics should ideally be reported.
+## Basic stats
 
-## Code graveyard
+To start with, we read the confusion matrices in. In all cases, the columns are the LENA-returned labels, and the rows are the reference/what human annotators said. In the reference, CHI stands for any child; FEM for any female adult, MAL for any mal adult. Overlaps within class (CHI with another CHI) are treated as if it was a sample of the pure class. Overlaps across human voices of different classes are marked with / -- that is CHI/FEM indicates frames for which there is overlap across a child and a female adult. We've generated one confusion matrix per subcorpus, plus one for the whole corpora (including the 5 subcorpora). Numbers in these original matrices refer to 100 ms frames.
 
-This is code that has been abandoned. It's not being knitted anymore by design.
+```{r read-cm}
 
-### DER tables
 
-While confusion matrices are useful to understand patterns of errors, it is sometimes desirable to have an overall index of performance. For this, we will use the Diarization Error Rate (http://www.xavieranguera.com/phdthesis/node108.html). It goes between 0 and 300, because it is the sum of:
+ber=read.table(paste0(thisdir,"BER","_cm.txt"),header=T)
+row=read.table(paste0(thisdir,"ROW","_cm.txt"),header=T)
+sod=read.table(paste0(thisdir,"SOD","_cm.txt"),header=T)
+war=read.table(paste0(thisdir,"WAR","_cm.txt"),header=T)
+all=read.table(paste0(thisdir,"all","_cm.txt"),header=T)
 
-- % missed: proportion of frames that, according to the human annotators contained speech, but the system returned as non-speech (i.e., none of the CHN, FAN, etc categories) -- goes from 0 to 100%
-- % false alarm: proportion of frames that, according to the human annotators DID NOT contain speech, but the system returned as containing speech -- goes from 0 to 100%
-- % speaker error: proportion of voiced frames for which at least one of the voices was not labeled correctly -- goes from 0 to 100%
+#remove empty rows
+ber=ber[rownames(ber)[rowSums(ber)>0],]
+row=row[rownames(row)[rowSums(row)>0],]
+war=war[rownames(war)[rowSums(war)>0],]
+sod=sod[rownames(sod)[rowSums(sod)>0],]
+all=sod[rownames(all)[rowSums(all)>0],]
 
-These four types of errors are added together, for a final overall DER of between 0 and 400%.
+sumref=rowSums(all)
 
-The mfcn table contains the results when only the categories with final N are taken into account (CHN and CXN collapsed together, separately from FAN and MAN; all other categories collapsed into silence).
+```
 
-The mfc table contains the results when  the categories with final F are collapsed together with those having final F (CHN, CHF, and, CXF, CXN collapsed together, separately from FAN=FAF and MAN=FAF; all other categories collapsed into silence).
 
-The mfc_split table contains the results when  the categories with final F are held separately from those having final F, which are also left in the reference (CHN=CXN, but separately from CHF=CXF,  separately from FAN, FAF and MAN, FAF; all other categories collapsed into silence). This one doesn't make a lot of sense, but in theory it  allows a system that perfectly detects FA as FAF to "win"...
+### Prevalence of tags within human annotation (intro to results)
 
-```{r read-der,eval=F}
-gold=mfcn=mfc=mfc_split=NULL
-  #description
-gold=read.table(paste0(thisdir,"/gold_stats.txt"),header=T,sep="\t")
+How much data has been annotated as being of each of the categories? Remember that each frame is 100 ms; so we divide by 10 to have seconds, and by 60 to have minutes.
+
+```{r bp1}
+
+n_min_human=rowSums(all,na.rm=T)/10/60
+
+round(n_min_human/sum(n_min_human)*100)
+barplot(n_min_human,las=2, main="#minutes of audio per human label")
+barplot(n_min_human[grep("/",names(n_min_human),invert=T)], main="same, removing all overlap")
+```
+
+
+### Prevalence of tags within LENA annotation (not discussed in paper, just fyi)
+
+How much data has been automatically tagged as being of each of the categories? Remember that each frame is 100 ms; so we divide by 10 to have seconds, and by 60 to have minutes.
+
+```{r bp2}
+
+n_min_lena=colSums(all,na.rm=T)/10/60
+
+barplot(n_min_lena,las=2, main="#minutes of audio per lena label")
+```
+
+## Diarization analyses
+
+While confusion matrices are useful to understand patterns of errors, it is sometimes desirable to have indices of performance that are more specific to the task of diarization. To this end, we use a number of metrics provided by pyannote.metrics.
+
+**THIS NEEDS TO BE UPDATED TO THE 201906 RESULTS**
+
+```{r DIAER}
+read.csv(paste0(thisdir,"/gold/mapped/diaer__report.csv"))->py
+dim(py) #873 clips
+summary(py)
+
+#294 FA, MI, confusion are NA because no speech at all in the clip
+
+round(sum(is.na(py$confusion..))/dim(py)[1]*100)  # percentage of clips with no speech REPORTED IN PAPER
+
+# DER and FA can be very high when there is little speech in a clip
+# so we NA anything that is more than 2 SDs above the mean
+py$false.alarm..[py$false.alarm..> (mean(py$false.alarm..,na.rm=T) + 2 * sd(py$false.alarm..,na.rm=T))]<- NA
+py$diarization.error.rate[py$diarization.error.rate> (mean(py$diarization.error.rate,na.rm=T) + 2 * sd(py$diarization.error.rate,na.rm=T))]<- NA
+
+summary(py) #the exclusion above affected 314-294=20 clips in FA, 7 in DIAER
+
+py$DER=py$false.alarm..+py$missed.detection..+py$confusion..
+
+round(sum(is.na(py$false.alarm..))/dim(py)[1]*100)
+round(sum(is.na(py$DER))/dim(py)[1]*100)
+
+#other fixes and addtions
+py=subset(py,item!="TOTAL")
+py$cor=substr(py$item,1,3)
+py$cor[grep("[0-9]",py$cor)]<-"tsi"
+py$cor=factor(py$cor)
+
+py$child=substr(py$item,1,8)
+py$child[py$cor=="tsi"]=substr(py$item[py$cor=="tsi"],1,3)
+
+# add in age info
+spreadsheet = read.csv(paste0(thisdir,"/ACLEW_list_of_corpora.csv"), header=TRUE, sep = ",")
+spreadsheet$child=paste0(spreadsheet$labname,"_",ifelse(nchar(spreadsheet$aclew_id)==3,paste0("0",spreadsheet$aclew_id),spreadsheet$aclew_id))
+spreadsheet = spreadsheet[,c("child","age_mo_round")]
+colnames(spreadsheet) = c("child","age")
+spreadsheet_tsi = read.csv(paste0(thisdir,"/tsi_key_info.csv"), header=TRUE, sep = ",")
+spreadsheet_tsi = spreadsheet_tsi[c("child","age")]
+age_id = rbind(spreadsheet, spreadsheet_tsi)
+py=merge(py,age_id,by.x="child",by.y="child",all.x=T)
+```
+
+*Variable explanation:*
+
+- "item": filename                      
+- "diarization.error.rate": sum of false.alarm.., missed.detection.., and confusion.. 
+- "total": total duration of voiced frames (counting overlapping speech repeatedly if necessary), in seconds
+- "correct": duration of diarization that is correct, in seconds               
+- "correct..": percentage of duration that is correct              
+- "false.alarm": duration of segments where the system said there was speech, whereas in fact there was not      
+- "false.alarm..": percentage of duration with false alarms          
+- "missed.detection": duration of segments where there was speech but the system missed it      
+- "missed.detection..": percentage of duration with missed speech     
+- "confusion": duration of segments assigned to the wrong speaker             
+- "confusion..": percentage of duration with assignment to the wrong speaker
+- cor: corpus ID
+- child: child ID
+
+### Performance in 3 standard speech tech metrics
+
+```{r mean.metrics}
+length(py$false.alarm..) #total N of clips
+summary(py$false.alarm..)
+
+summary(py$missed.detection..)
+
+summary(py$confusion..)
+
+```
+
+
+
+
+## Confusion matrices
+
+
+### Precision massive ana
+
+Here we just plot the most fine-grained analysis, it is precision because we divide by the sum of the columns --> the LENA categories
+
+```{r ggprec}
+
+prop_cat=data.frame(apply(all,2,dodiv)*100) #generates precision because columns
+colSums(prop_cat)
+stack(all)->stall
+colnames(stall)<-c("n","lena")
+stall$human=rownames(all)
+stall$pr=stack(prop_cat)$values
+
   
-  #system evals
-
-mfcn=read.table(paste0(thisdir,"/only_N_lena_eval.df"),sep="\t",skip=1)
-
-mfc=read.table(paste0(thisdir,"/NF_gathered_lena_eval.df"),sep="\t",skip=1)
-
-mfc_split=read.table(paste0(thisdir,"/NF_separated_lena_eval.df"),sep="\t",skip=1)
-
-colnames(mfcn)=colnames(mfc)=colnames(mfc_split)=c("file","DER",	"B3Precision"	,"B3Recall",	"B3F1",	"TauRefSys"	,"TauSysRef",	"CE",	"MI",	"NMI")
-mfcn$cor=substr(mfcn$file,1,3)
-mfcn$cor[grep("[0-9]",mfcn$cor)]<-"tsi"
-table(mfcn$cor)
-mfc$cor=substr(mfc$file,1,3)
-mfc$cor[grep("[0-9]",mfc$cor)]<-"tsi"
-table(mfc$cor)
-mfc_split$cor=substr(mfc_split$file,1,3)
-mfc_split$cor[grep("[0-9]",mfc_split$cor)]<-"tsi"
-
-
+ggplot(data = stall, mapping = aes(y = stall$human, x=stall$lena)) + 
+  geom_tile(aes(fill= rescale(stall$pr)), colour = "white") +
+  geom_text(aes(label = paste(round(stall$pr),"%")), vjust = -1,size=2) + 
+  geom_text(aes(label = stall$n), vjust = 1,size=2) + 
+  scale_fill_gradient(low = "white", high = "purple", name = "Proportion") +
+  xlab("LENA") + ylab("Human")
 ```
 
-There are 150 clips for BER ROW SOD and WAR, but some of them have an empty reference (ie no speech detected by the human annotator) AND an empty LENA file (ie no speech detected by LENA). So the numbers of clips we get now is correct, namely:
+### Recall massive ana
 
-BER ROW SOD WAR tsi 
-105 105 111 112 272 
+Here we just plot the most fine-grained analysis, it is precision because we divide by the sum of the rows --> the human categories
 
-To be able to calculate DER with and without silent clips, we will need to "count" the missing clips up to 150 for the ACLEW data.
+```{r ggrec}
 
-```{r complete,eval=F}
-TOADD=levels(mfcn$file)[!(levels(mfcn$file) %in% levels(gold$filename))]
-redo=cbind(TOADD,NA,NA,NA,NA, NA, NA, NA,NA,NA,"")
-colnames(redo)<-colnames(mfcn)
-redo[,"cor"]<-substr(redo[,"file"],1,3)
-redo[grep("[0-9]",redo[,"cor"]),"cor"]<-"tsi"
-
-  mfcn=rbind(mfcn,redo)
+prop_cat=data.frame(t(apply(all,1,dodiv)*100)) #generates recall because rows
+rowSums(prop_cat)
+stall$pr=stack(prop_cat)$values
   
-  mfc=rbind(mfc,redo)
+ggplot(data = stall, mapping = aes(y = stall$human, x=stall$lena)) + 
+  geom_tile(aes(fill= rescale(stall$pr)), colour = "white") +
+  geom_text(aes(label = paste(round(stall$pr),"%")), vjust = -1,size=2) + 
+  geom_text(aes(label = stall$n), vjust = 1,size=2) + 
+  scale_fill_gradient(low = "white", high = "purple", name = "Proportion") +
+  xlab("LENA") + ylab("Human")
+```
+
+### Overlap
+
+To simplify the discussion, I'd like to first deal with the problem of overlap. It transpires that overlaps are rare, affecting `r round(sum(sumref[grep("/",rownames(all))])/sum(sumref)*100)`% of frames. LENA's accuracy for detecting these overlaps can be conveyed by asking what proportion of frames with overlap get a LENA overlap label (`r colSums(all[grep("/",rownames(all)),grep("OL",colnames(all))])/sum(all[grep("/",rownames(all)),])*100 ` for OLF and OLN respectively); versus what proportion of frames that do not have an overlap in the referent nonetheless get a LENA overlap label (`r colSums(all[grep("/",rownames(all),invert=T),grep("OL",colnames(all))])/sum(all[grep("/",rownames(all),invert=T),])*100 ` for OLF and OLN respectively). My reading of these results is that the overlap detection system is not very good in that it only catches 24% of the cases of overlap (and also false-alarms 9% of non-overlaps as if they were overlaps). Nonetheless, since overlap is overall rare, we'll set aside overlap in the reference completely, by removing from consideration frames with overlap. 
+
+**QUESTION**: In what follows, we could take them into account in the denominator (because they still exist) or we could remove them from consideration altogether (remove lines from confusion matrix in which there is overlap; remove LENA's overlap-label columns). --> **decision**: take them into account.
+
+Before we proceed, we simplify the overlap rows.
+
+```{r nool}
+
+ol=all[grep("/",row.names(all),invert=T),]
+ol=rbind(ol,colSums(all[grep("/",row.names(all)),]))
+row.names(ol)[dim(ol)[1]]<-"overlap"
+
+```
+
+### Silence
+
+Next, we check LENA's accuracy to label silence as something other than voice. The absent of live human voices is extremely prevalent, with  `r round(sum(sumref[grep("SIL",rownames(ol))])/sum(sumref)*100)`% of frames containing no human vocalization, what we call silence. 
+
+LENA has many categories that apply in this space (electronics, noise, silence) but since these were not separately categorized in our human annotation, we collapsed across all of them into one large category that we call silence.
+
+Here, we would like to check, among the frames the human annotator also did not detect any voice for, what proportion were labeled as silence/TV/noise/FUZ by LENA ("silent frames" in the referent `r ol[grep("SIL",rownames(ol)),grep("SIL",colnames(ol))]/sum(ol[grep("SIL",rownames(ol)),])*100 `); versus what proportion of frames that do have some voice in the referent nonetheless get a LENA SILENCE label (`r sum(ol[grep("SIL",rownames(ol),invert=T),grep("SIL",colnames(ol))])/sum(ol[grep("SIL",rownames(ol),invert=T),])*100 `). My reading of these results is that the silence detection system does not over-apply these non-voice labels when the voice is present -- in only 7% of cases where there is a voice present, did the system return one of these labels. However, it fails to return a "SILENCE" label for the vast majority of frames that truly do not contain voice (62% of frames that are truly silent according to the human annotation failed to get a silent-like LENA label).
+
+
+
+### Voice confusions
+
+As can be imagined by the description above, a lot of frames get some LENA voicing label -- that is, LENA returns a label of child or adult for many frames. Is the actual label that is applied appropriate? To assess this, we provide the simplified confusion matrices below.
+
+For this first one, I calculated the percentages shown in the table taking as total the columns -- meaning that this shows *precision*. For instance, out of all the frames where the LENA returned a CHN label, 65% did actually contain a child voice, 11% contained the voice of a female adult or male according tot he human annotator, and 25% did not have any voice (according to the human annotator). 
+
+
+% is Precision
+
+```{r precision}
+prop_cat=data.frame(apply(ol,2,dodiv)*100) #generates precision because columns
+colSums(prop_cat)
+stack(ol)->stol
+colnames(stol)<-c("n","lena")
+stol$human=rownames(ol)
+stol$pr=stack(prop_cat)$values
   
-  mfc_split=rbind(mfc_split,redo)
+png("precision.png",width=5.5,height=5,units="in",res=300)
+ggplot(data = stol, mapping = aes(y = stol$human, x=stol$lena)) + 
+  geom_tile(aes(fill= rescale(stol$pr)), colour = "white") +
+  geom_text(aes(label = paste(round(stol$pr),"%")), vjust = -1,size=2) + 
+  geom_text(aes(label = stol$n), vjust = 2,size=2) + 
+  scale_fill_gradient(low = "white", high = "purple", name = "Proportion") +
+  xlab("LENA") + ylab("Human")  +ggtitle("% is Precision (cols)") 
+dev.off()
 
-mfcn$child=substr(mfcn$file,1,8)
-mfcn$child[mfcn$cor=="tsi"]=substr(mfcn$file[mfcn$cor=="tsi"],1,3)
-mfcn$DER[is.na(mfcn$DER)]<-0
-mfcn$DER=as.numeric(as.character(mfcn$DER))
-mfcn$DER[mfcn$DER>300]<-300
-
-mfc$child=substr(mfc$file,1,8)
-mfc$child[mfc$cor=="tsi"]=substr(mfc$file[mfc$cor=="tsi"],1,3)
-
-mfc_split$child=substr(mfc_split$file,1,8)
-mfc_split$child[mfc_split$cor=="tsi"]=substr(mfc_split$file[mfc_split$cor=="tsi"],1,3)
-
-table(mfcn$child)
-
-```
-
-Why are there different Ns across different ACLEW children? Why for tsi there are all, but for others only files with speech? Isn't it suspicious that the same files contained no speech and none was found for all three analysis modes??
-
-#### DER as a function of corpus
-
-One of our questions was whether LENA performed better for corpora of NAE than non-NAE, saliently ROW (British English) and Tsimane (not English at all).
-
-First an analysis with all clips
-
-```{r,eval=F}
-library(lme4)
-summary(lmer(DER~cor+(1|child),data=mfcn))
-
-
-```
-
-Next an analysis with only non-silent clips
-
-```{r,eval=F}
-include=gold$filename[gold$chi_dur+gold$ad_dur>0]
-summary(lmer(DER~cor+(1|child),data=mfcn,subset=c(mfcn$file %in% include)))
+#we report precision-sil for far versus near
+mean(stol$pr[substr(stol$lena,3,3)=="F" & substr(stol$lena,1,2)!="NO" & stol$human=="SIL"])
+mean(stol$pr[substr(stol$lena,3,3)=="N"& substr(stol$lena,1,2)!="NO" & stol$human=="SIL"])
 
 ```
 
 
 
+My interpretation of these results is that frame containing LENA's CHN and FAN do, more often than not, contain audio corresponding to those categories. CHF and MAF very seldom contain child/male adult material respectively. FAF and MAN are more intermediate in performance: FAF more often contains silence than female adult voice, but it still contains female voice a good third of the time. MAN contains a male voice 46% of the time, with 52% of the time actually consisting of silence or female voice.
+
+For this next matrix, I calculated the percentages shown in the table taking as total the rows -- meaning that this shows *recall*. For instance, out of all the frames that had a child voice (that did not overlap with others according to human annotators), 53% were labeled CHN by LENA; 23% were labeled OLN; 13% were labeled SIL. 
+
+% is Recall
+
+```{r recall}
+prop_cat=data.frame(t(apply(ol,1,dodiv)*100)) #generates recall because rows
+rowSums(prop_cat)
+stack(ol)->stol
+colnames(stol)<-c("n","lena")
+stol$human=rownames(ol)
+stol$pr=stack(prop_cat)$values
+  
+png("recall.png",width=5.5,height=5,units="in",res=300)
+
+ggplot(data = stol, mapping = aes(y = stol$human, x=stol$lena)) + 
+  geom_tile(aes(fill= rescale(stol$pr)), colour = "white") +
+  geom_text(aes(label = paste(round(stol$pr),"%")), vjust = -1,size=2) + 
+  geom_text(aes(label = stol$n), vjust = 2,size=2) + 
+  scale_fill_gradient(low = "white", high = "purple", name = "Proportion") +
+  xlab("LENA") + ylab("Human")  +ggtitle("% is Recall (rows)")
+dev.off()
+```
+
+
+My interpretation of these results is that LENA did a fairly good job of labeling child frames as such; however, the performance of both female and male adult voices is lower: 30-32% are labeled as the "right" category, with the rest being labeled as other categories.
+
+## CVC and CTC
+
+
+
+```{r cvc}
+read.table(paste0(thisdir,"cvtc.txt"),header=T)->cvtc
+
+
+png("cvc.png",width=5.5,height=5,units="in",res=300)
+
+plot(CVC_n~CVC_gold,data=cvtc,pch=20,main="child voc counts (near only)",col=alpha("black",.2))
+abline(lm(CVC_n~CVC_gold,data=cvtc))
+abline(lm(CVC_n~CVC_gold,data=cvtc,subset=c(cvtc$CVC_n>0 & cvtc$CVC_gold>0)),lty=2)
+
+dev.off()
+
+cor.test(cvtc$CVC_n,cvtc$CVC_gold)
+cor.test(cvtc$CVC_n[cvtc$CVC_n>0 & cvtc$CVC_gold>0],cvtc$CVC_gold[cvtc$CVC_n>0 & cvtc$CVC_gold>0])
+
+# RER against human
+
+sum(cvtc$CVC_gold>0)
+no_human_zeros=cvtc[ cvtc$CVC_gold>0,]
+rer=(no_human_zeros$CVC_n-no_human_zeros$CVC_gold)/no_human_zeros$CVC_gold*100
+summary(rer)
+aer=(cvtc$CVC_n-cvtc$CVC_gold)
+summary(aer)
+```
+
+
+```{r ctc}
+
+
+
+png("ctc.png",width=5.5,height=5,units="in",res=300)
+plot(CTC_n~CTC_gold,data=cvtc,pch=20,main="Conversational turn counts (near only)",col=alpha("black",.2))
+abline(lm(CTC_n~CTC_gold,data=cvtc))
+abline(lm(CTC_n~CTC_gold,data=cvtc,subset=c(cvtc$CTC_n>0 & cvtc$CTC_gold>0)),lty=2)
+dev.off()
+
+cor.test(cvtc$CTC_n,cvtc$CTC_gold)
+cor.test(cvtc$CTC_n[cvtc$CTC_n>0 & cvtc$CTC_gold>0],cvtc$CTC_gold[cvtc$CTC_n>0 & cvtc$CTC_gold>0])
+
+# RER against human
+
+sum(cvtc$CTC_gold>0)
+no_human_zeros=cvtc[ cvtc$CTC_gold>0,]
+rer=(no_human_zeros$CTC_n-no_human_zeros$CTC_gold)/no_human_zeros$CTC_gold*100
+summary(rer)
+aer=(cvtc$CTC_n-cvtc$CTC_gold)
+summary(aer)
+```
+
+
+## AWC
+
+```{r awc}
+read.table("LENA_AWC_rel_v1_June.txt")->awc
+colnames(awc)<-c("filename","gold","lena")
+gsub("LUC","ROW",awc$filename)->awc$filename
+
+awc$cor=substr(awc$filename,1,3)
+awc$cor[grep("[0-9]",awc$cor)]<-"tsi"
+awc$cor=factor(awc$cor)
+
+awc$child=substr(awc$filename,1,8)
+awc$child[awc$cor=="tsi"]=substr(awc$X[awc$cor=="tsi"],1,3)
+
+
+merge(awc,age_id,by="child")->awc
+
+png("awc.png",width=5.5,height=5,units="in",res=300)
+
+plot(gold~lena,data=awc,pch=20,main="AWC",col=alpha("black",.2))
+abline(lm(gold~lena,data=awc))
+abline(lm(gold~lena,data=awc,subset=c(awc$gold>0 & awc$lena>0)),lty=2)
+
+dev.off()
+
+cor.test(awc$gold,awc$lena)
+cor.test(awc$gold[awc$gold>0 & awc$lena>0],awc$lena[awc$gold>0 & awc$lena>0])
+
+# RER against human
+
+sum(awc$gold>0)
+no_human_zeros=awc[awc$gold>0,]
+rer=(no_human_zeros$lena-no_human_zeros$gold)/no_human_zeros$gold*100
+summary(rer)
+
+```
+
+
+
+## Variation as a function of corpus and child age
+
+### Diarization metrics
+
+
+```{r dm}
+
+colfill<-c("blue","brown","red","orange","purple")
+names(colfill)<-c("tsi","ROW","BER","SOD","WAR")
+for(dv in c("false.alarm..","missed.detection..","confusion..")){
+  if(dv=="false.alarm.."){ #note that the other two metrics are undefined when there is no speech
+    print("all clips")
+    mymodel=lmer(py[,dv]~cor*age+(1|child),data=py)
+  print(summary(mymodel))
+  print(Anova(mymodel))
+  }
+    print("only clips with some speech")
+    mymodel=lmer(py[,dv]~cor*age+(1|child),data=py,subset=c(total>0))
+  print(summary(mymodel))
+  print(Anova(mymodel))
+
+ plot(py[,dv]~jitter(age),data=py,col=alpha(colfill[py$cor],.2),pch=ifelse(py$total>0,20,3),ylab=dv)
+}
+
+
+```
+
+### cvc
+
+```{r cvc-age}
+cvtc$cor=substr(cvtc$filename,1,3)
+cvtc$cor[substr(cvtc$filename,1,1)=="C"]<-"tsi"
+cvtc$cor=factor(cvtc$cor)
+
+cvtc$child=substr(cvtc$filename,1,8)
+cvtc$child[cvtc$cor=="tsi"]<-substr(cvtc[cvtc$cor=="tsi"]$filename,1,3)
+
+merge(cvtc,age_id,by="child")->cvtc
+
+mymodel<-lmer(CVC_gold~CVC_n*age*cor + (1|child), data=cvtc)
+summary(mymodel)
+Anova(mymodel)
+
+#there is a 3-way interaction between age, corpus, and the predictive value of LENA's counts with respect to the gold counts
+# to investigate this we fit the same reg within corpus
+
+for(thiscor in levels(cvtc$cor)){
+  print(thiscor)
+ mymodel<-lmer(CVC_gold~CVC_n*age + (1|child), data=cvtc,subset=c(cor==thiscor))
+print(summary(mymodel))
+print(Anova(mymodel))
+}
+```
+
+### ctc
+
+```{r ctc-age}
+
+mymodel<-lmer(CTC_gold~CTC_n*age*cor + (1|child), data=cvtc)
+summary(mymodel)
+Anova(mymodel)
+
+for(thiscor in levels(cvtc$cor)){
+  print(thiscor)
+ mymodel<-lmer(CTC_gold~CTC_n*age + (1|child), data=cvtc,subset=c(cor==thiscor))
+print(summary(mymodel))
+print(Anova(mymodel))
+}
+```
