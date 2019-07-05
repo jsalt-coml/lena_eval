@@ -7,6 +7,7 @@ LENA_eval_201906/gold/
 LENA_eval_201906/lena/
 LENA_eval_201906/*.csv
 LENA_eval_201906/*.png
+*.png
 
 
 .DS_Store
