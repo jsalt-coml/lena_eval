@@ -1,0 +1,105 @@
+---
+title: "A thorough evaluation of the Language Environment Analysis (LENATM) system"
+shorttitle        : "IN PREP - LENA EVAL"
+
+author: 
+  - name          : "many"
+    affiliation   : "1"
+    corresponding : yes    # Define only one corresponding author
+    address       : " "
+    email         : " "
+
+affiliation:
+  - id            : "1"
+    institution   : " "
+
+
+
+abstract: >    
+    waiting 
+
+
+keywords          : ""
+wordcount         : ""
+
+bibliography      : ["lena_eval.bib"]
+
+figsintext        : yes
+figurelist        : no
+tablelist         : no
+footnotelist      : no
+lineno            : no
+
+lang              : "english"
+class             : "man"
+output            : papaja::apa6_pdf
+
+---
+
+
+```{r setup, include=TRUE,echo=F,warning=FALSE}
+#Sys.setlocale(category = "LC_ALL", locale = "en_SE.utf8")
+#2019-03-20 - the line above wasn't working on my mac. To fix unicode chars, I had to reset the default locale
+#by opening a terminal & copy-pasting "defaults write org.R-project.R force.LANG en_US.UTF-8"
+
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, cache = FALSE, fig.pos = "T")
+require("papaja")
+library(psych)
+library(car)
+
+#source("XXs.R")
+#read.table("XX",header=T)->data
+```
+
+
+
+
+## Brief introduction to LENA(R) products
+
+## Previous validation work
+
+
+## Present work
+
+# Methods
+
+## Corpora
+
+## Processing
+
+## LENA classification accuracy
+
+### Speech and talker segmentation metrics
+
+### Precision and recall
+
+## CVC and CTC evaluation
+
+## AWC evaluation
+
+# Results
+
+## LENA classification accuracy: False alarms, misses, confusion 
+
+## LENA classification accuracy: Precision and recall 
+
+## Conversational Turn Counts (CTC) accuracy 
+
+## Adult Word Counts accuracy 
+
+## Effects of age and differences across corpora 
+
+# Discussion
+
+# Acknowledgments
+
+
+
+\newpage
+
+
+
+# References
+
+\setlength{\parindent}{-0.5in}
+\setlength{\leftskip}{0.5in}
