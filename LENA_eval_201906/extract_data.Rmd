@@ -32,6 +32,21 @@ Then, we need to change the naming convention from the one that had child_sib_mo
 
 https://github.com/srvk/DiViMe/blob/master/utils/change_tsi_lena_names.py
 
+Finally, it turns out that whatever technique we used before did not create empty rttms for files with no speech. The following code generated them using the rttms from the divime paper.
+
+```{bash make_empty,eval=F}
+
+for j in /Users/acristia/Documents/gitrepos/divime_brm/yunnew/*.rttm ; do
+   name=$(basename $j)
+   name=`echo $name | sed "s/_M..//"`
+   if test -f "/Users/acristia/Documents/gitrepos/lena_eval/LENA_eval_201906/gold/$name" ; then
+       echo "$name exists"
+    else
+       touch  /Users/acristia/Documents/gitrepos/lena_eval/LENA_eval_201906/gold/$name
+       echo "$name created"
+    fi
+done
+```
 
 ## Going from LENA's .its to rttm's: tsi
 
@@ -42,7 +57,7 @@ For the tsi files, took from shared folder with Camila called tsi_its, containin
 grep "LENA" tsi_key_info.csv | while read -r line; do itsname=`echo $line | cut -f 5 -d ","` ; newname=`echo $line | cut -f 11 -d ","` ;  cp its/$itsname.its ${newname}.its ; done
 ```
 
-Notice there is one file for C18 that is supposed to have a LENA file, but the its is missing from the shared folder. We don´t have annotation for a second C18 day however. So it may be an error and there is in fact not a second LENA file for this child.∫
+Notice there is one file for C18 that is supposed to have a LENA file, but the its is missing from the shared folder. We don´t have annotation for a second C18 day however. So it may be an error and there is in fact not a second LENA file for this child.
 
 Then move the newly named its files into lena/TSI and run the following is used to generate a huge rttm that has the whole day.
 
@@ -103,6 +118,7 @@ source activate pyannote-lena
 ## You can change the mapping in labels_mapper.py
 ## The -o option indicates if overlapping classes need to be aggregated as being "OVL"
 
+rm -r -f */mapped*/
 python labels_mapper.py -p lena/ -m lena_sil #all the far categories go to silence
 mv lena/mapped lena/mapped_sil
 python labels_mapper.py -p lena/ -m lena_far #all the far categories go to silence

@@ -92,6 +92,8 @@ sod=read.table(paste0(thisdir,"SOD","_cm.txt"),header=T)
 war=read.table(paste0(thisdir,"WAR","_cm.txt"),header=T)
 all=read.table(paste0(thisdir,"all","_cm.txt"),header=T)
 
+summary(all)
+
 #remove empty rows
 ber=ber[rownames(ber)[rowSums(ber)>0],]
 row=row[rownames(row)[rowSums(row)>0],]
@@ -133,7 +135,6 @@ barplot(n_min_lena,las=2, main="#minutes of audio per lena label")
 
 While confusion matrices are useful to understand patterns of errors, it is sometimes desirable to have indices of performance that are more specific to the task of diarization. To this end, we use a number of metrics provided by pyannote.metrics.
 
-**THIS NEEDS TO BE UPDATED TO THE 201906 RESULTS**
 
 ```{r DIAER}
 read.csv(paste0(thisdir,"/gold/mapped/diaer__report.csv"))->py
@@ -141,6 +142,7 @@ dim(py) #873 clips
 summary(py)
 
 #294 FA, MI, confusion are NA because no speech at all in the clip
+#now 265
 
 round(sum(is.na(py$confusion..))/dim(py)[1]*100)  # percentage of clips with no speech REPORTED IN PAPER
 
