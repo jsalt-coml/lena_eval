@@ -38,29 +38,49 @@ gold_dict = {
     'UC6': 'OCH'
 }
 
-# Must arrive in [SIL, CHI, FEM, MAL, OVL]
-lena_dict = {
+#
+lena_dict_far = {
+    'CHF': 'CHF',
+    'CHN': 'CHN',
+    'CXF': 'CXF',
+    'CXN': 'CXN',
+    'FAF': 'FAF',
+    'FAN': 'FAN',
+    'MAF': 'MAF',
+    'MAN': 'MAN',
+    'NOF': 'SIL',
+    'NON': 'SIL',
+    'OLF': 'OLF',
+    'OLN': 'OLN',
+    'SIL': 'SIL',
+    'TVN': 'TVN',
+    'TVF': 'TVF'
+}
+
+#all the far categories  go to nonspeech
+lena_dict_sil = {
     'CHF': 'SIL',
-    'CHN': 'CHI',
+    'CHN': 'CHN',
     'CXF': 'SIL',
-    'CXN': 'OCH',
+    'CXN': 'CXN',
     'FAF': 'SIL',
-    'FAN': 'FEM',
+    'FAN': 'FAN',
     'MAF': 'SIL',
-    'MAN': 'MAL',
+    'MAN': 'MAN',
     'NOF': 'SIL',
     'NON': 'SIL',
     'OLF': 'SIL',
-    'OLN': 'OVL',
+    'OLN': 'OLN',
     'SIL': 'SIL',
     'TVN': 'TVN',
-    'TVF': 'TVF',
+    'TVF': 'SIL'
 }
 
-
 def map_rttm(rttm, overlap, dict):
-    if dict == "lena":
-        dict = lena_dict
+    if dict == "lena_far":
+        dict = lena_dict_far
+    elif dict == "lena_sil":
+        dict = lena_dict_sil
     elif dict == "gold":
         dict = gold_dict
 
@@ -149,9 +169,9 @@ def main():
                                                  "called mapped")
     parser.add_argument('-p', '--path', type=str, required=True,
                         help="Path to the folder containing .rttm files")
-    parser.add_argument('-m', '--map', type=str, required=True, choices=["lena", "gold"],
+    parser.add_argument('-m', '--map', type=str, required=True, choices=["lena_sil","lena_far", "gold"],
                         help="Indicates if this is lena files that needs to be mapped or gold files."
-                             "Must be in [lena,gold]")
+                             "Must be in [lena_sil,lena_far,gold]")
     parser.add_argument('-o', '--overlap', action="store_true",
                         help="Indicates if we need to map overlapping speech to the label \"OVL\"")
     args = parser.parse_args()

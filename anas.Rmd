@@ -170,8 +170,9 @@ spreadsheet = read.csv(paste0(thisdir,"/ACLEW_list_of_corpora.csv"), header=TRUE
 spreadsheet$child=paste0(spreadsheet$labname,"_",ifelse(nchar(spreadsheet$aclew_id)==3,paste0("0",spreadsheet$aclew_id),spreadsheet$aclew_id))
 spreadsheet = spreadsheet[,c("child","age_mo_round")]
 colnames(spreadsheet) = c("child","age")
-spreadsheet_tsi = read.csv(paste0(thisdir,"/tsi_key_info.csv"), header=TRUE, sep = ",")
-spreadsheet_tsi = spreadsheet_tsi[c("child","age")]
+spreadsheet_tsi = read.csv(paste0(thisdir,"/anon_metadata.csv"), header=TRUE, sep = ",")
+spreadsheet_tsi = spreadsheet_tsi[c("id","age_mo")]
+colnames(spreadsheet_tsi) = c("child","age")
 age_id = rbind(spreadsheet, spreadsheet_tsi)
 py=merge(py,age_id,by.x="child",by.y="child",all.x=T)
 ```
@@ -252,27 +253,18 @@ ggplot(data = stall, mapping = aes(y = stall$human, x=stall$lena)) +
 
 ### Overlap
 
-To simplify the discussion, I'd like to first deal with the problem of overlap. It transpires that overlaps are rare, affecting `r round(sum(sumref[grep("/",rownames(all))])/sum(sumref)*100)`% of frames. LENA's accuracy for detecting these overlaps can be conveyed by asking what proportion of frames with overlap get a LENA overlap label (`r colSums(all[grep("/",rownames(all)),grep("OL",colnames(all))])/sum(all[grep("/",rownames(all)),])*100 ` for OLF and OLN respectively); versus what proportion of frames that do not have an overlap in the referent nonetheless get a LENA overlap label (`r colSums(all[grep("/",rownames(all),invert=T),grep("OL",colnames(all))])/sum(all[grep("/",rownames(all),invert=T),])*100 ` for OLF and OLN respectively). My reading of these results is that the overlap detection system is not very good in that it only catches 24% of the cases of overlap (and also false-alarms 9% of non-overlaps as if they were overlaps). Nonetheless, since overlap is overall rare, we'll set aside overlap in the reference completely, by removing from consideration frames with overlap. 
+To simplify the discussion, I'd like to first deal with the problem of overlap. It transpires that overlaps are rare, affecting `r round(sum(sumref[rownames(all)=="OVL"])/sum(sumref)*100)`% of frames. LENA's accuracy for detecting these overlaps can be conveyed by asking what proportion of frames with overlap get a LENA overlap label (`r colSums(all[rownames(all)=="OVL",grep("OL",colnames(all))])/sum(all[rownames(all)=="OVL",])*100 ` for OLF and OLN respectively); versus what proportion of frames that do not have an overlap in the referent nonetheless get a LENA overlap label (`r colSums(all[rownames(all)!="OVL",grep("OL",colnames(all))])/sum(all[rownames(all)!="OVL",])*100 ` for OLF and OLN respectively). My reading of these results is that the overlap detection system is not very good in that it only catches 24% of the cases of overlap (and also false-alarms 9% of non-overlaps as if they were overlaps). Nonetheless, since overlap is overall rare, we'll set aside overlap in the reference completely, by removing from consideration frames with overlap. 
 
 **QUESTION**: In what follows, we could take them into account in the denominator (because they still exist) or we could remove them from consideration altogether (remove lines from confusion matrix in which there is overlap; remove LENA's overlap-label columns). --> **decision**: take them into account.
 
-Before we proceed, we simplify the overlap rows.
-
-```{r nool}
-
-ol=all[grep("/",row.names(all),invert=T),]
-ol=rbind(ol,colSums(all[grep("/",row.names(all)),]))
-row.names(ol)[dim(ol)[1]]<-"overlap"
-
-```
 
 ### Silence
 
-Next, we check LENA's accuracy to label silence as something other than voice. The absent of live human voices is extremely prevalent, with  `r round(sum(sumref[grep("SIL",rownames(ol))])/sum(sumref)*100)`% of frames containing no human vocalization, what we call silence. 
+Next, we check LENA's accuracy to label silence as something other than voice. The absent of live human voices is extremely prevalent, with  `r round(sum(sumref[grep("SIL",rownames(all))])/sum(sumref)*100)`% of frames containing no human vocalization, what we call silence. 
 
 LENA has many categories that apply in this space (electronics, noise, silence) but since these were not separately categorized in our human annotation, we collapsed across all of them into one large category that we call silence.
 
-Here, we would like to check, among the frames the human annotator also did not detect any voice for, what proportion were labeled as silence/TV/noise/FUZ by LENA ("silent frames" in the referent `r ol[grep("SIL",rownames(ol)),grep("SIL",colnames(ol))]/sum(ol[grep("SIL",rownames(ol)),])*100 `); versus what proportion of frames that do have some voice in the referent nonetheless get a LENA SILENCE label (`r sum(ol[grep("SIL",rownames(ol),invert=T),grep("SIL",colnames(ol))])/sum(ol[grep("SIL",rownames(ol),invert=T),])*100 `). My reading of these results is that the silence detection system does not over-apply these non-voice labels when the voice is present -- in only 7% of cases where there is a voice present, did the system return one of these labels. However, it fails to return a "SILENCE" label for the vast majority of frames that truly do not contain voice (62% of frames that are truly silent according to the human annotation failed to get a silent-like LENA label).
+Here, we would like to check, among the frames the human annotator also did not detect any voice for, what proportion were labeled as silence/TV/noise/FUZ by LENA ("silent frames" in the referent `r all[grep("SIL",rownames(all)),grep("SIL",colnames(all))]/sum(all[grep("SIL",rownames(all)),])*100 `); versus what proportion of frames that do have some voice in the referent nonetheless get a LENA SILENCE label (`r sum(all[grep("SIL",rownames(all),invert=T),grep("SIL",colnames(all))])/sum(all[grep("SIL",rownames(all),invert=T),])*100 `). My reading of these results is that the silence detection system does not over-apply these non-voice labels when the voice is present -- in only 7% of cases where there is a voice present, did the system return one of these labels. However, it fails to return a "SILENCE" label for the vast majority of frames that truly do not contain voice (62% of frames that are truly silent according to the human annotation failed to get a silent-like LENA label).
 
 
 
@@ -286,11 +278,11 @@ For this first one, I calculated the percentages shown in the table taking as to
 % is Precision
 
 ```{r precision}
-prop_cat=data.frame(apply(ol,2,dodiv)*100) #generates precision because columns
+prop_cat=data.frame(apply(all,2,dodiv)*100) #generates precision because columns
 colSums(prop_cat)
-stack(ol)->stol
+stack(all)->stol
 colnames(stol)<-c("n","lena")
-stol$human=rownames(ol)
+stol$human=rownames(all)
 stol$pr=stack(prop_cat)$values
   
 png("precision.png",width=5.5,height=5,units="in",res=300)
@@ -317,11 +309,11 @@ For this next matrix, I calculated the percentages shown in the table taking as 
 % is Recall
 
 ```{r recall}
-prop_cat=data.frame(t(apply(ol,1,dodiv)*100)) #generates recall because rows
+prop_cat=data.frame(t(apply(all,1,dodiv)*100)) #generates recall because rows
 rowSums(prop_cat)
-stack(ol)->stol
+stack(all)->stol
 colnames(stol)<-c("n","lena")
-stol$human=rownames(ol)
+stol$human=rownames(all)
 stol$pr=stack(prop_cat)$values
   
 png("recall.png",width=5.5,height=5,units="in",res=300)
@@ -466,7 +458,7 @@ cvtc$cor[substr(cvtc$filename,1,1)=="C"]<-"tsi"
 cvtc$cor=factor(cvtc$cor)
 
 cvtc$child=substr(cvtc$filename,1,8)
-cvtc$child[cvtc$cor=="tsi"]<-substr(cvtc[cvtc$cor=="tsi"]$filename,1,3)
+cvtc$child[cvtc$cor=="tsi"]<-substr(cvtc$filename[cvtc$cor=="tsi"],1,3)
 
 merge(cvtc,age_id,by="child")->cvtc
 

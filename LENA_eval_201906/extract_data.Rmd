@@ -9,85 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 gold_folder = "gold/"
 lena_folder = "lena/"
 corpora = c("BER", "ROW", "SOD","WAR","TSI")
-
-
-# Output labels
-# Keys = input labels, Values = output labels
-gold_dict_map = list(
-C1="OCH",
-C2="OCH",
-#C1="CHI",
-#C2="CHI",
-CHI="CHI",
-EE1="SIL",
-FA1="FEM",
-FA2="FEM",
-FA3="FEM",
-FA4="FEM",
-FA5="FEM",
-FA6="FEM",
-FA7="FEM",
-FA8="FEM",
-FAE="SIL",
-FC1="OCH",
-#FC1="CHI",
-MA1="MAL",
-MA2="MAL",
-MA3="MAL",
-MA4="MAL",
-MA5="MAL",
-MAE="SIL",
-MC1="MAL",
-MC2="MAL",
-MC3="MAL",
-MI1="OCH", #is this infant??? then it should go to OCH
-MOT="FEM", #this used to say MAL
-UC1="OCH",
-UC2="OCH",
-UC3="OCH",
-UC4="OCH",
-UC5="OCH",
-UC6="OCH",
-# UC1="CHI",
-# UC2="CHI",
-# UC3="CHI",
-# UC4="CHI",
-# UC5="CHI",
-# UC6="CHI",
-SIL="SIL"
-)
-
-lena_dict_map = list(
-CHF="CHF",
-CHN="CHN",
-CXF="CXF",
-CXN="CXN",
-FAF="FAF",
-FAN="FAN",
-MAF="MAF",
-MAN="MAN",
-NOF="SIL",
-NON="SIL",
-OLF="OLF",
-OLN="OLN",
-SIL="SIL",
-TVF="SIL",
-TVN="SIL"
-)
-  
-label_mapper <- function(input_label, dict_map){
-  # Given input label (multiple or not), returns output label
-  # Ex : FA1/UC6 -> CHI/FEM (overlap)
-  # UC1/UC2 -> CHI (overlap between two speakers belonging to the same class)
-  # CXN -> CHN (only one speaker)
-  output_labels = dict_map[strsplit(toString(input_label), "/")[[1]]]
-  output_labels = unique(unname(unlist(output_labels)))
-  if(length(output_labels) != 1) {
-    output_labels = sort(output_labels[output_labels!="SIL"])
-  }
-  return(paste(output_labels,collapse="/"))
-}
-
+names(corpora)<-c(substr(corpora[1:4],1,1),"C")
 
 ```
 
@@ -116,7 +38,7 @@ https://github.com/srvk/DiViMe/blob/master/utils/change_tsi_lena_names.py
 
 For the tsi files, took from shared folder with Camila called tsi_its, containing a lot more its than the ones we have annotation for, and sitting on top of that folder (ie above its subfolder) I did the following to get the right name:
 
-```{bash ,eval=F}
+```{bash rename-tsi,eval=F}
 grep "LENA" tsi_key_info.csv | while read -r line; do itsname=`echo $line | cut -f 5 -d ","` ; newname=`echo $line | cut -f 11 -d ","` ;  cp its/$itsname.its ${newname}.its ; done
 ```
 
@@ -124,13 +46,13 @@ Notice there is one file for C18 that is supposed to have a LENA file, but the i
 
 Then move the newly named its files into lena/TSI and run the following is used to generate a huge rttm that has the whole day.
 
-```{bash ,eval=F}
+```{bash its2rttm,eval=F}
 ./its2rttm.sh lena/TSI/
 ```
 
 Finally, for TSI, we use the golds to generate the corresponding sections in LENA's rttms.
 
-```{bash ,eval=F}
+```{bash gold2shortlena,eval=F}
 for j in gold/*.rttm ; do mv $j $j.unsorted ; done
 for j in gold/*.rttm.unsorted ; do sorted=`echo $j | sed "s/.unsorted//"`  ; awk  '{printf("%s %s %s %.2f %.2f %s %s %s %s %s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)}' $j |  sort -n -k4 > $sorted ; done
 
@@ -162,8 +84,8 @@ moved all C24 second day to gives_error folder
 I'm not sure how those three steps were done for the ACLEW files. The next script used the wav files' names, generated in "Going from eaf's to rttm's", to extract sections of the .its files for ACLEW.
 
 
-```{python ,eval=F}
- cut_lena.py
+```{bash cutlena,eval=F}
+python cut_lena.py
  
 ```
 
@@ -181,26 +103,30 @@ source activate pyannote-lena
 ## You can change the mapping in labels_mapper.py
 ## The -o option indicates if overlapping classes need to be aggregated as being "OVL"
 
-python labels_mapper.py -p lena/ -m lena
+python labels_mapper.py -p lena/ -m lena_sil #all the far categories go to silence
+mv lena/mapped lena/mapped_sil
+python labels_mapper.py -p lena/ -m lena_far #all the far categories go to silence
+mv lena/mapped lena/mapped_far
+
 python labels_mapper.py -p gold/ -m gold -o
 
 ## Evaluate lena performances (should not be run in the frontnode)
 # With -t being the task (identification, diarization or detection)
 # -m being the list of metrics
-python compute_metrics.py -ref gold/mapped/ -hyp lena/mapped/ -t diarization -m diaer coverage homogeneity completeness purity
+python compute_metrics.py -ref gold/mapped/ -hyp lena/mapped_sil/ -t diarization -m diaer coverage homogeneity completeness purity
 
 
 ```
 
 ## Generate frame-based rttms
 
-These contain the same info as the lena and gold rttms, but each line represents a 100 ms frame, and all frames are accounted for (whereas in standard rttms silence is not tagged). The following lines can be ran on a terminal (because they give an error here, not sure why).
+These contain the same info as the lena and gold rttms, but each line represents a 100 ms frame, and all frames are accounted for (whereas in standard rttms silence is not tagged). The following lines must be ran on a terminal (because they give an error here, not sure why).
 
 ```{bash runpy, eval=F}
 rm -r -f */frame/
-python frame_cutter.py --i lena/mapped/
+python frame_cutter.py --i lena/mapped_far/
 mkdir lena/frame/
-mv lena/mapped/*_cutted.rttm lena/frame/
+mv lena/mapped_far/*_cutted.rttm lena/frame/
 wc -l lena/frame/*.rttm
 
 python frame_cutter.py --i gold/mapped/
@@ -213,18 +139,13 @@ wc -l gold/frame/*.rttm
 ## generate confusion matrices
 
 ```{r gencm}
+lena_folder="lena/frame/"
+gold_folder="gold/frame/"
 
-# We define the levels for one-hot encoding
-# The lena levels represent the columns of the confusion matrix
-# The gold levels represent the rows of the confusion matrix 
-lena_levels <- sort(unique(as.vector(unlist(lena_dict_map))))
-#gold_levels <- sort(c("CHI", "CHI/FEM", "CHI/FEM/MAL", "CHI/MAL", "FEM", "FEM/MAL", "MAL", "SIL"))
-basic=c(levels(factor(unlist(gold_dict_map))))
-twoway=threeway=NULL
-for(i in basic[-5]) for(j in basic[-5]) if(i!=j) twoway=c(twoway,paste0(i,"/",j))
-for(i in basic[-5]) for(j in basic[-5]) for(k in basic[-5]) if(i!=j & j!=k & i != k) threeway=c(threeway,paste0(i,"/",j,"/",k))
- gold_levels<- sort(c(basic,twoway,threeway))
- 
+
+gold_levels=c("FEM","CHI","OCH","MAL","OVL","ELE","SIL")
+lena_levels=c("FAN","CHN","CXN","MAN","OLN","TVN","FAF","CHF","CXF","MAF","OLF","TVF","SIL")
+
 # Let's start by listing the files
 
 confusion_all <- matrix(0, nrow=length(gold_levels), ncol=length(lena_levels))
@@ -234,7 +155,7 @@ i=0
 for(corpus in corpora){#corpus="ROW"
   
   # List filenames
-  filenames = list.files(paste0(lena_folder,"frame"), pattern = "*.rttm")
+  filenames = list.files(lena_folder, pattern = "*.rttm")
   if(corpus=="TSI") corpus_filenames = filenames[substr(filenames,1,1) == "C"] else corpus_filenames = filenames[substr(filenames,1,3) == corpus]
   
   # Create confusion matrices
@@ -243,18 +164,16 @@ for(corpus in corpora){#corpus="ROW"
   rownames(confusion_corp) <- gold_levels
   
   for(filename in corpus_filenames){
-    lena_path = paste(lena_folder,"frame", filename, sep="/")
-    gold_path = paste(gold_folder,"frame", filename, sep="/")
+    lena_path = paste(lena_folder, filename, sep="/")
+    gold_path = paste(gold_folder, filename, sep="/")
     
     # The LENA always exist
     lena = read.csv(lena_path, header=FALSE, sep = " ")[c(4,5,8)]
     names(lena) <- c("onset", "duration", "label")
-    lena["label"] <- sapply(lena[["label"]], label_mapper, dict_map=lena_dict_map)
     
     if(file.exists(gold_path)){
       gold = read.csv(gold_path, header=FALSE, sep = " ")[c(4,5,8)]
       names(gold) <- c("onset", "duration", "label")
-      gold["label"] = sapply(gold[["label"]], label_mapper,dict_map=gold_dict_map)
     } else {
       gold = lena # we make a copy to have the same N of lines
       gold["label"] = "SIL"
@@ -306,8 +225,9 @@ Logic is:
 - Label vocs as counting towards CTC or not, then sum the yes's
 
 ```{r cvtc}
+# options(warn=2) for debugging, then options(warn=1)
 
-lena_folder="lena/mapped/"
+lena_folder="lena/mapped_far/"
 gold_folder="gold/mapped/"
 
 filenames = list.files(lena_folder, pattern = "*.rttm$")
@@ -318,17 +238,25 @@ for(filename in filenames){
     lena_path = paste(lena_folder, filename, sep="/")
     gold_path = paste(gold_folder, filename, sep="/")
     
-    # The LENA always exist
-    lena = read.csv(lena_path, header=FALSE, sep = " ")[c(4,5,8)]
-    names(lena) <- c("onset", "duration", "label") 
+# The LENA always exist, but it may be empty if the whole file is silence, according to LENA
+if(length(0<readLines(lena_path))){
+  lena = read.csv(lena_path, header=FALSE, sep = " ")[c(4,5,8)]
+  names(lena) <- c("onset", "duration", "label")
+}  else {#if it doesn't exist, then it's all empty, so generate a big empty file
+  if(substr(filename,1,1)=="C") lng= 60 else lng = 120
+  lena = data.frame(rbind(cbind(0,lng/2,"SIL"),cbind(lng/2,lng,"SIL")))
+  colnames(lena) <- c("onset", "duration", "label")
+  write.table(lena,"temp.txt")
+  read.table("temp.txt",header=T)->lena
+}
+
     
     #the gold doesn't always (empty = no speech)
     if(file.exists(gold_path)){
       gold = read.csv(gold_path, header=FALSE, sep = " ")[c(4,5,8)]
       names(gold) <- c("onset", "duration", "label")
-      gold["label"] = sapply(gold[["label"]], label_mapper,dict_map=gold_dict_map)
     } else {
-      gold = lena # we make a copy to have the same N of lines
+      gold <- lena # we make a copy to have the same N of lines
       gold["label"] = "SIL"
     }
     
