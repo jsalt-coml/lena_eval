@@ -10,12 +10,12 @@ lenafolder="lena/"
 
 for j in $goldoldfolder/*.rttm  
 do 
-echo $j
+#echo $j
    kid=`echo $j | sed 's/.*\///' | sed 's/_.*//'` 
    date=`echo $j | sed 's/.*M.._//' | sed 's/_.*//'` 
    start=`echo $j | sed 's/.*_//' | sed 's/.rttm//'` 
 
-echo $kid $date $start
+#echo $kid $date $start
 
 # we need to pull out all the lines corresponding to the 60 s of annotation
 
@@ -23,6 +23,15 @@ echo $kid $date $start
 
    awk -v start=$start '{ if ($4 >= start && $4 < start+60) {print $0} }' $lenatsifolder/${kid}_${date}.rttm > $lenafolder/${kid}_${date}_${start}.rttm
 
+   nlines=`wc -l $lenafolder/${kid}_${date}_${start}.rttm | awk '{print $1}'`
+
+#rarely it is the case that the resulting file is empty because the whole time is taken up by a given category
+   if [ $nlines -eq 0 ] ; then
+      echo "human, make sure to check $lenafolder/${kid}_${date}_${start}.rttm"
+
+
+
+   else
 # add previous line 
    first_onset=`head -n 1 $lenafolder/${kid}_${date}_${start}.rttm | cut -f 4 -d " "`
    previous_line=`grep $first_onset -C 1 $lenatsifolder/${kid}_${date}.rttm | head -n 1`
@@ -51,7 +60,10 @@ echo $kid $date $start
    awk -v start=$start '{$4 = $4-start; print}' < $lenafolder/${kid}_${date}_${start}.rttm > temp.txt
    mv temp.txt $lenafolder/${kid}_${date}_${start}.rttm
 
+#end if file not empty
+   fi
+
 # and to end, create a copy of the gold with the new name
-  cp $j $goldfolder/${kid}_${date}_${start}.rttm
+  awk  '{printf("%s %s %s %.2f %.2f %s %s %s %s %s\n",$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)}' $j |  sort -n -k4 > $goldfolder/${kid}_${date}_${start}.rttm
 
 done

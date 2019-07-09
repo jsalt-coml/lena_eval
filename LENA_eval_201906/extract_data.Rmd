@@ -34,11 +34,11 @@ https://github.com/srvk/DiViMe/blob/master/utils/change_tsi_lena_names.py
 
 Finally, it turns out that whatever technique we used before did not create empty rttms for files with no speech. The following code generated them using the rttms from the divime paper.
 
-```{bash make_empty,eval=F}
+```{bash make_empty_tsi,eval=F}
 
 for j in /Users/acristia/Documents/gitrepos/divime_brm/yunnew/*.rttm ; do
    name=$(basename $j)
-   name=`echo $name | sed "s/_M..//"`
+   name=`echo $name | sed "s/_M..//" | sed "s/_NA//"`
    if test -f "/Users/acristia/Documents/gitrepos/lena_eval/LENA_eval_201906/gold/$name" ; then
        echo "$name exists"
     else
@@ -48,16 +48,660 @@ for j in /Users/acristia/Documents/gitrepos/divime_brm/yunnew/*.rttm ; do
 done
 ```
 
+
+For ACLEW, I downloaded the raw folders from github, then used ELAN to generate a tab-sep file that has the on off times for all files for all folders.
+
+```{bash make_emptyaclew,eval=F}
+
+cat /Users/acristia/Documents/gitrepos/lena_eval/LENA_eval_201906/gold/raw_master/allonoff.txt | while read -r line ; do
+   on=`echo $line | awk '{printf("%06d\n", $2)}'`
+   off=`echo $line | awk '{printf("%06d\n", $3)}'`
+   name=`echo $line |  sed "s/.* //" | sed "s/.eaf//"`
+   cor=`grep "$name" /Users/acristia/Documents/gitrepos/lena_eval/LENA_eval_201906/ACLEW_list_of_corpora.csv | awk -F "," '{print $3}'`
+   if test -f "/Users/acristia/Documents/gitrepos/lena_eval/LENA_eval_201906/gold/${cor}_${name}_${on}_${off}.rttm" ; then
+       echo "${cor}_${name}_${on}_${off}.rttm exists"
+    else
+       touch  /Users/acristia/Documents/gitrepos/lena_eval/LENA_eval_201906/gold/${cor}_${name}_${on}_${off}.rttm
+       echo "${cor}_${name}_${on}_${off}.rttm created"
+    fi
+done
+```
+
+And this is the log for that (in comments).
+
+<!-- BER_3749_004140_004260.rttm exists -->
+<!-- BER_3749_004620_004740.rttm created -->
+<!-- BER_3749_005520_005640.rttm exists -->
+<!-- BER_3749_007860_007980.rttm exists -->
+<!-- BER_3749_009540_009660.rttm exists -->
+<!-- BER_3749_009720_009840.rttm created -->
+<!-- BER_3749_011280_011400.rttm created -->
+<!-- BER_3749_011640_011760.rttm created -->
+<!-- BER_3749_017640_017760.rttm exists -->
+<!-- BER_3749_019920_020040.rttm exists -->
+<!-- BER_3749_021240_021360.rttm exists -->
+<!-- BER_3749_026400_026520.rttm created -->
+<!-- BER_3749_028920_029040.rttm exists -->
+<!-- BER_3749_034680_034800.rttm exists -->
+<!-- BER_3749_043560_043680.rttm exists -->
+<!-- WAR_2535_004380_004500.rttm exists -->
+<!-- WAR_2535_006840_006960.rttm created -->
+<!-- WAR_2535_009720_009840.rttm exists -->
+<!-- WAR_2535_010920_011040.rttm exists -->
+<!-- WAR_2535_012600_012720.rttm exists -->
+<!-- WAR_2535_013320_013440.rttm exists -->
+<!-- WAR_2535_014940_015060.rttm created -->
+<!-- WAR_2535_018660_018780.rttm created -->
+<!-- WAR_2535_025740_025860.rttm exists -->
+<!-- WAR_2535_032640_032760.rttm created -->
+<!-- WAR_2535_034500_034620.rttm exists -->
+<!-- WAR_2535_035640_035760.rttm exists -->
+<!-- WAR_2535_036960_037080.rttm exists -->
+<!-- WAR_2535_038400_038520.rttm created -->
+<!-- WAR_2535_045660_045780.rttm exists -->
+<!-- BER_6035_008160_008280.rttm exists -->
+<!-- BER_6035_010680_010800.rttm exists -->
+<!-- BER_6035_013920_014040.rttm exists -->
+<!-- BER_6035_018600_018720.rttm created -->
+<!-- BER_6035_019380_019500.rttm created -->
+<!-- BER_6035_021240_021360.rttm created -->
+<!-- BER_6035_022140_022260.rttm created -->
+<!-- BER_6035_026940_027060.rttm exists -->
+<!-- BER_6035_027780_027900.rttm exists -->
+<!-- BER_6035_030300_030420.rttm exists -->
+<!-- BER_6035_030840_030960.rttm created -->
+<!-- BER_6035_037980_038100.rttm created -->
+<!-- BER_6035_041460_041580.rttm created -->
+<!-- BER_6035_045540_045660.rttm created -->
+<!-- BER_6035_049440_049560.rttm created -->
+<!-- SOD_9854_003120_003240.rttm exists -->
+<!-- SOD_9854_007380_007500.rttm exists -->
+<!-- SOD_9854_010740_010860.rttm exists -->
+<!-- SOD_9854_011460_011580.rttm exists -->
+<!-- SOD_9854_012060_012180.rttm exists -->
+<!-- SOD_9854_013260_013380.rttm created -->
+<!-- SOD_9854_015780_015900.rttm exists -->
+<!-- SOD_9854_019380_019500.rttm exists -->
+<!-- SOD_9854_020880_021000.rttm exists -->
+<!-- SOD_9854_021900_022020.rttm created -->
+<!-- SOD_9854_024300_024420.rttm created -->
+<!-- SOD_9854_027480_027600.rttm created -->
+<!-- SOD_9854_028320_028440.rttm exists -->
+<!-- SOD_9854_030060_030180.rttm exists -->
+<!-- SOD_9854_032340_032460.rttm exists -->
+<!-- ROW_8357_002820_002940.rttm exists -->
+<!-- ROW_8357_006900_007020.rttm exists -->
+<!-- ROW_8357_007620_007740.rttm exists -->
+<!-- ROW_8357_012660_012780.rttm exists -->
+<!-- ROW_8357_019560_019680.rttm exists -->
+<!-- ROW_8357_020220_020340.rttm exists -->
+<!-- ROW_8357_021540_021660.rttm exists -->
+<!-- ROW_8357_027960_028080.rttm exists -->
+<!-- ROW_8357_030300_030420.rttm exists -->
+<!-- ROW_8357_041400_041520.rttm exists -->
+<!-- ROW_8357_042720_042840.rttm exists -->
+<!-- ROW_8357_053160_053280.rttm created -->
+<!-- ROW_8357_053280_053400.rttm created -->
+<!-- ROW_8357_055860_055980.rttm created -->
+<!-- ROW_8357_057000_057120.rttm created -->
+<!-- WAR_3528_003060_003180.rttm exists -->
+<!-- WAR_3528_006600_006720.rttm exists -->
+<!-- WAR_3528_007680_007800.rttm exists -->
+<!-- WAR_3528_012000_012120.rttm created -->
+<!-- WAR_3528_015360_015480.rttm created -->
+<!-- WAR_3528_018480_018600.rttm created -->
+<!-- WAR_3528_023100_023220.rttm created -->
+<!-- WAR_3528_028920_029040.rttm exists -->
+<!-- WAR_3528_030600_030720.rttm created -->
+<!-- WAR_3528_045720_045840.rttm created -->
+<!-- WAR_3528_047940_048060.rttm created -->
+<!-- WAR_3528_049920_050040.rttm created -->
+<!-- WAR_3528_050400_050520.rttm created -->
+<!-- WAR_3528_054960_055080.rttm created -->
+<!-- WAR_3528_056340_056460.rttm created -->
+<!-- WAR_9398_003180_003300.rttm exists -->
+<!-- WAR_9398_005100_005220.rttm created -->
+<!-- WAR_9398_006000_006120.rttm exists -->
+<!-- WAR_9398_007680_007800.rttm exists -->
+<!-- WAR_9398_009300_009420.rttm exists -->
+<!-- WAR_9398_011640_011760.rttm created -->
+<!-- WAR_9398_012540_012660.rttm created -->
+<!-- WAR_9398_013500_013620.rttm created -->
+<!-- WAR_9398_018660_018780.rttm exists -->
+<!-- WAR_9398_019500_019620.rttm exists -->
+<!-- WAR_9398_022920_023040.rttm exists -->
+<!-- WAR_9398_026700_026820.rttm exists -->
+<!-- WAR_9398_027600_027720.rttm exists -->
+<!-- WAR_9398_033780_033900.rttm exists -->
+<!-- WAR_9398_034140_034260.rttm exists -->
+<!-- SOD_4483_002100_002220.rttm exists -->
+<!-- SOD_4483_002700_002820.rttm exists -->
+<!-- SOD_4483_003120_003240.rttm created -->
+<!-- SOD_4483_003420_003540.rttm exists -->
+<!-- SOD_4483_003780_003900.rttm created -->
+<!-- SOD_4483_004200_004320.rttm exists -->
+<!-- SOD_4483_004560_004680.rttm exists -->
+<!-- SOD_4483_004860_004980.rttm exists -->
+<!-- SOD_4483_004860_004980.rttm exists -->
+<!-- SOD_4483_004980_005100.rttm created -->
+<!-- SOD_4483_005280_005400.rttm exists -->
+<!-- SOD_4483_005460_005580.rttm created -->
+<!-- SOD_4483_005760_005880.rttm exists -->
+<!-- SOD_4483_006120_006240.rttm exists -->
+<!-- SOD_4483_006120_006240.rttm exists -->
+<!-- SOD_4483_006240_006360.rttm exists -->
+<!-- SOD_4483_006600_006720.rttm exists -->
+<!-- SOD_4736_004440_004560.rttm created -->
+<!-- SOD_4736_005760_005880.rttm created -->
+<!-- SOD_4736_008940_009060.rttm created -->
+<!-- SOD_4736_009720_009840.rttm created -->
+<!-- SOD_4736_011220_011340.rttm created -->
+<!-- SOD_4736_013800_013920.rttm created -->
+<!-- SOD_4736_016920_017040.rttm exists -->
+<!-- SOD_4736_018360_018480.rttm created -->
+<!-- SOD_4736_018780_018900.rttm exists -->
+<!-- SOD_4736_020280_020400.rttm created -->
+<!-- SOD_4736_023580_023700.rttm created -->
+<!-- SOD_4736_025740_025860.rttm created -->
+<!-- SOD_4736_026460_026580.rttm created -->
+<!-- SOD_4736_029520_029640.rttm created -->
+<!-- SOD_4736_033120_033240.rttm created -->
+<!-- ROW_7798_009660_009780.rttm exists -->
+<!-- ROW_7798_012420_012540.rttm created -->
+<!-- ROW_7798_013800_013920.rttm created -->
+<!-- ROW_7798_014400_014520.rttm created -->
+<!-- ROW_7798_017580_017700.rttm created -->
+<!-- ROW_7798_017880_018000.rttm exists -->
+<!-- ROW_7798_019560_019680.rttm exists -->
+<!-- ROW_7798_030780_030900.rttm created -->
+<!-- ROW_7798_033240_033360.rttm exists -->
+<!-- ROW_7798_037020_037140.rttm created -->
+<!-- ROW_7798_040380_040500.rttm exists -->
+<!-- ROW_7798_044580_044700.rttm exists -->
+<!-- ROW_7798_050580_050700.rttm exists -->
+<!-- ROW_7798_051420_051540.rttm created -->
+<!-- ROW_7798_056220_056340.rttm created -->
+<!-- SOD_1499_006120_006240.rttm exists -->
+<!-- SOD_1499_007500_007620.rttm exists -->
+<!-- SOD_1499_008580_008700.rttm exists -->
+<!-- SOD_1499_010980_011100.rttm exists -->
+<!-- SOD_1499_012720_012840.rttm exists -->
+<!-- SOD_1499_015420_015540.rttm exists -->
+<!-- SOD_1499_016260_016380.rttm exists -->
+<!-- SOD_1499_017340_017460.rttm exists -->
+<!-- SOD_1499_017820_017940.rttm exists -->
+<!-- SOD_1499_020040_020160.rttm created -->
+<!-- SOD_1499_021660_021780.rttm exists -->
+<!-- SOD_1499_023040_023160.rttm exists -->
+<!-- SOD_1499_024300_024420.rttm created -->
+<!-- SOD_1499_025740_025860.rttm created -->
+<!-- SOD_1499_027540_027660.rttm created -->
+<!-- BER_0396_005220_005340.rttm exists -->
+<!-- BER_0396_008100_008220.rttm exists -->
+<!-- BER_0396_008820_008940.rttm created -->
+<!-- BER_0396_010140_010260.rttm exists -->
+<!-- BER_0396_011160_011280.rttm exists -->
+<!-- BER_0396_012900_013020.rttm exists -->
+<!-- BER_0396_013680_013800.rttm exists -->
+<!-- BER_0396_014520_014640.rttm exists -->
+<!-- BER_0396_021840_021960.rttm created -->
+<!-- BER_0396_022920_023040.rttm created -->
+<!-- BER_0396_024120_024240.rttm exists -->
+<!-- BER_0396_024840_024960.rttm exists -->
+<!-- BER_0396_033660_033780.rttm exists -->
+<!-- BER_0396_037380_037500.rttm exists -->
+<!-- BER_0396_040500_040620.rttm exists -->
+<!-- BER_7758_003780_003900.rttm exists -->
+<!-- BER_7758_004740_004860.rttm exists -->
+<!-- BER_7758_010440_010560.rttm created -->
+<!-- BER_7758_010740_010860.rttm created -->
+<!-- BER_7758_012180_012300.rttm exists -->
+<!-- BER_7758_019140_019260.rttm exists -->
+<!-- BER_7758_021540_021660.rttm created -->
+<!-- BER_7758_026700_026820.rttm created -->
+<!-- BER_7758_027600_027720.rttm created -->
+<!-- BER_7758_027960_028080.rttm created -->
+<!-- BER_7758_029940_030060.rttm exists -->
+<!-- BER_7758_031380_031500.rttm created -->
+<!-- BER_7758_032520_032640.rttm created -->
+<!-- BER_7758_034260_034380.rttm created -->
+<!-- BER_7758_038460_038580.rttm exists -->
+<!-- ROW_2745_007200_007320.rttm exists -->
+<!-- ROW_2745_014700_014820.rttm created -->
+<!-- ROW_2745_017940_018060.rttm exists -->
+<!-- ROW_2745_020160_020280.rttm exists -->
+<!-- ROW_2745_023760_023880.rttm created -->
+<!-- ROW_2745_026760_026880.rttm created -->
+<!-- ROW_2745_031260_031380.rttm exists -->
+<!-- ROW_2745_033360_033480.rttm exists -->
+<!-- ROW_2745_033720_033840.rttm created -->
+<!-- ROW_2745_033960_034080.rttm exists -->
+<!-- ROW_2745_034980_035100.rttm exists -->
+<!-- ROW_2745_039900_040020.rttm exists -->
+<!-- ROW_2745_040800_040920.rttm created -->
+<!-- ROW_2745_044160_044280.rttm created -->
+<!-- ROW_2745_053040_053160.rttm created -->
+<!-- BER_3895_003780_003900.rttm exists -->
+<!-- BER_3895_006120_006240.rttm created -->
+<!-- BER_3895_009300_009420.rttm exists -->
+<!-- BER_3895_012180_012300.rttm created -->
+<!-- BER_3895_013020_013140.rttm exists -->
+<!-- BER_3895_013440_013560.rttm exists -->
+<!-- BER_3895_014940_015060.rttm exists -->
+<!-- BER_3895_021660_021780.rttm exists -->
+<!-- BER_3895_027120_027240.rttm created -->
+<!-- BER_3895_030120_030240.rttm exists -->
+<!-- BER_3895_030480_030600.rttm created -->
+<!-- BER_3895_033060_033180.rttm exists -->
+<!-- BER_3895_037560_037680.rttm created -->
+<!-- BER_3895_043560_043680.rttm created -->
+<!-- BER_3895_047220_047340.rttm exists -->
+<!-- BER_1844_002580_002700.rttm exists -->
+<!-- BER_1844_009060_009180.rttm created -->
+<!-- BER_1844_010560_010680.rttm created -->
+<!-- BER_1844_012120_012240.rttm exists -->
+<!-- BER_1844_013200_013320.rttm exists -->
+<!-- BER_1844_013740_013860.rttm exists -->
+<!-- BER_1844_018120_018240.rttm exists -->
+<!-- BER_1844_018960_019080.rttm exists -->
+<!-- BER_1844_020340_020460.rttm exists -->
+<!-- BER_1844_028320_028440.rttm exists -->
+<!-- BER_1844_029940_030060.rttm exists -->
+<!-- BER_1844_030660_030780.rttm exists -->
+<!-- BER_1844_031620_031740.rttm exists -->
+<!-- BER_1844_034080_034200.rttm exists -->
+<!-- BER_1844_041880_042000.rttm created -->
+<!-- WAR_5613_007800_007920.rttm exists -->
+<!-- WAR_5613_015240_015360.rttm exists -->
+<!-- WAR_5613_017820_017940.rttm exists -->
+<!-- WAR_5613_020040_020160.rttm exists -->
+<!-- WAR_5613_028560_028680.rttm exists -->
+<!-- WAR_5613_029700_029820.rttm created -->
+<!-- WAR_5613_030540_030660.rttm exists -->
+<!-- WAR_5613_031980_032100.rttm created -->
+<!-- WAR_5613_033000_033120.rttm exists -->
+<!-- WAR_5613_034620_034740.rttm exists -->
+<!-- WAR_5613_038820_038940.rttm exists -->
+<!-- WAR_5613_044400_044520.rttm created -->
+<!-- WAR_5613_053760_053880.rttm exists -->
+<!-- WAR_5613_056520_056640.rttm created -->
+<!-- WAR_5613_057240_057360.rttm created -->
+<!-- SOD_8445_006660_006780.rttm exists -->
+<!-- SOD_8445_011700_011820.rttm created -->
+<!-- SOD_8445_012900_013020.rttm created -->
+<!-- SOD_8445_015660_015780.rttm created -->
+<!-- SOD_8445_017580_017700.rttm exists -->
+<!-- SOD_8445_019980_020100.rttm exists -->
+<!-- SOD_8445_021960_022080.rttm exists -->
+<!-- SOD_8445_023880_024000.rttm exists -->
+<!-- SOD_8445_027600_027720.rttm exists -->
+<!-- SOD_8445_029040_029160.rttm created -->
+<!-- SOD_8445_038220_038340.rttm exists -->
+<!-- SOD_8445_039000_039120.rttm exists -->
+<!-- SOD_8445_044340_044460.rttm exists -->
+<!-- SOD_8445_048120_048240.rttm exists -->
+<!-- SOD_8445_049380_049500.rttm exists -->
+<!-- ROW_9408_003780_003900.rttm exists -->
+<!-- ROW_9408_004800_004920.rttm exists -->
+<!-- ROW_9408_008820_008940.rttm exists -->
+<!-- ROW_9408_014880_015000.rttm created -->
+<!-- ROW_9408_018540_018660.rttm created -->
+<!-- ROW_9408_019380_019500.rttm created -->
+<!-- ROW_9408_026100_026220.rttm created -->
+<!-- ROW_9408_033360_033480.rttm exists -->
+<!-- ROW_9408_035580_035700.rttm exists -->
+<!-- ROW_9408_036300_036420.rttm created -->
+<!-- ROW_9408_037500_037620.rttm created -->
+<!-- ROW_9408_039540_039660.rttm created -->
+<!-- ROW_9408_042120_042240.rttm created -->
+<!-- ROW_9408_043080_043200.rttm created -->
+<!-- ROW_9408_046140_046260.rttm created -->
+<!-- WAR_5959_003960_004080.rttm exists -->
+<!-- WAR_5959_004920_005040.rttm exists -->
+<!-- WAR_5959_008520_008640.rttm created -->
+<!-- WAR_5959_012240_012360.rttm created -->
+<!-- WAR_5959_012840_012960.rttm exists -->
+<!-- WAR_5959_018300_018420.rttm exists -->
+<!-- WAR_5959_021960_022080.rttm exists -->
+<!-- WAR_5959_022920_023040.rttm created -->
+<!-- WAR_5959_025800_025920.rttm exists -->
+<!-- WAR_5959_037560_037680.rttm exists -->
+<!-- WAR_5959_039300_039420.rttm created -->
+<!-- WAR_5959_041940_042060.rttm created -->
+<!-- WAR_5959_042300_042420.rttm created -->
+<!-- WAR_5959_051900_052020.rttm created -->
+<!-- WAR_5959_055800_055920.rttm created -->
+<!-- SOD_8924_002400_002520.rttm exists -->
+<!-- SOD_8924_006360_006480.rttm created -->
+<!-- SOD_8924_007140_007260.rttm exists -->
+<!-- SOD_8924_012780_012900.rttm exists -->
+<!-- SOD_8924_013560_013680.rttm created -->
+<!-- SOD_8924_014820_014940.rttm exists -->
+<!-- SOD_8924_015720_015840.rttm created -->
+<!-- SOD_8924_017160_017280.rttm exists -->
+<!-- SOD_8924_017340_017460.rttm exists -->
+<!-- SOD_8924_018240_018360.rttm created -->
+<!-- SOD_8924_018720_018840.rttm exists -->
+<!-- SOD_8924_019500_019620.rttm created -->
+<!-- SOD_8924_023400_023520.rttm created -->
+<!-- SOD_8924_024480_024600.rttm exists -->
+<!-- SOD_8924_028020_028140.rttm exists -->
+<!-- WAR_9755_004140_004260.rttm created -->
+<!-- WAR_9755_010980_011100.rttm exists -->
+<!-- WAR_9755_013140_013260.rttm exists -->
+<!-- WAR_9755_014640_014760.rttm created -->
+<!-- WAR_9755_016680_016800.rttm created -->
+<!-- WAR_9755_017160_017280.rttm exists -->
+<!-- WAR_9755_019020_019140.rttm exists -->
+<!-- WAR_9755_026520_026640.rttm created -->
+<!-- WAR_9755_029400_029520.rttm exists -->
+<!-- WAR_9755_031080_031200.rttm exists -->
+<!-- WAR_9755_035280_035400.rttm exists -->
+<!-- WAR_9755_036060_036180.rttm exists -->
+<!-- WAR_9755_036900_037020.rttm exists -->
+<!-- WAR_9755_038340_038460.rttm exists -->
+<!-- WAR_9755_038880_039000.rttm created -->
+<!-- WAR_3090_010980_011100.rttm exists -->
+<!-- WAR_3090_016320_016440.rttm created -->
+<!-- WAR_3090_020820_020940.rttm created -->
+<!-- WAR_3090_021120_021240.rttm exists -->
+<!-- WAR_3090_027060_027180.rttm exists -->
+<!-- WAR_3090_030780_030900.rttm exists -->
+<!-- WAR_3090_031860_031980.rttm created -->
+<!-- WAR_3090_032340_032460.rttm created -->
+<!-- WAR_3090_034200_034320.rttm created -->
+<!-- WAR_3090_037080_037200.rttm exists -->
+<!-- WAR_3090_043920_044040.rttm exists -->
+<!-- WAR_3090_046980_047100.rttm created -->
+<!-- WAR_3090_047700_047820.rttm exists -->
+<!-- WAR_3090_048720_048840.rttm exists -->
+<!-- WAR_3090_055920_056040.rttm exists -->
+<!-- BER_5750_004860_004980.rttm exists -->
+<!-- BER_5750_006420_006540.rttm exists -->
+<!-- BER_5750_008100_008220.rttm exists -->
+<!-- BER_5750_010560_010680.rttm exists -->
+<!-- BER_5750_022500_022620.rttm created -->
+<!-- BER_5750_027060_027180.rttm created -->
+<!-- BER_5750_029340_029460.rttm exists -->
+<!-- BER_5750_029760_029880.rttm exists -->
+<!-- BER_5750_030120_030240.rttm exists -->
+<!-- BER_5750_030420_030540.rttm exists -->
+<!-- BER_5750_034560_034680.rttm created -->
+<!-- BER_5750_038520_038640.rttm created -->
+<!-- BER_5750_039300_039420.rttm created -->
+<!-- BER_5750_039840_039960.rttm created -->
+<!-- BER_5750_040800_040920.rttm created -->
+<!-- WAR_9427_004380_004500.rttm exists -->
+<!-- WAR_9427_008940_009060.rttm created -->
+<!-- WAR_9427_009960_010080.rttm created -->
+<!-- WAR_9427_017880_018000.rttm exists -->
+<!-- WAR_9427_018240_018360.rttm exists -->
+<!-- WAR_9427_021000_021120.rttm exists -->
+<!-- WAR_9427_022800_022920.rttm exists -->
+<!-- WAR_9427_033300_033420.rttm exists -->
+<!-- WAR_9427_043260_043380.rttm exists -->
+<!-- WAR_9427_045000_045120.rttm exists -->
+<!-- WAR_9427_045960_046080.rttm created -->
+<!-- WAR_9427_049320_049440.rttm created -->
+<!-- WAR_9427_053340_053460.rttm created -->
+<!-- WAR_9427_056040_056160.rttm created -->
+<!-- WAR_9427_056760_056880.rttm exists -->
+<!-- ROW_1735_001919_002039.rttm created -->
+<!-- ROW_1735_010020_010140.rttm exists -->
+<!-- ROW_1735_015060_015180.rttm exists -->
+<!-- ROW_1735_016800_016920.rttm created -->
+<!-- ROW_1735_017160_017280.rttm exists -->
+<!-- ROW_1735_021480_021600.rttm exists -->
+<!-- ROW_1735_030120_030240.rttm exists -->
+<!-- ROW_1735_031260_031380.rttm exists -->
+<!-- ROW_1735_032340_032460.rttm exists -->
+<!-- ROW_1735_039120_039240.rttm exists -->
+<!-- ROW_1735_040620_040740.rttm exists -->
+<!-- ROW_1735_041520_041640.rttm created -->
+<!-- ROW_1735_044820_044940.rttm created -->
+<!-- ROW_1735_047580_047700.rttm created -->
+<!-- ROW_1735_050460_050580.rttm created -->
+<!-- ROW_9801_002100_002220.rttm exists -->
+<!-- ROW_9801_007440_007560.rttm created -->
+<!-- ROW_9801_008820_008940.rttm exists -->
+<!-- ROW_9801_011340_011460.rttm exists -->
+<!-- ROW_9801_012840_012960.rttm exists -->
+<!-- ROW_9801_014760_014880.rttm created -->
+<!-- ROW_9801_019260_019380.rttm exists -->
+<!-- ROW_9801_021720_021840.rttm exists -->
+<!-- ROW_9801_026580_026700.rttm created -->
+<!-- ROW_9801_028740_028860.rttm created -->
+<!-- ROW_9801_035400_035520.rttm created -->
+<!-- ROW_9801_036900_037020.rttm exists -->
+<!-- ROW_9801_043620_043740.rttm created -->
+<!-- ROW_9801_055020_055140.rttm created -->
+<!-- ROW_9801_056040_056160.rttm created -->
+<!-- ROW_3486_008160_008280.rttm exists -->
+<!-- ROW_3486_010620_010740.rttm created -->
+<!-- ROW_3486_022380_022500.rttm exists -->
+<!-- ROW_3486_026400_026520.rttm exists -->
+<!-- ROW_3486_027960_028080.rttm exists -->
+<!-- ROW_3486_030660_030780.rttm exists -->
+<!-- ROW_3486_033060_033180.rttm exists -->
+<!-- ROW_3486_039660_039780.rttm created -->
+<!-- ROW_3486_041460_041580.rttm created -->
+<!-- ROW_3486_047220_047340.rttm created -->
+<!-- ROW_3486_049500_049620.rttm created -->
+<!-- ROW_3486_050040_050160.rttm created -->
+<!-- ROW_3486_050400_050520.rttm created -->
+<!-- ROW_3486_050940_051060.rttm created -->
+<!-- ROW_3486_051300_051420.rttm created -->
+<!-- WAR_1130_002520_002820.rttm created -->
+<!-- WAR_1130_003000_003120.rttm exists -->
+<!-- WAR_1130_004380_004500.rttm exists -->
+<!-- WAR_1130_007080_007200.rttm exists -->
+<!-- WAR_1130_009120_009240.rttm exists -->
+<!-- WAR_1130_011220_011340.rttm exists -->
+<!-- WAR_1130_013260_013380.rttm created -->
+<!-- WAR_1130_021960_022080.rttm exists -->
+<!-- WAR_1130_022980_023100.rttm exists -->
+<!-- WAR_1130_023580_023700.rttm exists -->
+<!-- WAR_1130_026400_026520.rttm created -->
+<!-- WAR_1130_027660_027780.rttm created -->
+<!-- WAR_1130_037140_037260.rttm exists -->
+<!-- WAR_1130_039420_039540.rttm exists -->
+<!-- WAR_1130_040080_040200.rttm created -->
+<!-- SOD_3542_003120_003240.rttm exists -->
+<!-- SOD_3542_003900_004020.rttm exists -->
+<!-- SOD_3542_004920_005040.rttm exists -->
+<!-- SOD_3542_005220_005340.rttm created -->
+<!-- SOD_3542_006060_006180.rttm exists -->
+<!-- SOD_3542_006360_006480.rttm created -->
+<!-- SOD_3542_010080_010200.rttm created -->
+<!-- SOD_3542_010500_010620.rttm created -->
+<!-- SOD_3542_011580_011700.rttm exists -->
+<!-- SOD_3542_015540_015660.rttm exists -->
+<!-- SOD_3542_017220_017340.rttm exists -->
+<!-- SOD_3542_018180_018300.rttm exists -->
+<!-- SOD_3542_019020_019140.rttm exists -->
+<!-- SOD_3542_020700_020820.rttm exists -->
+<!-- SOD_3542_021480_021600.rttm exists -->
+<!-- SOD_3634_004260_004380.rttm exists -->
+<!-- SOD_3634_004860_004980.rttm exists -->
+<!-- SOD_3634_007260_007380.rttm created -->
+<!-- SOD_3634_010860_010980.rttm exists -->
+<!-- SOD_3634_017520_017640.rttm created -->
+<!-- SOD_3634_022140_022260.rttm created -->
+<!-- SOD_3634_022620_022740.rttm created -->
+<!-- SOD_3634_023040_023160.rttm created -->
+<!-- SOD_3634_023940_024060.rttm created -->
+<!-- SOD_3634_024540_024660.rttm created -->
+<!-- SOD_3634_025320_025440.rttm created -->
+<!-- SOD_3634_026100_026220.rttm created -->
+<!-- SOD_3634_028140_028260.rttm created -->
+<!-- SOD_3634_033000_033120.rttm created -->
+<!-- SOD_3634_036120_036240.rttm exists -->
+<!-- BER_2927_012000_012120.rttm exists -->
+<!-- BER_2927_013500_013620.rttm exists -->
+<!-- BER_2927_014160_014280.rttm exists -->
+<!-- BER_2927_019980_020100.rttm created -->
+<!-- BER_2927_023820_023940.rttm exists -->
+<!-- BER_2927_025080_025200.rttm exists -->
+<!-- BER_2927_026160_026280.rttm exists -->
+<!-- BER_2927_026460_026580.rttm exists -->
+<!-- BER_2927_027180_027300.rttm exists -->
+<!-- BER_2927_030120_030240.rttm exists -->
+<!-- BER_2927_037440_037560.rttm exists -->
+<!-- BER_2927_044340_044460.rttm exists -->
+<!-- BER_2927_053160_053280.rttm created -->
+<!-- BER_2927_054900_055020.rttm created -->
+<!-- BER_2927_056400_056520.rttm created -->
+<!-- ROW_1156_001980_002100.rttm exists -->
+<!-- ROW_1156_010140_010260.rttm exists -->
+<!-- ROW_1156_011580_011700.rttm exists -->
+<!-- ROW_1156_013140_013260.rttm exists -->
+<!-- ROW_1156_019680_019800.rttm created -->
+<!-- ROW_1156_022260_022380.rttm exists -->
+<!-- ROW_1156_025800_025920.rttm created -->
+<!-- ROW_1156_034500_034620.rttm created -->
+<!-- ROW_1156_034860_034980.rttm exists -->
+<!-- ROW_1156_038220_038340.rttm exists -->
+<!-- ROW_1156_040020_040140.rttm created -->
+<!-- ROW_1156_043020_043140.rttm created -->
+<!-- ROW_1156_046020_046140.rttm created -->
+<!-- ROW_1156_048600_048720.rttm created -->
+<!-- ROW_1156_054300_054420.rttm created -->
+<!-- BER_1618_003480_003600.rttm exists -->
+<!-- BER_1618_007620_007740.rttm created -->
+<!-- BER_1618_009000_009120.rttm created -->
+<!-- BER_1618_013200_013320.rttm created -->
+<!-- BER_1618_017400_017520.rttm created -->
+<!-- BER_1618_023520_023640.rttm created -->
+<!-- BER_1618_023820_023940.rttm created -->
+<!-- BER_1618_024180_024300.rttm created -->
+<!-- BER_1618_031620_031740.rttm exists -->
+<!-- BER_1618_041040_041160.rttm exists -->
+<!-- BER_1618_043620_043740.rttm created -->
+<!-- BER_1618_047700_047820.rttm created -->
+<!-- BER_1618_050520_050640.rttm created -->
+<!-- BER_1618_051240_051360.rttm created -->
+<!-- BER_1618_053820_053940.rttm created -->
+<!-- SOD_9858_002580_002700.rttm created -->
+<!-- SOD_9858_003360_003480.rttm created -->
+<!-- SOD_9858_004740_004860.rttm exists -->
+<!-- SOD_9858_008520_008640.rttm created -->
+<!-- SOD_9858_009600_009720.rttm exists -->
+<!-- SOD_9858_011520_011640.rttm created -->
+<!-- SOD_9858_012660_012780.rttm created -->
+<!-- SOD_9858_012960_013080.rttm created -->
+<!-- SOD_9858_013800_013920.rttm created -->
+<!-- SOD_9858_015660_015780.rttm created -->
+<!-- SOD_9858_017040_017160.rttm exists -->
+<!-- SOD_9858_018240_018360.rttm exists -->
+<!-- SOD_9858_021360_021480.rttm exists -->
+<!-- SOD_9858_022020_022140.rttm exists -->
+<!-- SOD_9858_023100_023220.rttm created -->
+<!-- BER_1196_002760_002880.rttm exists -->
+<!-- BER_1196_007500_007620.rttm created -->
+<!-- BER_1196_011160_011280.rttm exists -->
+<!-- BER_1196_013680_013800.rttm exists -->
+<!-- BER_1196_014760_014880.rttm created -->
+<!-- BER_1196_015660_015780.rttm exists -->
+<!-- BER_1196_016140_016260.rttm exists -->
+<!-- BER_1196_021240_021360.rttm exists -->
+<!-- BER_1196_022560_022680.rttm exists -->
+<!-- BER_1196_023820_023940.rttm created -->
+<!-- BER_1196_024960_025080.rttm exists -->
+<!-- BER_1196_032880_033000.rttm created -->
+<!-- BER_1196_033480_033600.rttm created -->
+<!-- BER_1196_034740_034860.rttm exists -->
+<!-- BER_1196_039000_039120.rttm exists -->
+<!-- ROW_9492_003780_003900.rttm exists -->
+<!-- ROW_9492_004560_004680.rttm exists -->
+<!-- ROW_9492_006180_006300.rttm created -->
+<!-- ROW_9492_007020_007140.rttm exists -->
+<!-- ROW_9492_007380_007500.rttm exists -->
+<!-- ROW_9492_011100_011220.rttm created -->
+<!-- ROW_9492_011340_011460.rttm exists -->
+<!-- ROW_9492_015240_015360.rttm exists -->
+<!-- ROW_9492_026220_026340.rttm created -->
+<!-- ROW_9492_027960_028080.rttm exists -->
+<!-- ROW_9492_037200_037320.rttm exists -->
+<!-- ROW_9492_044280_044400.rttm created -->
+<!-- ROW_9492_046020_046140.rttm created -->
+<!-- ROW_9492_047820_047940.rttm created -->
+<!-- ROW_9492_048180_048300.rttm created -->
+<!-- ROW_1768_008100_008220.rttm exists -->
+<!-- ROW_1768_009180_009300.rttm exists -->
+<!-- ROW_1768_014220_014340.rttm created -->
+<!-- ROW_1768_016920_017040.rttm created -->
+<!-- ROW_1768_022440_022560.rttm exists -->
+<!-- ROW_1768_023040_023160.rttm exists -->
+<!-- ROW_1768_023400_023520.rttm created -->
+<!-- ROW_1768_030000_030120.rttm exists -->
+<!-- ROW_1768_030300_030420.rttm exists -->
+<!-- ROW_1768_032580_032700.rttm created -->
+<!-- ROW_1768_033540_033660.rttm exists -->
+<!-- ROW_1768_034620_034740.rttm created -->
+<!-- ROW_1768_035220_035340.rttm exists -->
+<!-- ROW_1768_036720_036840.rttm created -->
+<!-- ROW_1768_044340_044460.rttm created -->
+<!-- SOD_9527_001980_002100.rttm exists -->
+<!-- SOD_9527_003660_003780.rttm exists -->
+<!-- SOD_9527_004800_004920.rttm exists -->
+<!-- SOD_9527_007920_008040.rttm created -->
+<!-- SOD_9527_008340_008460.rttm exists -->
+<!-- SOD_9527_010320_010440.rttm created -->
+<!-- SOD_9527_012060_012180.rttm created -->
+<!-- SOD_9527_013920_014040.rttm created -->
+<!-- SOD_9527_020460_020580.rttm created -->
+<!-- SOD_9527_025620_025740.rttm exists -->
+<!-- SOD_9527_027240_027360.rttm exists -->
+<!-- SOD_9527_032760_032880.rttm exists -->
+<!-- SOD_9527_042300_042420.rttm created -->
+<!-- SOD_9527_048900_049020.rttm created -->
+<!-- SOD_9527_049500_049620.rttm created -->
+<!-- WAR_4995_002820_002940.rttm created -->
+<!-- WAR_4995_005100_005220.rttm exists -->
+<!-- WAR_4995_007080_007200.rttm created -->
+<!-- WAR_4995_007440_007560.rttm created -->
+<!-- WAR_4995_012660_012780.rttm exists -->
+<!-- WAR_4995_017580_017700.rttm exists -->
+<!-- WAR_4995_019500_019620.rttm exists -->
+<!-- WAR_4995_020340_020460.rttm exists -->
+<!-- WAR_4995_023160_023280.rttm exists -->
+<!-- WAR_4995_026280_026400.rttm exists -->
+<!-- WAR_4995_026700_026820.rttm exists -->
+<!-- WAR_4995_027300_027420.rttm created -->
+<!-- WAR_4995_029760_029880.rttm created -->
+<!-- WAR_4995_032760_032880.rttm created -->
+<!-- WAR_4995_033120_033240.rttm created -->
+
+And we check that we have the same for LENA
+
+```{bash make_emptyaclew-lena,eval=F}
+
+for j in /Users/acristia/Documents/gitrepos/lena_eval/LENA_eval_201906/gold/[BRSW]*.rttm ; do
+   name=$(basename $j)
+   if test -f "/Users/acristia/Documents/gitrepos/lena_eval/LENA_eval_201906/lena/$name" ; then
+       echo "${name} exists"
+    else
+       touch  /Users/acristia/Documents/gitrepos/lena_eval/LENA_eval_201906/lena/${name}
+       echo "${name} created"
+    fi
+done
+```
+
+WAR_1130_002520_002820.rttm created
+ROW_1735_001919_002039.rttm created # weird on and off times... changed BY HAND to 20 / 40
+
 ## Going from LENA's .its to rttm's: tsi
 
 
 For the tsi files, took from shared folder with Camila called tsi_its, containing a lot more its than the ones we have annotation for, and sitting on top of that folder (ie above its subfolder) I did the following to get the right name:
 
 ```{bash rename-tsi,eval=F}
-grep "LENA" tsi_key_info.csv | while read -r line; do itsname=`echo $line | cut -f 5 -d ","` ; newname=`echo $line | cut -f 11 -d ","` ;  cp its/$itsname.its ${newname}.its ; done
+grep "LENA" tsi_key_info_r.csv | while read -r line; do itsname=`echo $line | cut -f 1 -d ","` ; newname=`echo $line | cut -f 4 -d ","` ;  cp its/$itsname.its ${newname}.its ; done
 ```
 
-Notice there is one file for C18 that is supposed to have a LENA file, but the its is missing from the shared folder. We don´t have annotation for a second C18 day however. So it may be an error and there is in fact not a second LENA file for this child.
+Notice there is one file missing:
+cp: its/e20170714_181139_009458.its: No such file or directory
+This is because this file was lost.
 
 Then move the newly named its files into lena/TSI and run the following is used to generate a huge rttm that has the whole day.
 
@@ -119,18 +763,39 @@ source activate pyannote-lena
 ## The -o option indicates if overlapping classes need to be aggregated as being "OVL"
 
 rm -r -f */mapped*/
+# it is unclear which of the following is the most reasonable, so there is no main one
+python labels_mapper.py -p lena/ -m lena_far #all the far categories stay as far
+mv lena/mapped lena/mapped_far
 python labels_mapper.py -p lena/ -m lena_sil #all the far categories go to silence
 mv lena/mapped lena/mapped_sil
-python labels_mapper.py -p lena/ -m lena_far #all the far categories go to silence
-mv lena/mapped lena/mapped_far
+python labels_mapper.py -p lena/ -m lena_sil_no_tv #all the far categories go to silence
+mv lena/mapped lena/mapped_sil_no_tv
+python labels_mapper.py -p lena/ -m lena_sil_no_tv_no_oln #all the far categories go to silence
+mv lena/mapped lena/mapped_sil_no_tv_no_oln
 
+#a gold version with no electronics
+python labels_mapper.py -p gold/ -m gold_no_ele -o
+mv gold/mapped gold/mapped_no_ele
+
+#this is our main gold
 python labels_mapper.py -p gold/ -m gold -o
 
 ## Evaluate lena performances (should not be run in the frontnode)
 # With -t being the task (identification, diarization or detection)
 # -m being the list of metrics
-python compute_metrics.py -ref gold/mapped/ -hyp lena/mapped_sil/ -t diarization -m diaer coverage homogeneity completeness purity
+# with all metrics it looks like: python compute_metrics.py -ref gold/mapped/ -hyp lena/mapped_sil/ -t diarization -m diaer coverage homogeneity completeness purity
 
+python compute_metrics.py -ref gold/mapped/ -hyp lena/mapped_far/ -t diarization -m diaer 
+mv gold/mapped/diaer__report.csv gold/diaer_lena_far.csv
+
+python compute_metrics.py -ref gold/mapped/ -hyp lena/mapped_sil/ -t diarization -m diaer
+mv gold/mapped/diaer__report.csv gold/diaer_lena_sil.csv
+
+python compute_metrics.py -ref gold/mapped_no_ele/ -hyp lena/mapped_sil_no_tv/ -t diarization -m diaer 
+mv gold/mapped_no_ele/diaer__report.csv gold/diaer_gold_no_ele_lena_sil_no_tv_report.csv
+
+python compute_metrics.py -ref gold/mapped_no_ele/ -hyp lena/mapped_sil_no_tv_no_oln/ -t diarization -m diaer 
+mv gold/mapped_no_ele/diaer__report.csv gold/diaer_gold_no_ele_lena_sil_no_tv_no_oln_report.csv
 
 ```
 
@@ -160,14 +825,13 @@ gold_folder="gold/frame/"
 
 
 gold_levels=c("FEM","CHI","OCH","MAL","OVL","ELE","SIL")
-lena_levels=c("FAN","CHN","CXN","MAN","OLN","TVN","FAF","CHF","CXF","MAF","OLF","TVF","SIL")
+lena_levels=c("FAN","FAF","CHN","CHF","CXN","CXF","MAN","MAF","OLN","OLF","TVN","TVF","SIL")
 
 # Let's start by listing the files
 
 confusion_all <- matrix(0, nrow=length(gold_levels), ncol=length(lena_levels))
 colnames(confusion_all) <- lena_levels
 rownames(confusion_all) <- gold_levels
-i=0
 for(corpus in corpora){#corpus="ROW"
   
   # List filenames
@@ -210,10 +874,7 @@ for(corpus in corpora){#corpus="ROW"
     
     confusion_file = t(gold_mat) %*% lena_mat
     confusion_corp = confusion_corp + confusion_file
-    # i=i+1
-    # if(i==5){
-    #   break
-    # }
+
   }
   print(corpus)
   print(confusion_corp)
@@ -268,7 +929,7 @@ if(length(0<readLines(lena_path))){
 
     
     #the gold doesn't always (empty = no speech)
-    if(file.exists(gold_path)){
+    if(file.exists(gold_path) & length(0<readLines(gold_path))){
       gold = read.csv(gold_path, header=FALSE, sep = " ")[c(4,5,8)]
       names(gold) <- c("onset", "duration", "label")
     } else {

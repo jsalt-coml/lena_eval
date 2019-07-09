@@ -137,7 +137,7 @@ While confusion matrices are useful to understand patterns of errors, it is some
 
 
 ```{r DIAER}
-read.csv(paste0(thisdir,"/gold/mapped/diaer__report.csv"))->py
+read.csv(paste0(thisdir,"/gold/mapped/mapped_sil/diaer__report.csv"))->py
 dim(py) #873 clips
 summary(py)
 
@@ -156,7 +156,7 @@ summary(py) #the exclusion above affected 314-294=20 clips in FA, 7 in DIAER
 py$DER=py$false.alarm..+py$missed.detection..+py$confusion..
 
 round(sum(is.na(py$false.alarm..))/dim(py)[1]*100)
-round(sum(is.na(py$DER))/dim(py)[1]*100)
+round(sum(is.na(py$DER))/dim(p"y)[1]*100)
 
 #other fixes and addtions
 py=subset(py,item!="TOTAL")
@@ -197,6 +197,9 @@ py=merge(py,age_id,by.x="child",by.y="child",all.x=T)
 
 ### Performance in 3 standard speech tech metrics
 
+In this analysis, which is the main one in the paper, we declare all F categories go to silence
+
+
 ```{r mean.metrics}
 length(py$false.alarm..) #total N of clips
 summary(py$false.alarm..)
@@ -207,8 +210,39 @@ summary(py$confusion..)
 
 ```
 
+In this alternative analysis, we declare all F categories separately. This should lead to higher false alarms (since F now counts as speech) and potentially higher confusion.
 
 
+```{r mean.metrics-far}
+read.csv(paste0(thisdir,"/gold/mapped/mapped_far/diaer__report.csv"))->py
+dim(py) #873 clips
+summary(py)
+
+#294 FA, MI, confusion are NA because no speech at all in the clip
+#now 265
+
+round(sum(is.na(py$confusion..))/dim(py)[1]*100)  # percentage of clips with no speech REPORTED IN PAPER
+
+# DER and FA can be very high when there is little speech in a clip
+# so we NA anything that is more than 2 SDs above the mean
+py$false.alarm..[py$false.alarm..> (mean(py$false.alarm..,na.rm=T) + 2 * sd(py$false.alarm..,na.rm=T))]<- NA
+py$diarization.error.rate[py$diarization.error.rate> (mean(py$diarization.error.rate,na.rm=T) + 2 * sd(py$diarization.error.rate,na.rm=T))]<- NA
+
+summary(py) 
+
+```
+
+In this alternative analysis, all the F and N categories map to the same (CHN and CHF go to CH) ** NOT DONE YET**
+
+```{r mean.metrics-joint, eval=F}
+length(py$false.alarm..) #total N of clips
+summary(py$false.alarm..)
+
+summary(py$missed.detection..)
+
+summary(py$confusion..)
+
+```
 
 ## Confusion matrices
 
