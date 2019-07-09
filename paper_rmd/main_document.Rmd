@@ -105,7 +105,7 @@ sumref=rowSums(all)
 ```
 
 ```{r DIAER,echo=F}
-read.csv(paste0(thisdir,"/gold/mapped/mapped_sil/diaer__report.csv"))->py
+read.csv(paste0(thisdir,"/gold/diaer_gold_no_ele_lena_sil_no_tv_no_oln_report.csv"))->py
 #dim(py) #873 clips
 #summary(py)
 
@@ -113,6 +113,7 @@ read.csv(paste0(thisdir,"/gold/mapped/mapped_sil/diaer__report.csv"))->py
 
 #other fixes and addtions
 py=subset(py,item!="TOTAL")
+py$DER=py$false.alarm..+py$missed.detection..+py$confusion..
 py$cor=substr(py$item,1,3)
 py$cor[grep("[0-9]",py$cor)]<-"tsi"
 py$cor=factor(py$cor)
@@ -136,21 +137,61 @@ Before starting, we provide some general observations based on the human annotat
 
 ### LENA classification accuracy: False alarms, misses, confusion 
 
-Our first analysis is based on standard speech technology metrics, which put errors in the perspective of how much speech there is. That is, if 10 frames are wrong in a file where there are 100 frames with speech, this is a much smaller problem than if 10 frames are wrong in a file where there is 1 frame with speech. In other words, these metrics should be considered relative error metrics. One problem, however, emerges when there is no speech whatsoever in a given file. In the speech technology literature, this is never discussed, because most researchers working on this are basing their analyses on files that have been selected to contain speech (e.g., recorded in a meeting, or during a phone conversation). We still wanted to take into account clips with no speech inside because it is key for our research goals: We need systems that can deal well with long stretches of silence, because we want to measure how much speech children hear. Indeed, as mentioned above, `r round(sum(is.na(py$confusion..))/dim(py)[1]*100)`% of our clips had no speech whatsoever. In these cases, the false alarm and confusion metrics are undefined. It also occurred that there was just a little speech; in this case, the denominator is very small, and therefore the ratio for these two metrics ended up being a very large number. Since the presence of outliers violate a basic assumption of regression models, and outliers greatly impact means, we declared as NA any metric that was 2 standard deviations above the mean over all clips. Please note that this leads to an overestimation of LENA's performance, because clips where the relative error rate is very high are removed from consideration. Also, preliminary analyses revealed that performance was lower when near and far were collapsed together (i.e., CHN and CHF were mapped onto a single CH category), so the following analyses use only near speaker categories (i.e., CHN, FAN, MAN, CXN) as well as the overlap category (OLN), with all other categories mapped as non-speech (i.e., CHF, CXF, FAF, MAF, NOF, NON, OLF, TVF, SIL). **For a first analysis on all files, TVN was also mapped as non-speech; a follow-up analysis only on ACLEW data segregated TVN such that there were 5 "speaker" categories: CHN, FAN, MAN, CXN, and TVN.**
+Our first analysis is based on standard speech technology metrics, which put errors in the perspective of how much speech there is. That is, if 10 frames are wrong in a file where there are 100 frames with speech, this is a much smaller problem than if 10 frames are wrong in a file where there is 1 frame with speech. In other words, these metrics should be considered relative error metrics. One problem, however, emerges when there is no speech whatsoever in a given file. In the speech technology literature, this is never discussed, because most researchers working on this are basing their analyses on files that have been selected to contain speech (e.g., recorded in a meeting, or during a phone conversation). We still wanted to take into account clips with no speech inside because it is key for our research goals: We need systems that can deal well with long stretches of silence, because we want to measure how much speech children hear. Indeed, as mentioned above, `r round(sum(is.na(py$confusion..))/dim(py)[1]*100)`% of our clips had no speech whatsoever. In these cases, the false alarm, miss, and confusion rates are all undefined, because the denominator is zero. In all likelihood, this leads to an overestimation of LENA's performance, because potential false alarms in these files are not counted against the system. It also occurred that there was just a little speech; in this case, the denominator is very small, and therefore the ratio for these two metrics ended up being a very large number. To avoid such outliers having an undue impact on our report, we present medians (rather than means).
 
-LENA's false alarm (i.e., saying that someone was speaking when they were not) averaged `r round(mean(py$false.alarm..,na.rm=T))`%, whereas the miss rate averaged `r round(mean(py$missed.detection..,na.rm=T))`%. 
-The confusion rate, as mentioned above, is only calculated for the correctly detected speech (i.e., not the speech that was missed, which counts towards the miss rate, nor the speech that was falsely identified, which is considered in the false alarm). The confusion rate was very low, averaging `r round(mean(py$confusion..,na.rm=T))`%. 
-These three metrics can be added together into a single "diarization error rate"; of course, if one of them is NA, then DER is NA; `r round(sum(is.na(py$DER))/dim(py)[1]*100)`% of the clips had NA diarization error rate (`round(sum(is.na(py$missed.detection..))/dim(py)[1]*100)` due to having no speech and `r round(sum(is.na(py$false.alarm..))/dim(py)[1]*100)-round(sum(is.na(py$missed.detection..))/dim(py)[1]*100)`% due to an outlier false alarm rate). The mean diarization error rate over the remaining clips was `r round(mean(py$DER,na.rm=T))`%. 
-**In a secondary analysis only on the ACLEW data, … COMPLETE… not sure the evaluation would be fair to LENA. My understanding is that their human annotators marked all sound as TV -- whereas you only marked speech as electronic. This means that neither the recall nor the precision can be trusted in our analysis: If we find that 50% of what LENA called TV was tagged as electronic speech, this may well be true. the other 50% was music, jingles, other TV sound. If we say that the recall is 30%, we don't know what the LENA-defined recall was -- perhaps LENA did miss 70% of what you tagged as electronic speech, but found 100% of the music and the other TV sounds, so the recall might be much higher than what we say.**
+There were, a priori, several ways of analyzing the data: 
+
+- collapsing near and far together (i.e., CHN and CHF were mapped onto a single CH category)
+- treating the near and far categories separately (i.e., CHN and CHF are both treated as "speakers", but not the same one)
+- not considering TV as a speaker category, since it is conceptually not identical to the electronic voices detected by ACLEW human annotators; in this case, the gold annotations should also map electronic voices to non-speech or silence
+- not considering OLN as a speaker category, since it is not conceptually identical to the overlap derived from humans' annotating different speaker categories.
+
+We thought the most informative decision would be to report on several of these settings, albeit briefly. We start with the situation that yields the best LENA performance: Electronic voices in the gold annotation are mapped onto silence, so that the categories found in the human annotation are FEM, MAL, CHI, OCH, and overlap; in the LENA annotation, only CHN, FAN, MAN, and CXN are considered speakers (with all far categories, TVN, and OLN all mapped onto silence). In this setting, LENA's false alarm (i.e., saying that someone was speaking when they were not) had a median of `r round(median(py$false.alarm..,na.rm=T))`%, whereas the miss rate had a median of `r round(median(py$missed.detection..,na.rm=T))`%. 
+The confusion rate, as mentioned above, is only calculated for the correctly detected speech (i.e., not the speech that was missed, which counts towards the miss rate, nor the speech that was falsely identified, which is considered in the false alarm). The confusion rate was very low, with a median of `r round(median(py$confusion..,na.rm=T))`%. 
+These three metrics can be added together into a single "diarization error rate". The median diarization error rate over the clips that had some speech was `r round(median(py$DER,na.rm=T))`%. 
+
+```{r cf-dm,echo=F}
+
+ read.csv("../LENA_eval_201906/gold/diaer_lena_sil.csv")->pysil
+ read.csv("../LENA_eval_201906/gold/diaer_lena_far.csv")->pyfar
+ read.csv("../LENA_eval_201906/gold/diaer_gold_no_ele_lena_sil_no_tv_report.csv")->pynotv
+
+ pysil$type<-"pysil"
+pyfar$type<-"pyfar"
+pynotv$type<-"pynotv"
+
+clean<-function(py){
+  py[py$item!="Total",]->py
+  py$cor=substr(py$item,1,1)
+  py$cor[py$cor=="C"] ="T"
+  py
+}
+
+allpy= rbind(pysil,pyfar,pynotv)
+
+clean(allpy)->allpy 
+
+medians=aggregate(allpy[,c("false.alarm..","missed.detection..","confusion..")],by=list(allpy$type),median,na.rm=T)
+
+colnames(medians)[1]<-c("type")
+medians[2:4]<-round(medians[2:4])
+medians$der=rowSums(medians[2:4])
+```
 
 
+If electronic voices in the gold annotation are still mapped onto silence and in the LENA annotation,  CHN, FAN, MAN, CXN as well as OLN are considered speakers (with all far categories as well as TVN mapped onto silence), so that the human categories considered were CHI, FEM, MAL, OCH, and overlap; and the LENA categories considered were CHN, FAN, MAN, CXN, and OLN. In this setting, LENA's false alarm, missed, and confusion rate medians were  `r medians[medians$type=="pynotv",2]`%, `r medians[medians$type=="pynotv",3]`%, and `r medians[medians$type=="pynotv",4]`% respectively, for a total median diarization error of `r medians[medians$type=="pynotv",5]`%. Performance likely degrades because OLN is not picking up the same regions as the overlapping speech found in the human annotations.
+
+Next, we allowed the electronic voices segmented by humans, and TVN among the LENA speaker categories, to be considered during the evaluation (rather than mapping them all to non-speech or silence), so that the human categories considered were CHI, FEM, MAL, OCH, overlap, and electronic; and the LENA categories considered were CHN, FAN, MAN,  CXN, OLN, and TVN. LENA's false alarm, missed, and confusion rate medians were  `r medians[medians$type=="pysil",2]`%, `r medians[medians$type=="pysil",3]`%, and `r medians[medians$type=="pysil",4]`% respectively, for a total median diarization error of `r medians[medians$type=="pysil",5]`%. Performance likely degrades because TVN is not picking up the electronic speech segmented by ACLEW annotators. 
+
+
+Finally, we declared the maximum possible number of categories: The human categories considered were still CHI, FEM, MAL, OCH, overlap, and electronic; but the LENA categories considered were CHN, FAN, MAN, CXN, OLN, TVN, CHF, FAF, MAF, CXF, OLF, TVF. LENA's false alarm, missed, and confusion rate medians were  `r medians[medians$type=="pyfar",2]`%, `r medians[medians$type=="pyfar",3]`%, and `r medians[medians$type=="pyfar",4]`% respectively, for a total median diarization error of `r medians[medians$type=="pyfar",5]`%. Performance degrades because everything is treated as speech, leading to huge apparent false alarm rates. 
 
 ### LENA classification accuracy: Precision and recall 
 
-	By now, we have established that the best performance (when "far" labels such as CHF and OLF are mapped onto silence), the overall relative diarization error rate is about `r round(mean(py$DER,na.rm=T))`%%, due mainly to missing speech (`round(mean(py$missed.detection..,na.rm=T))`%%), with false alarms (`round(mean(py$false.alarm..,na.rm=T))`%) and confusion between talker categories (`round(mean(py$confusion..,na.rm=T))`%) constituting a relatively small proportion of errors. However, this metric may not capture what our readers are interested in, for two reasons. First, this metric gives more importance to correctly classifying segments as speech versus non-speech (False alarms + misses) than confusing talkers (confusion). Second, many LENA adopters use the system not to make decisions on the sections labeled as non-speech, but rather on sections labeled as speech, and particularly those labeled adults and key child. The metrics above do not give more importance to these two categories, and do not give us insight on the patterns of error made by the system. Looking at precision of speech categories is crucial for users who interpret LENA's estimated quantity of adult speech or key child speech, as low precision means that some of what LENA called e.g. key child was not in fact the key child, and thus it is providing overestimates. Looking at recall may be most interesting for adopters who intend to employ LENA as a first-pass annotation: the lower the recall, the more is missed by the system and thus cannot be retrieved (because the system labeled it as something else, which will not be inspected given the original filter). Recall also impacts quantity estimates, since it indicates how much was missed of that category.
+By now, we have established that the best performance (when "far" labels such as CHF and OLF are mapped onto silence, as are TVN and OLN), the overall relative diarization error rate is about `r round(median(py$DER,na.rm=T))`%, due mainly to missing speech (`r round(median(py$missed.detection..,na.rm=T))`%), with false alarms (`r round(median(py$false.alarm..,na.rm=T))`%) and confusion between talker categories (`r round(median(py$confusion..,na.rm=T))`%) constituting a relatively small proportion of errors. However, this metric may not capture what our readers are interested in, for two reasons. First, this metric gives more importance to correctly classifying segments as speech versus non-speech (False alarms + misses) than confusing talkers (confusion). Second, many LENA adopters use the system not to make decisions on the sections labeled as non-speech, but rather on sections labeled as speech, and particularly those labeled adults and key child. The metrics above do not give more importance to these two categories, and do not give us insight on the patterns of error made by the system. Looking at precision of speech categories is crucial for users who interpret LENA's estimated quantity of adult speech or key child speech, as low precision means that some of what LENA called e.g. key child was not in fact the key child, and thus it is providing overestimates. Looking at recall may be most interesting for adopters who intend to employ LENA as a first-pass annotation: the lower the recall, the more is missed by the system and thus cannot be retrieved (because the system labeled it as something else, which will not be inspected given the original filter). Recall also impacts quantity estimates, since it indicates how much was missed of that category.
 	
 	
-Therefore, this subsection shows confusion matrices, containing information on precision and recall, for each key category. For this analysis, we collapsed over all human annotations that contained overlap between two speakers into a category called "overlap". Please remember that this category is not defined the same way as the LENA overlap category. For LENA, overlap between any two categories falls within overlap -- i.e., CHN+TV would be counted towards overlap; whereas for us, only overlap between two talker categories (e.g., key child and female adult) counts as overlap. (Note that neither case contemplates overlap between two speakers of the same category as overlap.)
+Therefore, this subsection shows confusion matrices, containing information on precision and recall, for each key category. For this analysis, we collapsed over all human annotations that contained overlap between two speakers into a category called "overlap". Please remember that this category is not defined the same way as the LENA overlap category. For LENA, overlap between any two categories falls within overlap -- i.e., CHN+TV would be counted towards overlap; whereas for us, only overlap between two talker categories (e.g., key child and female adult) counts as overlap.
 
 ```{r ggprec}
 
@@ -171,20 +212,19 @@ ggplot(data = stall, mapping = aes(y = stall$human, x=stall$lena)) +
 ```
 
 
-We start by explaining how to interpret one cell in Figure (precision): Focus on the crossing of the human category FEM and the LENA category FAN; when LENA tags a given frame as FAN, this corresponds to a frame tagged as being a female adult by the human `r round(stall$pr[stall$lena=="FAN" & stall$human=="FEM"])`% of the time. This category, as mentioned above, is the most common speaker category in the audio, so that over `r floor(stall$n[stall$lena=="FAN" & stall$human=="FEM"]/1000)`k frames (representing `r round(stall$n[stall$lena=="FAN" & stall$human=="FEM"]/sum(stall$n[stall$lena=="FAN"])*100)` of the frames tagged as FAN by LENA)  were tagged as being female adult by both the human and LENA. The remaining `r round(stall$n[stall$lena=="FAN" & stall$human!="FEM"]/sum(stall$n[stall$lena=="FAN"])*100)`% of frames that LENA tagged as FAN were actually other categories according to our human coders: `r round(stall$pr[stall$lena=="FAN" & stall$human=="SIL"])`% were silence, `r round(sum(stall$pr[stall$lena=="FAN" & stall$human=="OVL"]))`% were in regions of overlap between speakers or between a speaker and an electronic voice, and `r round(sum(stall$pr[stall$lena=="FAN" & !(stall$human=="SIL" | stall$human=="FEM" | stall$human=="OVL")]))`% were due to confusions with other speaker tags. Inspection of the rest of the confusion matrix shows that, other than silence, this is the most precise LENA tag. 
+We start by explaining how to interpret one cell in Figure (precision): Focus on the crossing of the human category FEM and the LENA category FAN; when LENA tags a given frame as FAN, this corresponds to a frame tagged as being a female adult by the human `r round(stall$pr[stall$lena=="FAN" & stall$human=="FEM"])`% of the time. This category, as mentioned above, is the most common speaker category in the audio, so that over `r floor(stall$n[stall$lena=="FAN" & stall$human=="FEM"]/1000)`k frames (representing `r round(stall$n[stall$lena=="FAN" & stall$human=="FEM"]/sum(stall$n[stall$lena=="FAN"])*100)`% of the frames tagged as FAN by LENA)  were tagged as being female adult by both the human and LENA. The remaining `r round(stall$n[stall$lena=="FAN" & stall$human!="FEM"]/sum(stall$n[stall$lena=="FAN"])*100)`% of frames that LENA tagged as FAN were actually other categories according to our human coders: `r round(stall$pr[stall$lena=="FAN" & stall$human=="SIL"])`% were silence, `r round(sum(stall$pr[stall$lena=="FAN" & stall$human=="OVL"]))`% were in regions of overlap between speakers or between a speaker and an electronic voice, and `r round(sum(stall$pr[stall$lena=="FAN" & !(stall$human=="SIL" | stall$human=="FEM" | stall$human=="OVL")]))`% were due to confusions with other speaker tags. Inspection of the rest of the confusion matrix shows that, other than silence, this is the most precise LENA tag. 
 
-Precision for CHN comes in secondplace, at `r round(stall$pr[stall$lena=="CHN" & stall$human=="CHI"])`%; thus, fewer than half of the frames labeled as being the key child are, in fact, the key child. The majority of the frames, LENA incorrectly tagged as being the key child are actually silence (or rather, lack of speech) according to the human annotator (`round(stall$pr[stall$lena=="CHN" & stall$human=="SIL"])`%), with the remaining errors being due to confusion with other categories: About `r round(stall$pr[stall$lena=="CHN" & stall$human=="FEM"])`% of them are actually a female adult; `r round(stall$pr[stall$lena=="CHN" & stall$human=="OCH"])`% are another child; and `r round(stall$pr[stall$lena=="CHN" & stall$human=="OVL"])`% are regions of overlap across speakers, according to our human coders. 
+Precision for CHN comes in secondplace, at `r round(stall$pr[stall$lena=="CHN" & stall$human=="CHI"])`%; thus, fewer than half of the frames labeled as being the key child are, in fact, the key child. The majority of the frames, LENA incorrectly tagged as being the key child are actually silence (or rather, lack of speech) according to the human annotator (`r round(stall$pr[stall$lena=="CHN" & stall$human=="SIL"])`%), with the remaining errors being due to confusion with other categories: About `r round(stall$pr[stall$lena=="CHN" & stall$human=="FEM"])`% of them are actually a female adult; `r round(stall$pr[stall$lena=="CHN" & stall$human=="OCH"])`% are another child; and `r round(stall$pr[stall$lena=="CHN" & stall$human=="OVL"])`% are regions of overlap across speakers, according to our human coders. 
 
-MAN and CXN score similarly, `r round(stall$pr[stall$lena=="MAN" & stall$human=="MAL"])` and `r round(stall$pr[stall$lena=="CXN" & stall$human=="OCH"])`% respectively, meaning that less than a tenth of the areas LENA tagged as being these speakers actually correspond to them. As with the key child, most errors are due to LENA tagging silent frames as these categories. However, in this case confusion with other speaker tags is far from negligible. In fact, the most common speaker tag in the human annotation among the regions that LENA tagged as being MAN were actually female adult speech (`round(stall$pr[stall$lena=="MAN" & stall$human=="FEM"])`%); and, for CXN, it was not uncommon to find a CXN tag for a frame human listeners identified as a female adult (`round(stall$pr[stall$lena=="CXN" & stall$human=="FEM"])`%) or the key child (`round(stall$pr[stall$lena=="CXN" & stall$human=="OCH"])`%). In a nutshell, this suggests extreme caution before undertaking any analyses that rely on the precision of MAN and CXN, since most of what is being tagged as such is silence or other speakers.
+MAN and CXN score similarly, `r round(stall$pr[stall$lena=="MAN" & stall$human=="MAL"])` and `r round(stall$pr[stall$lena=="CXN" & stall$human=="OCH"])`% respectively, meaning that less than a tenth of the areas LENA tagged as being these speakers actually correspond to them. As with the key child, most errors are due to LENA tagging silent frames as these categories. However, in this case confusion with other speaker tags is far from negligible. In fact, the most common speaker tag in the human annotation among the regions that LENA tagged as being MAN were actually female adult speech (`r round(stall$pr[stall$lena=="MAN" & stall$human=="FEM"])`%); and, for CXN, it was not uncommon to find a CXN tag for a frame human listeners identified as a female adult (`r round(stall$pr[stall$lena=="CXN" & stall$human=="FEM"])`%) or the key child (`r round(stall$pr[stall$lena=="CXN" & stall$human=="OCH"])`%). In a nutshell, this suggests extreme caution before undertaking any analyses that rely on the precision of MAN and CXN, since most of what is being tagged as such is silence or other speakers.
 
-Another observation is that the "far" tags of the speaker categories do tend to more frequently correspond to what humans tagged as silence (`round(mean(stall$pr[substr(stall$lena,3,3)=="F" & stall$human=="SIL"]))`%) than the "near" tags (`round(mean(stall$pr[substr(stall$lena,3,3)=="N" & stall$human=="SIL"]))`%), and thus it is reasonable to exclude them from consideration. The relatively high proportion of near LENA tags that correspond to regions that humans labeled as silence could be partially due to the fact that the LENA system, in order to process a daylong recording quickly, does not make judgments on small frames independently, but rather imposes a minimum duration for all speaker categories, padding with silence in order to achieve it. Thus, any key child utterance that is shorter than .6 secs will contain as much silence as needed to achieve this minimum (and more for the other talker categories). Our system of annotation, whereby human annotators had no access whatsoever to the LENA tags, puts us in an ideal situation to assess the impact of this design decision, because any annotation that starts from the LENA segmentation should bias the human annotator to ignore such short interstitial silences to a greater extent than if they have no access to their tags whatsoever.
+Another observation is that the "far" tags of the speaker categories do tend to more frequently correspond to what humans tagged as silence (`r round(mean(stall$pr[substr(stall$lena,3,3)=="F" & stall$human=="SIL"]))`%) than the "near" tags (`r round(mean(stall$pr[substr(stall$lena,3,3)=="N" & stall$human=="SIL"]))`%), and thus it is reasonable to exclude them from consideration. The relatively high proportion of near LENA tags that correspond to regions that humans labeled as silence could be partially due to the fact that the LENA system, in order to process a daylong recording quickly, does not make judgments on small frames independently, but rather imposes a minimum duration for all speaker categories, padding with silence in order to achieve it. Thus, any key child utterance that is shorter than .6 secs will contain as much silence as needed to achieve this minimum (and more for the other talker categories). Our system of annotation, whereby human annotators had no access whatsoever to the LENA tags, puts us in an ideal situation to assess the impact of this design decision, because any annotation that starts from the LENA segmentation should bias the human annotator to ignore such short interstitial silences to a greater extent than if they have no access to their tags whatsoever.
 
-	These analyses shed light on the extent to which we can trust the LENA tags to contain what the name indicates. We now move on to recall, which indicates a complementary perspective: how much of the original annotations were captured by LENA.
+These analyses shed light on the extent to which we can trust the LENA tags to contain what the name indicates. We now move on to recall, which indicates a complementary perspective: how much of the original annotations were captured by LENA.
 
 ```{r ggrec}
 
 prop_cat=data.frame(t(apply(all,1,dodiv)*100)) #generates recall because rows
-rowSums(prop_cat)
 rec=stall
 rec$pr=stack(prop_cat)$values
   
@@ -196,11 +236,11 @@ ggplot(data = rec, mapping = aes(y = rec$human, x=rec$lena)) +
   xlab("LENA") + ylab("Human")
 ```
 
-	Again, we start with an example to facilitate the interpretation of this figure: The best performance for a talker category this time is CHN: Nearly half of the original frames humans tagged as being uttered by the key child were captured by the LENA under the CHN tag. Among the remaining regions that humans labeled as being the key child, `r round(mean(rec$pr[rec$lena=="CXN" & rec$human=="CHI"]))`% was captured by LENA's CXN category and `r round(mean(rec$pr[rec$lena=="OLN" & rec$human=="CHI"]))`% by its OLN tag, with the remainder spread out across several categories. This result can be taken to suggest that an analysis pipeline that uses the LENA system to capture the key child's vocalizations by extracting only CHN regions will get nearly half of the key child's speech. Where additional human vetting is occuring in the pipeline, such researchers may consider additionally pulling out segments labeled as CXN, since this category actually contains a further `r round(mean(rec$pr[rec$lena=="CXN" & rec$human=="CHI"]))`% of the key child's speech. Moreover, as we saw above, over a third of these LENA tags corresponds to the key child, which means that human coders who are re-coding these regions could filter out the two thirds that do not.
+Again, we start with an example to facilitate the interpretation of this figure: The best performance for a talker category this time is CHN: Nearly half of the original frames humans tagged as being uttered by the key child were captured by the LENA under the CHN tag. Among the remaining regions that humans labeled as being the key child, `r round(mean(rec$pr[rec$lena=="CXN" & rec$human=="CHI"]))`% was captured by LENA's CXN category and `r round(mean(rec$pr[rec$lena=="OLN" & rec$human=="CHI"]))`% by its OLN tag, with the remainder spread out across several categories. This result can be taken to suggest that an analysis pipeline that uses the LENA system to capture the key child's vocalizations by extracting only CHN regions will get nearly half of the key child's speech. Where additional human vetting is occuring in the pipeline, such researchers may consider additionally pulling out segments labeled as CXN, since this category actually contains a further `r round(mean(rec$pr[rec$lena=="CXN" & rec$human=="CHI"]))`% of the key child's speech. Moreover, as we saw above, over a third of these LENA tags corresponds to the key child, which means that human coders who are re-coding these regions could filter out the two thirds that do not.
 	
-	Many colleagues also use the LENA as a first pass to capture female adult speech via their FAN label. Only `r round(mean(rec$pr[rec$lena=="FAN" & rec$human=="FEM"]))` of the female adult speech can be captured this way. Unlike the case of the key child, missed female speech is classified into many of the other categories, and thus there may not exist an easy solution (i.e., one would have to pull out all examples of many other categories to get at least half of the original female adult). However, if the hope is to capture as much of the female speech as possible, perhaps a solution may be to also pull out OLN regions, since these capture a further `r round(mean(rec$pr[rec$lena=="OLN" & rec$human=="FEM"]))`% of the original female adult speech and, out of the OLN tags, `r round(mean(stall$pr[stall$lena=="OLN" & stall$human=="FEM"]))`% are indeed female adults (meaning that human annotators re-coding these regions need to filter out 4 out of 5 clips, on average).
+Many colleagues also use the LENA as a first pass to capture female adult speech via their FAN label. Only `r round(mean(rec$pr[rec$lena=="FAN" & rec$human=="FEM"]))` of the female adult speech can be captured this way. Unlike the case of the key child, missed female speech is classified into many of the other categories, and thus there may not exist an easy solution (i.e., one would have to pull out all examples of many other categories to get at least half of the original female adult). However, if the hope is to capture as much of the female speech as possible, perhaps a solution may be to also pull out OLN regions, since these capture a further `r round(mean(rec$pr[rec$lena=="OLN" & rec$human=="FEM"]))`% of the original female adult speech and, out of the OLN tags, `r round(mean(stall$pr[stall$lena=="OLN" & stall$human=="FEM"]))`% are indeed female adults (meaning that human annotators re-coding these regions need to filter out 4 out of 5 clips, on average).
 	
-	For the remaining two near speaker labels (MAN, CXN), recall averaged `r round(mean(rec$pr[(rec$lena=="MAN" & rec$human=="MAL")|(rec$lena=="CXN" & rec$human=="CXN")]))`%, meaning that less than a quarter of male adult and other child speech is being captured by LENA. In fact, most of these speakers' contributions are being tagged by the LENA as OLN (mean across MAN and CXN `r round(mean(rec$pr[(rec$lena=="OLN" & rec$human=="MAL")|(rec$lena=="OLN" & rec$human=="CXN")]))`%) or silence (mean across MAN and CXN `r round(mean(rec$pr[(rec$lena=="SIL" & rec$human=="MAL")|(rec$lena=="SIL" & rec$human=="CXN")]))`%), although the remaining sizable proportion of misses is actually distributed across many categories. 
+For the remaining two near speaker labels (MAN, CXN), recall averaged `r round(mean(rec$pr[(rec$lena=="MAN" & rec$human=="MAL")|(rec$lena=="CXN" & rec$human=="CXN")]))`%, meaning that less than a quarter of male adult and other child speech is being captured by LENA. In fact, most of these speakers' contributions are being tagged by the LENA as OLN (mean across MAN and CXN `r round(mean(rec$pr[(rec$lena=="OLN" & rec$human=="MAL")|(rec$lena=="OLN" & rec$human=="CXN")]))`%) or silence (mean across MAN and CXN `r round(mean(rec$pr[(rec$lena=="SIL" & rec$human=="MAL")|(rec$lena=="SIL" & rec$human=="CXN")]))`%), although the remaining sizable proportion of misses is actually distributed across many categories. 
 
 Finally, as with precision, the "far" categories show worse performance than the "near" ones. It is always the case that a higher percentage of frames is "captured" by the near rather than the far labels. For instance, out of all frames attributed to the key child by the human annotator, `r round(rec$pr[(rec$lena=="CHN" & rec$human=="CHI")])`% were picked up by the LENA CHN label versus `r round(rec$pr[(rec$lena=="CHF" & rec$human=="CHI")])`% by the LENA CHF label. This result can be used to argue why, when sampling LENA daylong files using the LENA software, users need not take into account the "F" categories.
 
@@ -217,7 +257,7 @@ cor.cvc.noZeros= cor.test(cvtc$CVC_n[cvtc$CVC_n>0 & cvtc$CVC_gold>0],cvtc$CVC_go
 ```
 
 
-Given the inaccuracy of far LENA tags, and in order to follow the LENA system procedure, we only counted vocalizations attributed to CHN and ignored those attributed to CHF. As shown in Figure (CVC), there is a strong association between clip-level counts estimated via the LENA system and those found in the human annotations: the Pearson correlation between the two was r=`round(cor.cvc.all$estimate,3)` (p=`signif(cor.cvc.all$p.value,3)`) when all clips were taken into account, and r=`round(cor.cvc.noZeros$estimate,3)` (p=`signif(cor.cvc.noZeros$p.value,3)`)  when only clips with some child speech (i.e., excluding clips with 0 counts in both LENA and human annotations) were considered. This suggests that the LENA system captures  differences in terms of number of child vocalizations across clips well.
+Given the inaccuracy of far LENA tags, and in order to follow the LENA system procedure, we only counted vocalizations attributed to CHN and ignored those attributed to CHF. As shown in Figure (CVC), there is a strong association between clip-level counts estimated via the LENA system and those found in the human annotations: the Pearson correlation between the two was r = `r round(cor.cvc.all$estimate,3)` (p = `r signif(cor.cvc.all$p.value,3)`) when all clips were taken into account, and r = `r round(cor.cvc.noZeros$estimate,3)` (p = `r signif(cor.cvc.noZeros$p.value,3)`)  when only clips with some child speech (i.e., excluding clips with 0 counts in both LENA and human annotations) were considered. This suggests that the LENA system captures  differences in terms of number of child vocalizations across clips well.
 
 
 
@@ -273,7 +313,8 @@ no_human_zeros=cvtc[ cvtc$CTC_gold>0,]
 rer=(no_human_zeros$CTC_n-no_human_zeros$CTC_gold)/no_human_zeros$CTC_gold*100
 aer=(cvtc$CTC_n-cvtc$CTC_gold)
 ```
-	Again, we only considered "near" speaker categories in the turn count, and applied the same rule the LENA does, where a turn can be from the key child to an adult or vice versa, and should happen within 5 seconds to be counted. The association between clip-level LENA and human CTC was weaker than that found for CVC:  the Pearson correlation between the two was r=`round(cor.ctc.all$estimate,3)` (p=`signif(cor.ctc.all$p.value,3)`) when all clips were taken into account, and r=`round(cor.ctc.noZeros$estimate,3)` (p=`signif(cor.ctc.noZeros$p.value,3)`)  when only clips with some child speech (i.e., excluding `r sum(cvtc$CTC_n>0 & cvtc$CTC_gold>0)` clips with 0 counts in both LENA and human annotations) were considered. This suggests that the LENA system captures  differences in terms of number of child vocalizations across clips well. The absolute error rate ranged from `r min(aer)` to `r max(aer)`, with a mean of `r mean(aer)` and a median of `r median(aer)`. As for  relative error rates, these require the number in the denominator to be non-null. For this analysis, therefore, we need to remove the `r sum(cvtc$CTC_gold==0)` clips in which the human annotator said there were no child-adult or adult-child turns  whatsoever. When we do this, the mean relative error rate ranged from `r min(rer)` to `r max(rer)`, with a mean of `r mean(rer)` and a median of `r median(rer)`
+
+Again, we only considered "near" speaker categories in the turn count, and applied the same rule the LENA does, where a turn can be from the key child to an adult or vice versa, and should happen within 5 seconds to be counted. The association between clip-level LENA and human CTC was weaker than that found for CVC:  the Pearson correlation between the two was r = `r round(cor.ctc.all$estimate,3)` (p = `r signif(cor.ctc.all$p.value,3)`) when all clips were taken into account, and r = `r round(cor.ctc.noZeros$estimate,3)` (p = `r signif(cor.ctc.noZeros$p.value,3)`)  when only clips with some child speech (i.e., excluding `r sum(cvtc$CTC_n>0 & cvtc$CTC_gold>0)` clips with 0 counts in both LENA and human annotations) were considered.  The absolute error rate ranged from `r min(aer)` to `r max(aer)`, with a mean of `r mean(aer)` and a median of `r median(aer)`. As for  relative error rates, these require the number in the denominator to be non-null. For this analysis, therefore, we need to remove the `r sum(cvtc$CTC_gold==0)` clips in which the human annotator said there were no child-adult or adult-child turns  whatsoever. When we do this, the mean relative error rate ranged from `r min(rer)` to `r max(rer)`, with a mean of `r mean(rer)` and a median of `r median(rer)`
 
 
 
@@ -302,8 +343,9 @@ cor.awc.noZeros= cor.test(awc$gold[awc$gold>0 & awc$lena>0],awc$lena[awc$gold>0 
 # # RER against human
 # 
 # 
+no_human_zeros=subset(awc,gold>0)
  rer=(no_human_zeros$lena-no_human_zeros$gold)/no_human_zeros$gold*100
-aer=(awc$lena-cvtc$gold)
+aer=(awc$lena-awc$gold)
 ```
 
 ```{r awc-fig}
@@ -311,12 +353,10 @@ aer=(awc$lena-cvtc$gold)
 plot(gold~lena,data=awc,pch=20,main="AWC",col=alpha("black",.2))
 abline(lm(gold~lena,data=awc))
 abline(lm(gold~lena,data=awc,subset=c(awc$gold>0 & awc$lena>0)),lty=2)
-
-
 ```
 
 
-One child in the SOD corpus was learning French. We have included this child to increase power, but results without this one child are nearly identical.  The association between clip-level LENA and human AWC was strong: the Pearson correlation between the two was r=`round(cor.awc.all$estimate,3)` (p=`signif(cor.awc.all$p.value,3)`) when all clips were taken into account, and r=`round(cor.awc.noZeros$estimate,3)` (p=`signif(cor.awc.noZeros$p.value,3)`)  when only clips with some child speech (i.e., excluding `r sum(awc$gold>0 & awc$lena>0)` clips with 0 counts in both LENA and human annotations) were considered. This suggests that the LENA system captures  differences in terms of number of child vocalizations across clips well. The absolute error rate ranged from `r min(aer)` to `r max(aer)`, with a mean of `r mean(aer)` and a median of `r median(aer)`. As for  relative error rates, these require the number in the denominator to be non-null. For this analysis, therefore, we need to remove the `r sum(awc$gold>0)` clips in which the human annotator said there were no child-adult or adult-child turns  whatsoever. When we do this, the mean relative error rate ranged from `r min(rer)` to `r max(rer)`, with a mean of `r mean(rer)` and a median of `r median(rer)`
+One child in the SOD corpus was learning French. We have included this child to increase power, but results without this one child are nearly identical.  The association between clip-level LENA and human AWC was strong: the Pearson correlation between the two was r=`r round(cor.awc.all$estimate,3)` (p=`r signif(cor.awc.all$p.value,3)`) when all clips were taken into account, and r=`r round(cor.awc.noZeros$estimate,3)` (p=`r signif(cor.awc.noZeros$p.value,3)`)  when only clips with some child speech (i.e., excluding `r sum(awc$gold>0 & awc$lena>0)` clips with 0 counts in both LENA and human annotations) were considered. This suggests that the LENA system captures  differences in terms of number of child vocalizations across clips well. The absolute error rate ranged from `r min(aer)` to `r max(aer)`, with a mean of `r mean(aer)` and a median of `r median(aer)`. As for  relative error rates, these require the number in the denominator to be non-null. For this analysis, therefore, we need to remove the `r sum(awc$gold>0)` clips in which the human annotator said there were no child-adult or adult-child turns  whatsoever. When we do this, the mean relative error rate ranged from `r min(rer)` to `r max(rer)`, with a mean of `r mean(rer)` and a median of `r median(rer)`
 
 
 ### Effects of age and differences across corpora 
@@ -349,9 +389,9 @@ age_id = rbind(spreadsheet, spreadsheet_tsi)
 py=merge(py,age_id,by.x="child",by.y="child",all.x=T) #one row is lost... **ATTENTION BUG HERE**
 
 for(dv in c("false.alarm..","missed.detection..","confusion..")){
-    print(dv)
+    #print(dv)
     mymodel=lmer(py[,dv]~cor*age+(1|child),data=py,subset=c(total>0))
-  print(Anova(mymodel))
+  #print(Anova(mymodel))
 }
 
 ```
@@ -372,22 +412,22 @@ merge(cvtc,age_id,by="child")->cvtc
 
 mymodel<-lmer(CVC_gold~CVC_n*age*cor + (1|child), data=cvtc)
 #summary(mymodel)
-Anova(mymodel)
+#Anova(mymodel)
 
 #there is a 3-way interaction between age, corpus, and the predictive value of LENA's counts with respect to the gold counts
 # to investigate this we fit the same reg within corpus
 
 for(thiscor in levels(cvtc$cor)){
-  print(thiscor)
+  #print(thiscor)
  mymodel<-lmer(CVC_gold~CVC_n*age + (1|child), data=cvtc,subset=c(cor==thiscor))
-print(summary(mymodel))
-print(Anova(mymodel))
+#print(summary(mymodel))
+#print(Anova(mymodel))
 }
 ```
 
-For CVC, we fit a mixed model where CVC according to the human was predicted from CVC according to LENA, in interaction with corpus and age, as fixed factors; with child ID as random effect. An Analysis of Variance (type 2) found a triple interaction, suggesting that the predicted value of LENA with respect to human CVC depended on both the corpus and the child age; and a two-way interaction between CVC by LENA and corpus. To investigate these further, we fit a model where CVC according to the human was predicted from CVC according to LENA in interaction with age (as fixed factors, with child ID as random) within each corpus separately. This revealed a significant interaction between LENA CVC and age for BER (indicating that the predictive value of LENA CVC increased with child age), whereas for the other four corpora this interaction was not significant, nor was the main effect of age, and only the LENA CVC emerged as a significant predictor of variance in child vocalization counts derived from human annotation.[singfit] 
+For CVC, we fit a mixed model where CVC according to the human was predicted from CVC according to LENA, in interaction with corpus and age, as fixed factors; with child ID as random effect. An Analysis of Variance (type 2) found a triple interaction, suggesting that the predicted value of LENA with respect to human CVC depended on both the corpus and the child age; and a two-way interaction between CVC by LENA and corpus. To investigate these further, we fit a model where CVC according to the human was predicted from CVC according to LENA in interaction with age (as fixed factors, with child ID as random) within each corpus separately. This revealed a significant interaction between LENA CVC and age for BER (indicating that the predictive value of LENA CVC increased with child age), whereas for the other four corpora this interaction was not significant, nor was the main effect of age, and only the LENA CVC emerged as a significant predictor of variance in child vocalization counts derived from human annotation.[1] 
 
-[singfit]: For both BER and WAR, the variance associated to the child ID random factor was zero. This suggests a mixed model was not necessary, as child ID is not explaining any additional variance, but it does not alter the interpretation in the main text.
+[1]: For both BER and WAR, the variance associated to the child ID random factor was zero. This suggests a mixed model was not necessary, as child ID is not explaining any additional variance, but it does not alter the interpretation in the main text.
 
 
 ```{r ctc-age, echo=F}
@@ -395,16 +435,16 @@ For CVC, we fit a mixed model where CVC according to the human was predicted fro
 
 mymodel<-lmer(CTC_gold~CTC_n*age*cor + (1|child), data=cvtc)
 #summary(mymodel)
-Anova(mymodel)
+#Anova(mymodel)
 
 #there is a 2-way interaction between corpus and the predictive value of LENA's counts with respect to the gold counts
 # to investigate this we fit the same reg within corpus ; we remove age because it was not involved in these interactions
 
 for(thiscor in levels(cvtc$cor)){
-  print(thiscor)
+ # print(thiscor)
  mymodel<-lmer(CTC_gold~CTC_n + (1|child), data=cvtc,subset=c(cor==thiscor))
-print(summary(mymodel))
-print(Anova(mymodel))
+#print(summary(mymodel))
+#print(Anova(mymodel))
 }
 bermod<-summary(lmer(CTC_gold~CTC_n + (1|child), data=cvtc,subset=c(cor=="BER")))
 rowmod<-summary(lmer(CTC_gold~CTC_n + (1|child), data=cvtc,subset=c(cor=="ROW")))
@@ -415,9 +455,14 @@ warmod<-summary(lmer(CTC_gold~CTC_n + (1|child), data=cvtc,subset=c(cor=="WAR"))
 ```
 
 
-For CTC, we fit a mixed model where CTC according to the human was predicted from CTC according to LENA, in interaction with corpus and age, as fixed factors; with child ID as random effect. An Analysis of Variance (type 2) found a two-way interaction between CTC by LENA and corpus. To investigate this further, we fit the same regressions within each corpus separately. These follow-up analyses revealed that CTC by LENA was a better predictor of human-tagged CTC for WAR (estimate = `r round(warmod$coefficients[2,1],3)`, SE of estimate = `r round(warmod$coefficients[2,2],3)`, t = `r round(warmod$coefficients[2,3],3)`) and TSI (estimate = `r round(tsimod$coefficients[2,1],3)`, SE of estimate = `r round(tsimod$coefficients[2,2],3)`, t = `r round(tsimod$coefficients[2,3],3)`), than L05  (estimate = `r round(rowmod$coefficients[2,1],3)`, SE of estimate = `r round(rowmod$coefficients[2,2],3)`, t = `r round(tsimod$coefficients[2,3],3)`) or SOD (estimate = `r round(sodmod$coefficients[2,1],3)`, SE of estimate = `r round(sodmod$coefficients[2,2],3)`, t = `r round(sodmod$coefficients[2,3],3)`), and for these than for BER (estimate = `r round(bermod$coefficients[2,1],3)`, SE of estimate = `r round(bermod$coefficients[2,2],3)`, t = `r round(bermod$coefficients[2,3],3)`).[singfit2] 
+For CTC, we fit a mixed model where CTC according to the human was predicted from CTC according to LENA, in interaction with corpus and age, as fixed factors; with child ID as random effect. An Analysis of Variance (type 2) found a two-way interaction between CTC by LENA and corpus. To investigate this further, we fit the same regressions within each corpus separately.[2]  These follow-up analyses revealed that CTC by LENA varied in its strength of prediction of human-tagged CTC across corpora  (
+BER estimate = `r round(bermod$coefficients[2,1],3)`, SE of estimate = `r round(bermod$coefficients[2,2],3)`, t = `r round(bermod$coefficients[2,3],3)`;
+L05  (estimate = `r round(rowmod$coefficients[2,1],3)`, SE of estimate = `r round(rowmod$coefficients[2,2],3)`, t = `r round(tsimod$coefficients[2,3],3)`)
+TSI estimate = `r round(tsimod$coefficients[2,1],3)`, SE of estimate = `r round(tsimod$coefficients[2,2],3)`, t = `r round(tsimod$coefficients[2,3],3)`; 
+SOD estimate = `r round(sodmod$coefficients[2,1],3)`, SE of estimate = `r round(sodmod$coefficients[2,2],3)`, t = `r round(sodmod$coefficients[2,3],3)`; 
+WAR estimate = `r round(warmod$coefficients[2,1],3)`, SE of estimate = `r round(warmod$coefficients[2,2],3)`, t = `r round(warmod$coefficients[2,3],3)`).
 
-[singfit2]: For both TSI and WAR, the variance associated to the child ID random factor was zero. This suggests a mixed model was not necessary, as child ID is not explaining any additional variance, but it does not alter the interpretation in the main text.
+[2]: For both TSI and WAR, the variance associated to the child ID random factor was zero. This suggests a mixed model was not necessary, as child ID is not explaining any additional variance, but it does not alter the interpretation in the main text.
 
 ## Discussion
 
