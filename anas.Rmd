@@ -466,21 +466,11 @@ summary(rer)
 
 ```{r dm}
 
-colfill<-c("blue","brown","red","orange","purple")
-names(colfill)<-c("tsi","ROW","BER","SOD","WAR")
 for(dv in c("false.alarm..","missed.detection..","confusion..")){
-  if(dv=="false.alarm.."){ #note that the other two metrics are undefined when there is no speech
-    print("all clips")
-    mymodel=lmer(py[,dv]~cor*age+(1|child),data=py)
-  print(summary(mymodel))
-  print(Anova(mymodel))
-  }
-    print("only clips with some speech")
+    print(dv)
     mymodel=lmer(py[,dv]~cor*age+(1|child),data=py,subset=c(total>0))
-  print(summary(mymodel))
+  #print(summary(mymodel))
   print(Anova(mymodel))
-
- plot(py[,dv]~jitter(age),data=py,col=alpha(colfill[py$cor],.2),pch=ifelse(py$total>0,20,3),ylab=dv)
 }
 
 

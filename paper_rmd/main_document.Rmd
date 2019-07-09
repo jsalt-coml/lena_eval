@@ -110,19 +110,6 @@ read.csv(paste0(thisdir,"/gold/mapped/mapped_sil/diaer__report.csv"))->py
 #summary(py)
 
 #294 FA, MI, confusion are NA because no speech at all in the clip
-#now 265
-
-
-# DER and FA can be very high when there is little speech in a clip
-# so we NA anything that is more than 2 SDs above the mean
-py$false.alarm..[py$false.alarm..> (mean(py$false.alarm..,na.rm=T) + 2 * sd(py$false.alarm..,na.rm=T))]<- NA
-
-summary(py) #the exclusion above affected 314-294=20 clips in FA, 7 in DIAER
-
-py$DER=py$false.alarm..+py$missed.detection..+py$confusion..
-
-#round(sum(is.na(py$false.alarm..))/dim(py)[1]*100)
-#round(sum(is.na(py$DER))/dim(py)[1]*100)
 
 #other fixes and addtions
 py=subset(py,item!="TOTAL")
@@ -198,6 +185,7 @@ Another observation is that the "far" tags of the speaker categories do tend to 
 
 prop_cat=data.frame(t(apply(all,1,dodiv)*100)) #generates recall because rows
 rowSums(prop_cat)
+rec=stall
 rec$pr=stack(prop_cat)$values
   
 ggplot(data = rec, mapping = aes(y = rec$human, x=rec$lena)) + 
@@ -219,7 +207,7 @@ Finally, as with precision, the "far" categories show worse performance than the
 ### Child Vocalization Counts (CVC) accuracy 
 
 ```{r cvc,echo=F}
-read.table(paste0(thisdir,"cvtc.txt"),header=T)->cvtc
+read.table(paste0(thisdir,"/cvtc.txt"),header=T)->cvtc
 
 
 
@@ -259,19 +247,23 @@ aer=(cvtc$CVC_n-cvtc$CVC_gold)
 ```
 
 
-The absolute error rate ranged from `r min(aer)` to `r max(aer)`, with a mean of `r mean(aer)` and a median of `r median(aer)`. As for  relative error rates, these require the number in the denominator to be non-null. For this analysis, therefore, we need to remove the `r sum(cvtc$CVC_gold=0)` clips in which the human annotator said there were no child vocalizations whatsoever. When we do this, the mean relative error rate ranged from `r min(rer)` to `r max(rer)`, with a mean of `r mean(rer)` and a median of `r median(rer)`
+The absolute error rate ranged from `r min(aer)` to `r max(aer)`, with a mean of `r mean(aer)` and a median of `r median(aer)`. As for  relative error rates, these require the number in the denominator to be non-null. For this analysis, therefore, we need to remove the `r sum(cvtc$CVC_gold==0)` clips in which the human annotator said there were no child vocalizations whatsoever. When we do this, the mean relative error rate ranged from `r min(rer)` to `r max(rer)`, with a mean of `r mean(rer)` and a median of `r median(rer)`
 
 
 ### Conversational Turn Counts (CTC) accuracy 
 
 
-```{r ctc}
+```{r ctc-fig}
 
 
 
 plot(CTC_n~CTC_gold,data=cvtc,pch=20,main="Conversational turn counts (near only)",col=alpha("black",.2))
 abline(lm(CTC_n~CTC_gold,data=cvtc))
 abline(lm(CTC_n~CTC_gold,data=cvtc,subset=c(cvtc$CTC_n>0 & cvtc$CTC_gold>0)),lty=2)
+
+```
+
+```{r ctc, echo=F}
 
 cor.ctc.all=cor.test(cvtc$CTC_n,cvtc$CTC_gold)
 cor.ctc.noZeros=cor.test(cvtc$CTC_n[cvtc$CTC_n>0 & cvtc$CTC_gold>0],cvtc$CTC_gold[cvtc$CTC_n>0 & cvtc$CTC_gold>0])
@@ -281,9 +273,7 @@ no_human_zeros=cvtc[ cvtc$CTC_gold>0,]
 rer=(no_human_zeros$CTC_n-no_human_zeros$CTC_gold)/no_human_zeros$CTC_gold*100
 aer=(cvtc$CTC_n-cvtc$CTC_gold)
 ```
-
-
-	Again, we only considered "near" speaker categories in the turn count, and applied the same rule the LENA does, where a turn can be from the key child to an adult or vice versa, and should happen within 5 seconds to be counted. The association between clip-level LENA and human CTC was weaker than that found for CVC:  the Pearson correlation between the two was r=`round(cor.ctc.all$estimate,3)` (p=`signif(cor.ctc.all$p.value,3)`) when all clips were taken into account, and r=`round(cor.ctc.noZeros$estimate,3)` (p=`signif(cor.ctc.noZeros$p.value,3)`)  when only clips with some child speech (i.e., excluding `r sum(cvtc$CTC_n>0 & cvtc$CTC_gold>0)` clips with 0 counts in both LENA and human annotations) were considered. This suggests that the LENA system captures  differences in terms of number of child vocalizations across clips well. The absolute error rate ranged from `r min(aer)` to `r max(aer)`, with a mean of `r mean(aer)` and a median of `r median(aer)`. As for  relative error rates, these require the number in the denominator to be non-null. For this analysis, therefore, we need to remove the `r sum(cvtc$CTC_gold>0)` clips in which the human annotator said there were no child-adult or adult-child turns  whatsoever. When we do this, the mean relative error rate ranged from `r min(rer)` to `r max(rer)`, with a mean of `r mean(rer)` and a median of `r median(rer)`
+	Again, we only considered "near" speaker categories in the turn count, and applied the same rule the LENA does, where a turn can be from the key child to an adult or vice versa, and should happen within 5 seconds to be counted. The association between clip-level LENA and human CTC was weaker than that found for CVC:  the Pearson correlation between the two was r=`round(cor.ctc.all$estimate,3)` (p=`signif(cor.ctc.all$p.value,3)`) when all clips were taken into account, and r=`round(cor.ctc.noZeros$estimate,3)` (p=`signif(cor.ctc.noZeros$p.value,3)`)  when only clips with some child speech (i.e., excluding `r sum(cvtc$CTC_n>0 & cvtc$CTC_gold>0)` clips with 0 counts in both LENA and human annotations) were considered. This suggests that the LENA system captures  differences in terms of number of child vocalizations across clips well. The absolute error rate ranged from `r min(aer)` to `r max(aer)`, with a mean of `r mean(aer)` and a median of `r median(aer)`. As for  relative error rates, these require the number in the denominator to be non-null. For this analysis, therefore, we need to remove the `r sum(cvtc$CTC_gold==0)` clips in which the human annotator said there were no child-adult or adult-child turns  whatsoever. When we do this, the mean relative error rate ranged from `r min(rer)` to `r max(rer)`, with a mean of `r mean(rer)` and a median of `r median(rer)`
 
 
 
@@ -306,11 +296,6 @@ awc$child[awc$cor=="tsi"]=substr(awc$X[awc$cor=="tsi"],1,3)
 merge(awc,age_id,by="child")->awc
 
 
-plot(gold~lena,data=awc,pch=20,main="AWC",col=alpha("black",.2))
-abline(lm(gold~lena,data=awc))
-abline(lm(gold~lena,data=awc,subset=c(awc$gold>0 & awc$lena>0)),lty=2)
-
-
 cor.awc.all= cor.test(awc$gold,awc$lena)
 cor.awc.noZeros= cor.test(awc$gold[awc$gold>0 & awc$lena>0],awc$lena[awc$gold>0 & awc$lena>0])
 # 
@@ -321,6 +306,15 @@ cor.awc.noZeros= cor.test(awc$gold[awc$gold>0 & awc$lena>0],awc$lena[awc$gold>0 
 aer=(awc$lena-cvtc$gold)
 ```
 
+```{r awc-fig}
+
+plot(gold~lena,data=awc,pch=20,main="AWC",col=alpha("black",.2))
+abline(lm(gold~lena,data=awc))
+abline(lm(gold~lena,data=awc,subset=c(awc$gold>0 & awc$lena>0)),lty=2)
+
+
+```
+
 
 One child in the SOD corpus was learning French. We have included this child to increase power, but results without this one child are nearly identical.  The association between clip-level LENA and human AWC was strong: the Pearson correlation between the two was r=`round(cor.awc.all$estimate,3)` (p=`signif(cor.awc.all$p.value,3)`) when all clips were taken into account, and r=`round(cor.awc.noZeros$estimate,3)` (p=`signif(cor.awc.noZeros$p.value,3)`)  when only clips with some child speech (i.e., excluding `r sum(awc$gold>0 & awc$lena>0)` clips with 0 counts in both LENA and human annotations) were considered. This suggests that the LENA system captures  differences in terms of number of child vocalizations across clips well. The absolute error rate ranged from `r min(aer)` to `r max(aer)`, with a mean of `r mean(aer)` and a median of `r median(aer)`. As for  relative error rates, these require the number in the denominator to be non-null. For this analysis, therefore, we need to remove the `r sum(awc$gold>0)` clips in which the human annotator said there were no child-adult or adult-child turns  whatsoever. When we do this, the mean relative error rate ranged from `r min(rer)` to `r max(rer)`, with a mean of `r mean(rer)` and a median of `r median(rer)`
 
@@ -329,11 +323,101 @@ One child in the SOD corpus was learning French. We have included this child to 
 
 The preceding sections include results that are wholesale, over all corpora. However, we have reason to believe that performance could be higher for the corpora collected in North America (BER, WAR, SOD) than those collected in other English-speaking countries (L05) or non-English speaking populations (TSI). Additionally, our age ranges are wide, and in the case of TSI children, some of the children are older than the oldest children in the LENA training set. To assess whether accuracy varies as a function of corpora and child age, we fit mixed models as follows.
 
-We predicted false alarm, miss, and confusion rates from corpus, child age, and the interaction as fixed, child ID as random, on clips where there was some speech according to the human annotator; since misses and confusions are undefined when the annotator said there was no speech but false alarms is not, we additionally fitted a model to all clips (i.e., regardless of whether they had speech or not. We followed up with an Analysis of Variance (type 3) to assess significance. In none of these analyses was corpus, child age, or their interaction significant.
+```{r lmer-dm, echo=F}
+read.csv(paste0(thisdir,"/gold/diaer_gold_no_ele_lena_sil_no_tv_no_oln_report.csv"))->py
 
-For CVC, we fit a mixed model where CVC according to the human was predicted from CVC according to LENA, in interaction with corpus and age, as fixed factors; with child ID as random effect. An Analysis of Variance (type 3) found a triple interaction, suggesting that the predicted value of LENA with respect to human CVC depended on both the corpus and the child age; and a two-way interaction between CVC by LENA and corpus. To investigate these further, we fit the same regressions within each corpus separately. This revealed that there accuracy of LENA CVC increased with age for BER, but decreased for WAR, being stable in the others.
+#other fixes and addtions
+py=subset(py,item!="TOTAL")
+py$cor=substr(py$item,1,3)
+py$cor[grep("[0-9]",py$cor)]<-"tsi"
+py$cor=factor(py$cor)
 
-For CTC, we fit a mixed model where CTC according to the human was predicted from CTC according to LENA, in interaction with corpus and age, as fixed factors; with child ID as random effect. An Analysis of Variance (type 3) found a two-way interaction between CTC by LENA and corpus. To investigate this further, we fit the same regressions within each corpus separately. These follow-up analyses revealed that CTC by LENA was a better predictor of human-tagged CTC for WAR (t=5.06) than ROW  (t=2.04) or SOD (t=2.92), and for these than for BER (t=1.07).
+py$child=substr(py$item,1,8)
+py$child[py$cor=="tsi"]=substr(py$item[py$cor=="tsi"],1,3)
+
+
+
+# add in age info
+spreadsheet = read.csv(paste0(thisdir,"/ACLEW_list_of_corpora.csv"), header=TRUE, sep = ",")
+spreadsheet$child=paste0(spreadsheet$labname,"_",ifelse(nchar(spreadsheet$aclew_id)==3,paste0("0",spreadsheet$aclew_id),spreadsheet$aclew_id))
+spreadsheet = spreadsheet[,c("child","age_mo_round")]
+colnames(spreadsheet) = c("child","age")
+spreadsheet_tsi = read.csv(paste0(thisdir,"/anon_metadata.csv"), header=TRUE, sep = ",")
+spreadsheet_tsi = spreadsheet_tsi[c("id","age_mo")]
+colnames(spreadsheet_tsi) = c("child","age")
+age_id = rbind(spreadsheet, spreadsheet_tsi)
+py=merge(py,age_id,by.x="child",by.y="child",all.x=T) #one row is lost... **ATTENTION BUG HERE**
+
+for(dv in c("false.alarm..","missed.detection..","confusion..")){
+    print(dv)
+    mymodel=lmer(py[,dv]~cor*age+(1|child),data=py,subset=c(total>0))
+  print(Anova(mymodel))
+}
+
+```
+
+
+We predicted false alarm, miss, and confusion rates (when all "F" categories, TV, and overlap were mapped onto silence, which yielded the best results in Section XX) from corpus, child age, and the interaction as fixed effects, child ID as random effect, on clips where there was some speech according to the human annotator. We followed up with an Analysis of Variance (type 2) to assess significance. In none of these analyses was corpus, child age, or their interaction significant.
+
+
+```{r cvc-age, echo=F}
+cvtc$cor=substr(cvtc$filename,1,3)
+cvtc$cor[substr(cvtc$filename,1,1)=="C"]<-"tsi"
+cvtc$cor=factor(cvtc$cor)
+
+cvtc$child=substr(cvtc$filename,1,8)
+cvtc$child[cvtc$cor=="tsi"]<-substr(cvtc$filename[cvtc$cor=="tsi"],1,3)
+
+merge(cvtc,age_id,by="child")->cvtc
+
+mymodel<-lmer(CVC_gold~CVC_n*age*cor + (1|child), data=cvtc)
+#summary(mymodel)
+Anova(mymodel)
+
+#there is a 3-way interaction between age, corpus, and the predictive value of LENA's counts with respect to the gold counts
+# to investigate this we fit the same reg within corpus
+
+for(thiscor in levels(cvtc$cor)){
+  print(thiscor)
+ mymodel<-lmer(CVC_gold~CVC_n*age + (1|child), data=cvtc,subset=c(cor==thiscor))
+print(summary(mymodel))
+print(Anova(mymodel))
+}
+```
+
+For CVC, we fit a mixed model where CVC according to the human was predicted from CVC according to LENA, in interaction with corpus and age, as fixed factors; with child ID as random effect. An Analysis of Variance (type 2) found a triple interaction, suggesting that the predicted value of LENA with respect to human CVC depended on both the corpus and the child age; and a two-way interaction between CVC by LENA and corpus. To investigate these further, we fit a model where CVC according to the human was predicted from CVC according to LENA in interaction with age (as fixed factors, with child ID as random) within each corpus separately. This revealed a significant interaction between LENA CVC and age for BER (indicating that the predictive value of LENA CVC increased with child age), whereas for the other four corpora this interaction was not significant, nor was the main effect of age, and only the LENA CVC emerged as a significant predictor of variance in child vocalization counts derived from human annotation.[singfit] 
+
+[singfit]: For both BER and WAR, the variance associated to the child ID random factor was zero. This suggests a mixed model was not necessary, as child ID is not explaining any additional variance, but it does not alter the interpretation in the main text.
+
+
+```{r ctc-age, echo=F}
+
+
+mymodel<-lmer(CTC_gold~CTC_n*age*cor + (1|child), data=cvtc)
+#summary(mymodel)
+Anova(mymodel)
+
+#there is a 2-way interaction between corpus and the predictive value of LENA's counts with respect to the gold counts
+# to investigate this we fit the same reg within corpus ; we remove age because it was not involved in these interactions
+
+for(thiscor in levels(cvtc$cor)){
+  print(thiscor)
+ mymodel<-lmer(CTC_gold~CTC_n + (1|child), data=cvtc,subset=c(cor==thiscor))
+print(summary(mymodel))
+print(Anova(mymodel))
+}
+bermod<-summary(lmer(CTC_gold~CTC_n + (1|child), data=cvtc,subset=c(cor=="BER")))
+rowmod<-summary(lmer(CTC_gold~CTC_n + (1|child), data=cvtc,subset=c(cor=="ROW")))
+sodmod<-summary(lmer(CTC_gold~CTC_n + (1|child), data=cvtc,subset=c(cor=="SOD")))
+tsimod<-summary(lmer(CTC_gold~CTC_n + (1|child), data=cvtc,subset=c(cor=="tsi")))
+warmod<-summary(lmer(CTC_gold~CTC_n + (1|child), data=cvtc,subset=c(cor=="WAR")))
+
+```
+
+
+For CTC, we fit a mixed model where CTC according to the human was predicted from CTC according to LENA, in interaction with corpus and age, as fixed factors; with child ID as random effect. An Analysis of Variance (type 2) found a two-way interaction between CTC by LENA and corpus. To investigate this further, we fit the same regressions within each corpus separately. These follow-up analyses revealed that CTC by LENA was a better predictor of human-tagged CTC for WAR (estimate = `r round(warmod$coefficients[2,1],3)`, SE of estimate = `r round(warmod$coefficients[2,2],3)`, t = `r round(warmod$coefficients[2,3],3)`) and TSI (estimate = `r round(tsimod$coefficients[2,1],3)`, SE of estimate = `r round(tsimod$coefficients[2,2],3)`, t = `r round(tsimod$coefficients[2,3],3)`), than L05  (estimate = `r round(rowmod$coefficients[2,1],3)`, SE of estimate = `r round(rowmod$coefficients[2,2],3)`, t = `r round(tsimod$coefficients[2,3],3)`) or SOD (estimate = `r round(sodmod$coefficients[2,1],3)`, SE of estimate = `r round(sodmod$coefficients[2,2],3)`, t = `r round(sodmod$coefficients[2,3],3)`), and for these than for BER (estimate = `r round(bermod$coefficients[2,1],3)`, SE of estimate = `r round(bermod$coefficients[2,2],3)`, t = `r round(bermod$coefficients[2,3],3)`).[singfit2] 
+
+[singfit2]: For both TSI and WAR, the variance associated to the child ID random factor was zero. This suggests a mixed model was not necessary, as child ID is not explaining any additional variance, but it does not alter the interpretation in the main text.
 
 ## Discussion
 
