@@ -156,19 +156,249 @@ products}\label{brief-introduction-to-lenar-products}
 
 \subsubsection{Corpora}\label{corpora}
 
+The data for the evaluation comes from two different projects. The
+largest one is the ACLEW project (Bergelson et al., 2017b Databrary
+volume; Soderstrom et al AMPPS under review); in this paper we focus on
+four different corpora of child daylong recordings that have been pooled
+together, sampled, and annotated in a coordinated manner. These four
+corpora are: the Bergelson corpus (\enquote{BER}) from US English
+families from the upstate New York area (Bergelson, 2016), the LuCiD
+Language 0--5 corpus (\enquote{L05}) consisting of English-speaking
+families from Northwest England (Rowland et al., 2018), the McDivitt and
+Winnipeg corpora ( \enquote{MCD}) of Canadian English families (McDivitt
+\& Soderstrom, 2016), and the Warlaumont corpus (\enquote{WAR}) of US
+English from Merced, California (Warlaumont et al., 2016). Some
+recordings in BER, and all recordings in MCD and WAR are available from
+HomeBank repository (VanDam et al., 2016). The second project contains a
+single corpus collected from Tsimane' speaking families in Bolivia
+(Scaff et al., in prep.; here \enquote{TSI}).
+
+Key properties of the five corpora are summarized in Table 2. Each
+corpus consists of daylong (4--16 hour) at-home recordings; each corpus
+samples from a unique community. Corpora span languages and dialects;
+socioeconomic environment varying both within and across corpora. In
+each recording, the key child (\enquote{participant}) wears a LENA
+recorder in a special vest throughout a normal day.
+
+For the four ACLEW corpora, out of the 106 recorded participants,
+daylong recordings from 10 infants from each corpus were chosen for
+manual annotation, selected to represent a diversity of ages (0--36
+months) and socio-economic contexts. In the SOD corpus, sensitive
+information was found in one of the files, and thus one child needed to
+be excluded. The tenth day for this corpus was a second day by one of
+the 9 included children. From each daylong file, fifteen 2-minute
+non-overlapping audio (with a 5-minute context window) were randomly
+sampled from the entire daylong timeline for manual annotation. This 30
+minute sample corresponded to approximately 1 minute of annotated speech
+per key child (collapsing across all speaker categories).
+
+The TSI corpus consisted of 1-2 daylong recordings from 12 infants, out
+of the 25 recorded from field work that year; the other 13 had been
+recorded using other devices (not the LENA DLP). From these daylong
+files, 1-minute segments were sampled in a period fashion. That is, for
+each day, we skipped the first 33 minutes to allow the family to
+acclimate to the recorder, and then extracted 1 minute (with a 5-minute
+context window) every 60 minutes, until the end of the recording was
+reached. This resulted in 4 to 16 minutes of manually annotated audio
+per child per recording (mean = 12.64 minutes), and an average of 3
+minutes of speech per key child (collapsing across all speaker
+categories).
+
+We chose to sample 1 or 2 minutes at a time (Tsimane, and ACLEW corpora,
+respectively) because conversations are likely to be bursty (Goh \&
+Barbasi; cf.~Slone et al Fausey et al ICIS18 session). That is, it is
+likely the case that speech is not produced at a periodic rate (e.g.,
+one phrase every 20 seconds), but rather it occurs in bursts (a
+conversation is followed by a long period of silence between the
+conversational partners, followed by another bout of conversation,
+perhaps with different interlocutors, followed by silence, and so on).
+In this context, imagine that you sample a 5-second stretch. If you find
+speech in that stretch, then it is likely you have by chance fallen on a
+conversation bout; if you do not find speech, then you have likely found
+a silence bout. If you were to extend that selection out to several
+minutes, then it is likely that you will simply add more material from
+the same type (i.e.~conversation bout or silence bout). As a result, any
+sampling method that favors medium-sized stretches (5-15 minutes) will
+tend to end up with samples that are internally homogeneous (throughout
+the 5 minutes, there is a conversation), but highly heterogeneous as a
+collection if sampling is random throughout the day. This in turn would
+lead to artificially high correlations between LENA and human metrics in
+all dependent variables (e.g., since probably little speech, fewer
+turns, and fewer child vocalizations will be found in silent bouts and
+more in conversational ones). Thus, our strategy of sampling
+randomly/periodically and in short stretches is more likely to represent
+both conversational and short bouts, and to capture finer-grained
+variation in speech quantity.
+
+In the 5 corpora, the 1- or 2-min samples were annotated for all
+hearable utterance boundaries and talker ID. In ACLEW corpora
+\footnote{see Casillas et al., 2017a, 2017b for the general annotation protocol, and Soderstrom et al., submitted to AMPPS, for an introduction to the databases},
+talker IDs reflected unique individual talkers, but were coded in such a
+way to readily allow mapping onto LENAs talker categories (e.g.~key
+child, other children, female adult, male adult). In the TSI corpus,
+only the key child and one female adult whose voice recurred throughout
+the day were individually identified, with all other talkers being
+classified on the basis of broad age and sex into male adult, female
+adult, and other children. The ACLEW datasets had other coding levels
+which will not be discussed here.
+
 \subsubsection{Processing}\label{processing}
+
+Several different time units are needed to clarify how different metrics
+are calculated (see Figure XX). Clips refer to the 1- or 2-minute
+samples extracted from recordings. This is the basic unit at which child
+vocalization counts and conversational turn counts can be established.
+In addition, since most previous work evaluating adult word counts did
+so at the clip level, we do so here as well.
+
+\begin{figure}
+\centering
+\includegraphics{fig_levels.jpg}
+\caption{Levels at which performance is evaluated.}
+\end{figure}
+
+The other metrics require a more detailed explanation, conveyed
+graphically in Figure XX. The stretch of time that has been assigned to
+a speech or non-speech category by LENA is a segment. In one clip, there
+may be just one long segment (e.g., the whole clip has been assigned to
+Silence by LENA); or there may be more (e.g., the first 5 seconds are
+attributed to the key child, then there is a 50-second Silence segment,
+and the final 5 seconds are attributed to a Female Adult). In LENA's
+automated analysis, only one of these categories may be active at a
+given point in time. In contrast, we typically speak of utterances or
+vocalizations to refer to stretches of speech detected by humans and
+assigned to different talkers. Again, clips may have zero or more
+utterances. Unlike LENA, however, a given point in time may be
+associated with multiple speakers. Given that there need not be a
+one-to-one correspondence between LENA segments and human utterances, we
+need to define smaller time units that can be used to check for
+agreement. In this paper, we use 10 ms frames. This is the basic time
+unit used for all classification accuracy estimations, which are
+introduced in more detail in the next subsection.
 
 \subsubsection{LENA classification
 accuracy}\label{lena-classification-accuracy}
 
+Our first goal was to establish LENA talker tag accuracy, particularly
+for the four broad LENA talker categories (key child, other child,
+female adult, male adult; or CHN, CXN, FAN, MAN), but taking into
+account other categories (with some limitation on their interpretation).
+We calculated accuracy in two complementary ways. First, we used three
+frame-based, standard metrics of speech and talker segmentation to allow
+direct comparison with other systems in the speech technology literature
+(False Alarms, Misses, Confusion Rate). We also use Diarization Error
+Rate, which is derived from the first three metrics; together these
+provide a stringent and standard test of accuracy. Second, we used
+frame-based precision and recall of each category to provide an
+intuitive representation of the error patterns shown by this system. In
+both cases, electronic voices were rare in the ACLEW annotations and not
+coded at all (by design) in the Tsimane data, they were mapped onto
+silence.
+
 \paragraph{Speech and talker segmentation
 metrics}\label{speech-and-talker-segmentation-metrics}
 
+The original coding was converted using custom-written python scripts
+into rttm format (REF), a text-based format indicating, for each
+vocalization, its start time, duration, and speaker. This representation
+was used in pyannote.metrics (REF) to compute four standard diarization
+metrics: rate of false alarm for speech, rate of misses for speech, rate
+of confusion between talkers, and the derived diarization error rate
+(DER). These are calculated with the following formulas at the level of
+each clip, where FA (false alarm) is the number of frames during which
+there is no talk according to the human annotator but during which LENA
+found some talk; M (miss) is the number of frames during which there is
+talk according to the human annotator but during which LENA found no
+talk; C (confusion) is the number of frames correctly classified as LENA
+as containing talk, but whose voice type has not been correctly
+identified (when the LENA model recognizes female adult speech where
+there is male adult speech for instance), and T is the total number of
+frames that contain talk according to the human annotation:
+
+\begin{itemize}
+\tightlist
+\item
+  false alarm rate = FA/T,
+\item
+  miss rate = M/T,
+\item
+  confusion rate = C/T,
+\item
+  DER = (FA+M+C)/T,
+\end{itemize}
+
+In the human annotation, there is no class representing overlapping
+speech as such. For the sake of completeness and full comparison with
+the LENA model, time where two or more different speech sources were
+active at the same time, according to the human annotators, have been
+mapped to the class \enquote{overlap} post hoc. This allows us to
+compare this Overlap class to LENA's OLN (and, for the precision/recall
+analysis introduced next, OLF) by the LENA model. Therefore, the
+confusion rate is computed based on the matches in Table XX.
+
+Table XX: Correspondances between LENA and our human annotation.
+*Electronic voices were only annotated in the ACLEW dataset. Although
+some Tsimane' families listen to the radio, radio speech was not
+annotated in the TSI corpus.
+
+Please remember that the overlap category is not defined the same way as
+the LENA overlap category. For LENA, overlap between any two categories
+falls within overlap -- i.e., CHN+TV would be counted towards overlap as
+would FAN+FAN; whereas for us, only overlap between two talker
+categories (e.g., key child and female adult) counts as overlap.
+Similarly, the TVN is not equivalent to the electronic speech tag in the
+ACLEW coding.
+
 \paragraph{Precision and recall}\label{precision-and-recall}
+
+This evaluation looks in more detail at the pattern of errors, by
+assessing how LENA and human annotators agreed and disagreed. In both
+precision and recall, the numerator is the intersection between a LENA
+tag and a human tag (e.g., the number of frames that LENA classified as
+CHN and the annotator classified as Key child; notice, there is no
+constraint that these two categories by conceptually the same). The
+denominator differs: To calculate precision, we divide that number by
+the total number of frames attributed to a category by LENA, whereas for
+recall, we divide by the total number of frames attributed to a category
+by the human annotator.
 
 \subsubsection{CVC and CTC evaluation}\label{cvc-and-ctc-evaluation}
 
+From the human annotation, each vocalization by the key child counted
+towards the total Child Vocalization Count (CVC) for a given clip. For
+the Conversational Turn Count (CTC), a sequence of key child and any
+adult (or vice versa) within 5 seconds counted towards the clip total
+CTC.
+
 \subsubsection{AWC evaluation}\label{awc-evaluation}
+
+For the AWC portion of this evaluation, we could only use transcriptions
+from the four ACLEW corpora, since the TSI corpus has not been
+transcribed (and thus lacks word counts). In contrast, annotators for
+the four ACLEW corpora were proficient in the language spoken in the
+daylong recording, and transcribed all adult speech based using
+canonical lexical forms (e.g. \enquote{wanna}, not \enquote{want to}) in
+keeping with minCHAT format (MacWhinney).
+
+Reference adult word counts were determined by counting all
+unambiguously transcribed words spoken by adult talkers. This was
+achieved by first discarding all non-lexical transcript entries such as
+non-linguistic communicative sounds, paralinguistic markers, and markers
+indicating incomprehensible speech. In addition, all utterances from the
+key child and other children were omitted from the Adult Word Count. The
+remaining orthographic entries separated by whitespaces were then
+counted as gold standard target words for LENA to detect.
+
+As for LENA word counts, the regions sampled for manual annotation were
+not guaranteed to perfectly align with LENA utterances. Of all LENA
+utterances overlapping with the annotated speech, 14\% had only partial
+overlap with the annotations. To match LENA AWCs with the annotated word
+counts, words from the partially overlapping LENA utterances were
+included in proportion to the amount of overlap between the LENA turn
+and the reference segment in question (e.g., if 10\% of a LENA-estimated
+utterance was overlapping with a manually-annotated utterance, 10\% of
+the total LENA AWC estimate for the given turn was included in the LENA
+word count estimate for that reference segment).
 
 \subsection{Results}\label{results}
 
@@ -481,12 +711,16 @@ than if there are 10 (LENA would be doubling the number of
 vocalizations).
 
 The absolute error rate ranged from -47 to 30, with a mean of -1.63 and
-a median of 0. As for relative error rates, these require the number in
-the denominator to be non-null. For this analysis, therefore, we need to
-remove the 460 clips in which the human annotator said there were no
-child vocalizations whatsoever. When we do this, the mean relative error
-rate ranged from -100 to 800, with a mean of -20.17 and a median of
--44.44
+a median of 0. Since these numbers can be affected by silent clips, in
+which both humans and LENA agree on there not being any vocalizations,
+we also calculated the absolute error rate excluding these clips. In
+this case, the absolute error rate ranged from -47 to 13, with a mean of
+-5.35 and a median of -4. As for relative error rates, these require the
+number in the denominator to be non-null. For this analysis, therefore,
+we need to remove the 460 clips in which the human annotator said there
+were no child vocalizations whatsoever. When we do this, the mean
+relative error rate ranged from -100 to 800, with a mean of -20.17 and a
+median of -44.44
 
 \subsubsection{Conversational Turn Counts (CTC)
 accuracy}\label{conversational-turn-counts-ctc-accuracy}
@@ -506,7 +740,9 @@ the two was r = 0.55 (p = 0.00) when all clips were taken into account,
 and r = 0.47 (p = 0.00) when only clips with some child speech (i.e.,
 excluding 322 clips with 0 counts in both LENA and human annotations)
 were considered. The absolute error rate ranged from -75 to 25, with a
-mean of -6.82 and a median of 0. As for relative error rates, these
+mean of -6.82 and a median of 0. The absolute error rate excluding clips
+where both human and LENA counts were zero ranged from -75 to 20, with a
+mean of -15.67 and a median of -12. As for relative error rates, these
 require the number in the denominator to be non-null. For this analysis,
 therefore, we need to remove the 427 clips in which the human annotator
 said there were no child-adult or adult-child turns whatsoever. When we
@@ -531,12 +767,14 @@ with some child speech (i.e., excluding 309 clips with 0 counts in both
 LENA and human annotations) were considered. This suggests that the LENA
 system captures differences in terms of number of child vocalizations
 across clips well. The absolute error rate ranged from -211 to 157, with
-a mean of -0.20 and a median of 0. As for relative error rates, these
-require the number in the denominator to be non-null. For this analysis,
-therefore, we need to remove the 361 clips in which the human annotator
-said there were no child-adult or adult-child turns whatsoever. When we
-do this, the mean relative error rate ranged from -100 to 7400, with a
-mean of 55.04 and a median of -17.78
+a mean of -0.20 and a median of 0. The absolute error rate excluding
+clips where both human and LENA counts were zero ranged from -211 to
+157, with a mean of 0.46 and a median of -2. As for relative error
+rates, these require the number in the denominator to be non-null. For
+this analysis, therefore, we need to remove the 361 clips in which the
+human annotator said there were no child-adult or adult-child turns
+whatsoever. When we do this, the mean relative error rate ranged from
+-100 to 7400, with a mean of 55.04 and a median of -17.78
 
 \subsubsection{Effects of age and differences across
 corpora}\label{effects-of-age-and-differences-across-corpora}
