@@ -588,7 +588,7 @@ Even if it turns out that LENA is not accurate enough to classify children preci
 
 ## Acknowledgments
 
-
+This work was supported by a Trans-Atlantic Platform “Digging into Data” collaborative grant (ACLEW:Analyzing Child Language Experiences Around The World; ANR-16-DATA-0004 ACLEW (AC); HJ- 253479-17 (EB), SSHRC-869-2016-0003(MS)). We acknowledge further support from (ANR-17-CE28-0007 LangAge, ANR-14-CE30-0003 MechELex, ANR-17-EURE-0017); and the J. S. McDonnell Foundation Understanding Human Cognition Scholar Award (AC); Social Sciences and Humanities Research Council of Canada Insight Grant (435-2015-0628; MS); NIH (DP5 OD019812-01; EB), and the Economic and Social Sciences Research Council (ES/L008955/1; CR) 	
 
 \newpage
 
