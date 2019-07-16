@@ -447,23 +447,40 @@ colnames(spreadsheet_tsi) = c("child","age")
 age_id = rbind(spreadsheet, spreadsheet_tsi)
 py=merge(py,age_id,by.x="child",by.y="child",all.x=T) #one row is lost... **ATTENTION BUG HERE**
 
+mymodels=NULL
 for(dv in c("false.alarm..","missed.detection..","confusion..")){
     #print(dv)
-    mymodel=lmer(py[,dv]~cor*age+(1|child),data=py,subset=c(total>0))
+    mymodels[[dv]]<-summary(lmer(py[,dv]~cor*age+(1|child),data=py,subset=c(total>0)))
   #print(Anova(mymodel))
 }
 
 ```
 
-```{r der-fig, eval=F,echo=F}
+```{r der-fig, fig.cap="Diarization error rate as a function of corpus and child age (divided into quartiles). Only corpus-quartile combinations with more than 2 children are shown. Central tendency is median. Error bars indicate standard deviation over observations divided by the square root of the number of infants. "}
 #use median for the central tendency, interquartile range for the variance
 py<-within(py, quartile <- as.integer(cut(py$age, quantile(py$age, probs=0:4/4), include.lowest=TRUE)))
 
+
 meds=aggregate(py$DER,by=list(py$cor,py$quartile),median,na.rm=T)
-plot(meds$x[meds$Group.2=="1"]~meds$Group.1[meds$Group.2=="1"],ylim=range(0,90))
-plot(meds$x[meds$Group.2=="2"]~meds$Group.1[meds$Group.2=="2"],add=T)
-plot(meds$x[meds$Group.2=="3"]~meds$Group.1[meds$Group.2=="3"],add=T)
-plot(meds$x[meds$Group.2=="4"]~meds$Group.1[meds$Group.2=="4"],add=T)
+meds$jitter=as.numeric(meds$Group.2)+(as.numeric(meds$Group.1)/8-mean(as.numeric(meds$Group.1)/8))
+
+
+sds=aggregate(py$DER,by=list(py$cor,py$quartile),sd,na.rm=T)
+meds$sds=sds$x
+meds$id=paste0(meds$Group.1,meds$Group.2)
+
+bychild=aggregate(py$diarization.error.rate..,list(py$child,py$cor,py$quartile),mean)
+ns=data.frame(table(bychild$Group.2,bychild$Group.3))
+ns$id=paste0(ns$Var1,ns$Var2)
+meds=merge(meds,ns,by="id")
+meds$se=meds$sd/sqrt(meds$Freq)
+
+excluded=subset(meds,Freq<=2)
+meds=subset(meds,Freq>2)
+
+plot(meds$x~meds$jitter,ylim=range(0,115),pch=substr(meds$Group.1,1,1),xlab="Age in months (quartiled)",xaxt="n",ylab="Diarization error rate",xlim=c(0.5,4.5))
+arrows(meds$jitter, meds$x-meds$se, meds$jitter, meds$x+meds$se, length=0.05, angle=90, code=3,lty=3,col="gray")
+axis(1,at=0.5:4.5,labels=quantile(py$age, probs=0:4/4))
 
 ```
 
