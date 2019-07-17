@@ -131,7 +131,25 @@ system}
   }
 
 
-  \abstract{waiting}
+  \abstract{In the previous decade, dozens of studies involving thousands of
+children across several research disciplines have made use of a combined
+daylong audio-recorder and automated algorithmic analysis called the
+LENA system, which aims to assess children's language environment.
+However, validation of the system lags behind its growing importance in
+the research domain. Here we assess LENA accuracy across its key outcome
+measures: speaker classification, adult word counts, child vocalization
+counts, and conversational turn counts. Our assessment is based on
+manual (LENA-output naive) random and period sampling, in (a)
+populations similar to LENAs original training data from North American
+English-learning children, (b) another dialect of English (UK), and (c)
+in a different language and socio-cultural setting (rural Bolivia). We
+find reasonably high accuracy across some measures, with more
+problematic levels of performance across others. We find little
+difference in accuracy as a function of dialect, language, or
+socio-cultural setting. Whether LENA results are ``good enough'' for a
+given research, educational, or clinical application depends largely on
+the specifics at hand; we conclude with a set of recommendations to help
+researchers make this determination for their goals.}
   
 
 
@@ -145,12 +163,207 @@ system}
 
 
 
+While nearly all humans eventually become competent users of their
+language(s), documenting the experiential context of early acquisition
+is crucial for both theoretical and applied reasons. Regarding theory,
+there are many open questions about what kinds of experiences and
+interactions are necessary, sufficient, or optimal for supporting
+language development. Moreover, the ability to accurately and quickly
+assess an infant's state of development at a given point in time is of
+central importance for clinical purposes, both for children with known
+risks of language delays and disorders, and those who might not be
+identified based on risk factors. Reliable assessments are also crucial
+for measuring intervention efficacy.
+
+One approach that has been making its way into the mainstream literature
+across applied and basic research on language and cognition relies on
+day-long recordings gathered with LENA(R) products (e.g.~Greenwood et
+al, 2011; Oller et al 20 2010; Gilkerson et al 2017, inter alia),
+analyzed by LENA's automated, closed-source algorithms. As we summarize
+below, this approach has many advantages, which may explain its
+expanding popularity. While dozens of papers over the past decade have
+used LENA's automated output, only a handful include validity estimates
+{[}e.g.~Weisleder \& Fenald 2013; Zimmerman et al 2009, d'Apice et al
+2019{]}, even fewer where validity estimation was the primary focus of
+the paper (e.g.~Ganek \& Eriks-Brophy, Bulgarelli \& Bergelson, in press
+@ BRM, Lehet Dilley Houston; for a fuller report, see Cristia et al,
+under review). As a result, few studies report sufficient details about
+validation accuracy for one or more metrics, limiting systematic review
+or meta-analytic assessment (Cristia et al., under review).
+
+The work undertaken thus far also has some limitations, which are
+described further in the \enquote{Previous Validation} section below,
+and mentioned briefly next. First, many validations or evaluations of
+LENA omit analysis of the less-directly \enquote{relevant} categories of
+input like noise, silence, or overlap. Second, many LENA evaluations
+rely on LENA's own output as a starting point to either select portions
+of the file for manual annotation, or use its segmentation into
+talker-turns as the unit of analysis (without conducting independent
+segmentation). Both decisions can lead to inflated accuracy estimates.
+Here we endeavor to conduct an evaluation that is fully independent of
+the LENA algorithms automated output assessment, permitting a
+systematic, extensive, and independent evaluation of the key automated
+metrics provided by this system. Summarily, we report the LENA(R)
+algorithms' performance based on random or periodic sampling from a set
+of recordings, which (as detailed and argued below) is preferable to
+other types of sampling. We conduct our analysis on (a) a sample of
+children similar to the LENA(R) training set (i.e.~infants and toddlers,
+growing up in North American English-speaking homes, {[}LTR-06-2{]}) (b)
+check for generalization to a different dialect (UK English); and (c)
+extend our analysis to a different language and setting
+(Tsimane'-speaking homes in rural Bolivia).
+
 \subsubsection{Brief introduction to LENA(R)
 products}\label{brief-introduction-to-lenar-products}
 
+The LENA(R) system consists of a hardware component (a lightweight,
+sturdy, and easy-to-use recording device worn by a child in specialized
+clothing) and a suite of proprietary computer programs designed to
+provide automated quantitative analyses of the auditory environment and
+the child's own vocalizations.
+
+The LENA software was developed over an extensive corpus of full day
+audio recordings from a child's perspective using their patented
+recording hardware {[}Xu et al, 2009{]}. The original dataset included
+over 65,000 hours of recording across 329 American English-speaking
+families chosen for diversity in child age (1-42 months) and
+socio-economic status {[}LTR-6-2{]}. From these recordings, half-hour
+selections from 309 recordings were transcribed and annotated for the
+purpose of developing the algorithm, and an additional 60 minutes from
+each of 70 recordings were transcribed and annotated for testing the
+result {[}ibid{]}.
+
+The resulting LENA software takes each audio recording and processes it
+incrementally in short windows, extracting a variety of acoustic
+features which are used to classify the audio stream into segments of at
+least 600 ms in length (or longer for some of the categories) using a
+Minimum Duration Gaussian Mixture Model (MDGMM, {[}Xu et al, 2008{]}).
+Silence may be included to \enquote{pad} segments to this minimum
+duration. The segments are classified according to a set of broad
+speaker classifications - Male Adult, Female Adult, \enquote{Key} Child
+(i.e.~the one wearing the recorder) and Other Child - and non-speaker
+classifications - Noise, Television (including any electronics), Overlap
+(speech overlapped with other speech or nonspeech sounds), and Silence
+(SIL). With the exception of Silence, these classifications are then
+passed through a further likelihood test and labeled as \enquote{Near}
+(high probability) or \enquote{Far} (low probability), yielding the
+following classes: MAN/MAF, FAN/FAF, CHN/CHF, CXN/CXF, NON/NOF, TVN/TVF,
+OLN/OLF. Given the large number of acronyms and labels of various kinds,
+we provide a listing of relevant LENA abbreviations on Table xx; in what
+follows, we highlight the specific labels that we evaluate in the
+present work in bold.
+
+After this broad speaker classification step, Female or Male Adult
+\enquote{Near} segments (FAN and MAN) are further processed using an
+adaptation of the Sphinx Phone Decoder {[}Lamere et al, 2003{]} in order
+to form an automated estimate of the number of words in each segment
+(adult word count, or \textbf{AWC}). Key Child (CHN) segments are
+further processed to sub-classify into vegetative noises (VEG), crying
+(CRY), and speech-like vocalization (VOC). LENA provides the count
+(child vocalization count, or CVC) and duration of these VOC
+sub-segments. A further metric, Conversational turn counts (CTC),
+reflects the number of alternations between an adult and the key child
+(or vice versa), bounded by 5 s of non-speech.
+
+Table xx. A partial listing of common LENA abbreviations and their
+meanings.
+
 \subsubsection{Previous validation work}\label{previous-validation-work}
 
-\subsubsection{Present work}\label{present-work}
+A recent systematic review (Cristia, Bulgarelli, \& Bergelson,
+submitted) found 23 papers, containing 28 studies, reporting on the
+accuracy of LENA's labels and derived metrics (AWC, CVC, CTC). They
+conclude there are \enquote{reasonably good results {[}overall{]}: over
+61\% for recall and precision based on 11-12 non-independent studies;
+correlations for AWC mean r=.79, on n=11, with a mean RER{[}Relative
+Error Rate{]}=10\% on n=11; CVC mean r=.76, n=5, with a mean RER=1\% on
+n=5. The exception to this general trend towards good performance was
+CTC, with a mean r=.31, n=5, RER=-64\% on n=2.}
+
+While this systematic review sought to take stock of the current
+literature using LENA reportings, there were several limitations that
+make it likely that these measures do not provide a full or fair picture
+of LENA output accuracy. First, for the majority of included studies,
+the validity report was not fully evaluated by peer review. Even if the
+study may have appeared in a peer-reviewed report, the LENA validation
+was often a secondary goal to support a different research objective,
+and therefore often lacked methodological details or even full results.
+For instance, Seidl et al. report on validation of LENA labels among
+children at familial risk for autism in a short appendix to the journal;
+in this Appendix, only confusions between female adult and child are
+mentioned -- suggesting that confusions between key child and any other
+category (other child, male adult, silence, etc.) were ignored rather
+than counted as an error. While this approach may be reasonable for a
+given study's goals, it has the undesirable side effect of reducing the
+granularity of our understanding. Second, previous studies typically did
+not take silence, noise, or overlap into account in the reported
+confusion matrices or other accuracy measures, particularly within
+segments. That is, if a LENA segment labeled \enquote{key child}
+contained one second of silence and two seconds of speech, the full
+three second clip was often tagged as \enquote{correct} though it was
+only 67\% correct, leading to an overestimation of the accuracy of the
+\enquote{key child} label.
+
+Third, a majority of previous validation studies used the LENA output
+itself to select the sections that would be annotated for validation (in
+Cristia et al., subm, this held for 14/25 studies that specified the
+method of selection). For instance, clips may have been selected for
+manual annotation on the basis of high AWC and/or CTC according to the
+algorithm. This unfortunately leads to biased sampling: Since LENA only
+counts words within FAN and MAN segments and conversational turns
+involving FAN/MAN alternations with CHN in close proximity, high AWC or
+CTC can only occur in sections of the recording that are \enquote{clean}
+enough for the algorithm to parse; otherwise, most of the section would
+have been classified as overlap (OLN), which does not count towards AWC
+or CTC. This would tend to bias these reports toward a higher level of
+accuracy than would be obtained overall across the full recording.
+
+Forth, previous validation work has typically focused on a single
+corpus, participant population, age range, and language. As a result, it
+is difficult to assess whether a numerical difference in accuracy found
+across two papers is statistically significant. Even if this difference
+is large, it is challenging to decide whether this is due to a
+difference in the way the corpus was constituted and annotated, on how
+LENA fares with that population, age range, and language.
+
+\subsubsection{The present work}\label{the-present-work}
+
+We sought to assess the validity of LENA's metrics through an approach
+that complements the preceding literature (including our own work).
+Specifically, we report an evaluation of all speech labels and some
+non-speech labels of LENA (silence (SIL), overlap near (OLN), overlap
+far (OLF)), as well as LENA's key derived metrics: adult word count
+(AWC), conversational turn count (CTC), and child vocalization count
+(CVC). We aim to address several of the potential limitations
+highlighted above.
+
+First, to maximally avoid potential bias in our annotations, we used
+random or periodic sampling (detailed below) to choose which sections of
+daylong recordings to annotate, and did not give annotaters access to
+the LENA output. Second, to allow assessment of the accuracy of the
+segmentation itself as well as categorical labeling, evaluation is done
+at the level of 10 ms frames. This will allow us to capture a much
+finer-grained representation of the auditory environment (i.e.~if LENA
+classified a 2 s audio segment as FAN, but .8 s of this was actually
+non-speech noise, LENA would be credited only for the proportion that
+was correct).
+
+Third, to gain traction on generalizability rather than focusing on a
+single sample that either mirrors or diverges from LENAs original
+population, we include five corpora. Three corpora based on the same
+population, language, and dialect LENA was established with; a fourth
+corpus that allows an extension to a different dialect of English; and a
+fifth corpus that is an extension to a totally different recording
+condition (a rural setting, with large families and many children
+present, in a different language). The age range also varies a great
+deal, particularly in this last corpus.
+
+Finally, the present study relies on a collaborative annotation effort
+across several labs. Critically, this means that we can \enquote{fairly}
+compare annotations across our corpora: annotation decisions were either
+identical or comparable, and all analyses were identical. This allows us
+to more readily answer questions regarding differences in reliability as
+a function of e.g.~child age and language.
 
 \subsection{Methods}\label{methods}
 
