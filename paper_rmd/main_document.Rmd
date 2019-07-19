@@ -43,7 +43,7 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE, cache = FALSE, fig.pos =
 require("papaja")
 thisdir=c("../LENA_eval_201906/")
 library(lme4)
-library(sm)
+#library(sm)
 library(scales)
 library(ggpubr)
 library(ggplot2)
@@ -52,7 +52,7 @@ library(car)
 dodiv=function(x) x/sum(x, na.rm=T)
 
 #source("XXs.R")
-#read.table("XX",header=T)->data
+read.csv("../paper_rmd/figures/table_1.csv",header=F)->abbreviations_table
 ```
 
 While nearly all humans eventually become competent users of their language(s), documenting the experiential context of early acquisition is crucial for both theoretical and applied reasons. Regarding theory, there are many open questions about what kinds of experiences and interactions are necessary, sufficient, or optimal for supporting language development. Moreover, the ability to accurately and quickly assess an infant's state of development at a given point in time is of central importance for clinical purposes, both for children with known risks of language delays and disorders, and those who might not be identified based on risk factors. Reliable assessments are also crucial for measuring intervention efficacy. 
@@ -75,8 +75,13 @@ The resulting LENA software takes each audio recording and processes it incremen
 	
 After this broad speaker classification step, Female or Male Adult "Near" segments (FAN and MAN) are further processed using an adaptation of the Sphinx Phone Decoder [Lamere et al, 2003] in order to form an automated estimate of the number of words in each segment (adult word count, or **AWC**). Key Child (CHN) segments are further processed to sub-classify into vegetative noises (VEG), crying (CRY), and speech-like vocalization (VOC). LENA provides the count (child vocalization count, or CVC) and duration of these VOC sub-segments. A further metric, Conversational turn counts (CTC), reflects the number of alternations between an adult and the key child (or vice versa), bounded by 5 s of non-speech. 
 
-Table xx. A partial listing of common LENA abbreviations and their meanings.
+Table 1. A partial listing of common LENA abbreviations and their meanings.
+```{r tab-demo, echo = FALSE, results="asis"}
 
+colnames(abbreviations_table)<-c("Abbreviations","Meanings")
+
+apa_table(abbreviations_table,  caption = "A partial listing of common LENA abbreviations and their meanings.")
+```
 
 
 ### Previous validation work
