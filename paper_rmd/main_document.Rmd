@@ -84,9 +84,9 @@ The resulting LENA software takes each audio recording and processes it incremen
 After this broad speaker classification step, Female or Male Adult "Near" segments (FAN and MAN) are further processed using an adaptation of the Sphinx Phone Decoder [Lamere et al, 2003] in order to form an automated estimate of the number of words in each segment (adult word count, or **AWC**). Key Child (CHN) segments are further processed to sub-classify into vegetative noises (VEG), crying (CRY), and speech-like vocalization (VOC). LENA provides the count (child vocalization count, or CVC) and duration of these VOC sub-segments. A further metric, Conversational turn counts (CTC), reflects the number of alternations between an adult and the key child (or vice versa), bounded by 5 s of non-speech. 
 
 Table 1. A partial listing of common LENA abbreviations and their meanings.
-```{r tab-demo, echo = FALSE, results="asis"}
+```{r tab-abb, echo = FALSE, results="asis"}
 
-read.csv("../fake/figures/table_1.csv",header=F)->abbreviations_table
+read.csv("../paper_rmd/figures/table_1.csv",header=F)->abbreviations_table
 colnames(abbreviations_table)<-c("Abbreviations","Meanings")
 
 kable(abbreviations_table, "latex", booktabs = T) %>%
@@ -134,6 +134,21 @@ We chose to sample 1 or 2 minutes at a time (Tsimane, and ACLEW corpora, respect
 
 In the 5 corpora, the 1- or 2-min samples were annotated for all hearable utterance boundaries and talker ID. In ACLEW corpora \footnote{see Casillas et al., 2017a, 2017b for the general annotation protocol, and Soderstrom et al., submitted to AMPPS, for an introduction to the databases}, talker IDs reflected unique individual talkers, but were coded in such a way to readily allow mapping onto LENAs talker categories (e.g. key child, other children, female adult, male adult). In the TSI corpus, only the key child and one female adult whose voice recurred throughout the day were individually identified, with all other talkers being classified on the basis of broad age and sex into male adult, female adult, and other children. The ACLEW datasets had other coding levels which will not be discussed here. 
 
+Table 2. Key properties of the five corpora
+```{r tab-corp, echo = FALSE, results="asis"}
+
+read.csv("../paper_rmd/figures/table_2.csv",header=T)->datasets_table
+colnames(datasets_table) <- c("Corpus", "# Children", "# Clips", "Clip dur \n (in seconds)", "Age mean (range) in months", "Location")
+
+kable(datasets_table, "latex", caption = "Key properties of the five corpora", booktabs = T, linesep = "", align = rep("c", 5)) %>%
+  kable_styling(latex_options = "striped",  full_width = F) %>%
+  column_spec(1, width = "1cm") %>%
+  column_spec(2, width = "2.5cm") %>%
+  column_spec(3, width = "1.5cm") %>%
+  column_spec(4, width = "3cm") %>%
+  column_spec(5, width = "3.5cm") %>%
+  column_spec(6, width = "3.5cm") 
+```
 
 
 ### Processing
