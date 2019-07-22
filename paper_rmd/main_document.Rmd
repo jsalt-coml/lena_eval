@@ -32,6 +32,13 @@ lineno            : no
 
 lang              : "english"
 class             : "man"
+
+header-includes:
+- \usepackage{booktabs}
+- \usepackage{makecell}
+- \usepackage[table]{xcolor}
+output            : papaja::apa6_pdf
+
 output            : papaja::apa6_pdf
 
 ---
@@ -40,19 +47,20 @@ output            : papaja::apa6_pdf
 ```{r setup, include=TRUE,echo=F,warning=FALSE}
 
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, cache = FALSE, fig.pos = "T")
+options(kableExtra.latex.load_packages = FALSE)
 require("papaja")
 thisdir=c("../LENA_eval_201906/")
 library(lme4)
-#library(sm)
+library(sm)
 library(scales)
 library(ggpubr)
 library(ggplot2)
 library(car)
+library(dplyr)
+library(kableExtra)
 
 dodiv=function(x) x/sum(x, na.rm=T)
 
-#source("XXs.R")
-read.csv("../paper_rmd/figures/table_1.csv",header=F)->abbreviations_table
 ```
 
 While nearly all humans eventually become competent users of their language(s), documenting the experiential context of early acquisition is crucial for both theoretical and applied reasons. Regarding theory, there are many open questions about what kinds of experiences and interactions are necessary, sufficient, or optimal for supporting language development. Moreover, the ability to accurately and quickly assess an infant's state of development at a given point in time is of central importance for clinical purposes, both for children with known risks of language delays and disorders, and those who might not be identified based on risk factors. Reliable assessments are also crucial for measuring intervention efficacy. 
@@ -78,9 +86,13 @@ After this broad speaker classification step, Female or Male Adult "Near" segmen
 Table 1. A partial listing of common LENA abbreviations and their meanings.
 ```{r tab-demo, echo = FALSE, results="asis"}
 
+read.csv("../fake/figures/table_1.csv",header=F)->abbreviations_table
 colnames(abbreviations_table)<-c("Abbreviations","Meanings")
 
-apa_table(abbreviations_table,  caption = "A partial listing of common LENA abbreviations and their meanings.")
+kable(abbreviations_table, "latex", booktabs = T) %>%
+  kable_styling(latex_options = "striped", full_width = F) %>%
+  column_spec(1, width = "10em") %>%
+  column_spec(2, width = "30em")
 ```
 
 
