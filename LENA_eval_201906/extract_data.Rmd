@@ -786,16 +786,16 @@ python labels_mapper.py -p gold/ -m gold -o
 # with all metrics it looks like: python compute_metrics.py -ref gold/mapped/ -hyp lena/mapped_sil/ -t diarization -m diaer coverage homogeneity completeness purity
 
 python compute_metrics.py -ref gold/mapped/ -hyp lena/mapped_far/ -t diarization -m diaer 
-mv gold/mapped/diaer__report.csv gold/diaer_lena_far.csv
+mv gold/mapped/diaer__report.csv diaer_lena_far.csv
 
 python compute_metrics.py -ref gold/mapped/ -hyp lena/mapped_sil/ -t diarization -m diaer
-mv gold/mapped/diaer__report.csv gold/diaer_lena_sil.csv
+mv gold/mapped/diaer__report.csv diaer_lena_sil.csv
 
 python compute_metrics.py -ref gold/mapped_no_ele/ -hyp lena/mapped_sil_no_tv/ -t diarization -m diaer 
-mv gold/mapped_no_ele/diaer__report.csv gold/diaer_gold_no_ele_lena_sil_no_tv_report.csv
+mv gold/mapped_no_ele/diaer__report.csv diaer_gold_no_ele_lena_sil_no_tv_report.csv
 
 python compute_metrics.py -ref gold/mapped_no_ele/ -hyp lena/mapped_sil_no_tv_no_oln/ -t diarization -m diaer 
-mv gold/mapped_no_ele/diaer__report.csv gold/diaer_gold_no_ele_lena_sil_no_tv_no_oln_report.csv
+mv gold/mapped_no_ele/diaer__report.csv diaer_gold_no_ele_lena_sil_no_tv_no_oln_report.csv
 
 ```
 
