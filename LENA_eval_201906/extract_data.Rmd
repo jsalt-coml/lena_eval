@@ -940,6 +940,7 @@ if(length(0<readLines(lena_path))){
     #sort by onset
    lena=lena[order(lena[,"onset"]),]
    gold=gold[order(gold[,"onset"]),]
+
    
    #add ctc def
    lena$label=as.character(lena$label)
@@ -961,20 +962,24 @@ if(length(0<readLines(lena_path))){
    gold$turn=ifelse(gold$label %in% c("CHI","FEM","MAL") & gold$prev_label %in% c("CHI","FEM","MAL") & gold$iti < 5, 1,0)
    
    #create paired data
-   cvtc=rbind(cvtc, cbind(filename,                         sum(lena$label=="CHN"),sum(lena$label=="CHF"),sum(gold$label=="CHI"), #CVC
+   cvtc=rbind(cvtc, cbind(filename,                         
+  sum(lena$label=="CHN"),sum(gold[lena$label=="CHN","duration"]),sum(lena$label=="CHF"),sum(gold$label=="CHI"),sum(gold[gold$label=="CHI","duration"]), #CVC
   sum(lena$turn_n,na.rm=T),sum(lena$turn_nf,na.rm=T),sum(gold$turn,na.rm=T), #CTC
-  sum(lena$label=="CXN"),sum(lena$label=="CXF"),sum(gold$label=="OCH"), #other chi voc
- sum(lena$label=="FAN"),sum(lena$label=="FAF"),sum(gold$label=="FEM"), #fem voc                               
- sum(lena$label=="MAN"),sum(lena$label=="MAF"),sum(gold$label=="MAL") #mal voc  
+  sum(lena$label=="CXN"),sum(gold[lena$label=="CXN","duration"]),sum(lena$label=="CXF"),sum(gold$label=="OCH"), sum(gold[gold$label=="OCH","duration"]), #other chi voc
+ sum(lena$label=="FAN"),sum(gold[lena$label=="FAN","duration"]),sum(lena$label=="FAF"),sum(gold$label=="FEM"),sum(gold$label=="FEM"), #fem voc                               
+ sum(lena$label=="MAN"),sum(gold[lena$label=="MAN","duration"]),sum(lena$label=="MAF"),sum(gold$label=="MAL"),sum(gold$label=="MAL") #mal voc  
     ))
 }
-colnames(cvtc)<-c("filename","CVC_n","CVC_nf","CVC_gold",
+colnames(cvtc)<-c("filename","CVC_n","Cdur_lena","CVC_nf","CVC_gold","Cdur_gold",
                   "CTC_n","CTC_nf","CTC_gold",
-                  "OCH_n","OCH_nf","OCH_gold",
-                  "FEM_n","FEM_nf","FEM_gold",
-                  "MAL_n","MAL_nf","MAL_gold"
+                  "OCH_n","OCdur_lena","OCH_nf","OCH_gold","OCdur_gold",
+                  "FEM_n","Fdur_lena","FEM_nf","FEM_gold","Fdur_gold",
+                  "MAL_n","Mdur_lena","MAL_nf","MAL_gold","Mdur_gold"
                   )
 write.table(cvtc,file="cvtc.txt")
   
-
+#for Jun Du
+#select only Tsimane
+tsi=cvtc[substr(cvtc[,"filename"],1,1)=="C",c("filename","Cdur_lena","Cdur_gold","OCdur_lena","OCdur_gold","Fdur_lena","Fdur_gold","Mdur_lena","Mdur_gold")]
+write.table(tsi,"~/Desktop/tsi-dur-lena.txt",row.names=F)
 ```
