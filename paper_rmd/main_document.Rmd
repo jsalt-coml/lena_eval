@@ -22,7 +22,7 @@ abstract: >
 keywords          : ""
 wordcount         : ""
 
-bibliography      : ["empty.bib"]
+bibliography      : ["LENASysRev.bib"]
 
 figsintext        : yes
 figurelist        : no
