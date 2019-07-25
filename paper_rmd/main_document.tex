@@ -154,6 +154,8 @@ researchers make this determination for their goals.}
 
 
 
+  \usepackage{booktabs}
+  \usepackage{makecell}
 
 \begin{document}
 
@@ -177,19 +179,19 @@ for measuring intervention efficacy.
 
 One approach that has been making its way into the mainstream literature
 across applied and basic research on language and cognition relies on
-day-long recordings gathered with LENA(R) products (e.g.~Greenwood et
-al, 2011; Oller et al 20 2010; Gilkerson et al 2017, inter alia),
-analyzed by LENA's automated, closed-source algorithms. As we summarize
-below, this approach has many advantages, which may explain its
-expanding popularity. While dozens of papers over the past decade have
-used LENA's automated output, only a handful include validity estimates
-{[}e.g.~Weisleder \& Fenald 2013; Zimmerman et al 2009, d'Apice et al
-2019{]}, even fewer where validity estimation was the primary focus of
-the paper (e.g.~Ganek \& Eriks-Brophy, Bulgarelli \& Bergelson, in press
-@ BRM, Lehet Dilley Houston; for a fuller report, see Cristia et al,
-under review). As a result, few studies report sufficient details about
-validation accuracy for one or more metrics, limiting systematic review
-or meta-analytic assessment (Cristia et al., under review).
+day-long recordings gathered with LENA(R) products (e.g. {\textbf{???}},
+{\textbf{???}}, {\textbf{???}}, inter alia?), analyzed by LENA's
+automated, closed-source algorithms. As we summarize below, this
+approach has many advantages, which may explain its expanding
+popularity. While dozens of papers over the past decade have used LENA's
+automated output, only a handful include validity estimates {[}e.g.
+({\textbf{???}}); ({\textbf{???}}); d'Apice et al 2019{]}, even fewer
+where validity estimation was the primary focus of the paper (e.g.~Ganek
+\& Eriks-Brophy, Bulgarelli \& Bergelson in press @ BRM,
+({\textbf{???}}) for a fuller report, see ({\textbf{???}})). As a
+result, few studies report sufficient details about validation accuracy
+for one or more metrics, limiting systematic review or meta-analytic
+assessment ({\textbf{???}})
 
 The work undertaken thus far also has some limitations, which are
 described further in the \enquote{Previous Validation} section below,
@@ -224,20 +226,20 @@ the child's own vocalizations.
 
 The LENA software was developed over an extensive corpus of full day
 audio recordings from a child's perspective using their patented
-recording hardware {[}Xu et al, 2009{]}. The original dataset included
-over 65,000 hours of recording across 329 American English-speaking
-families chosen for diversity in child age (1-42 months) and
-socio-economic status {[}LTR-6-2{]}. From these recordings, half-hour
-selections from 309 recordings were transcribed and annotated for the
-purpose of developing the algorithm, and an additional 60 minutes from
-each of 70 recordings were transcribed and annotated for testing the
-result {[}ibid{]}.
+recording hardware ({\textbf{???}}). The original dataset included over
+65,000 hours of recording across 329 American English-speaking families
+chosen for diversity in child age (1-42 months) and socio-economic
+status {[}LTR-6-2{]}. From these recordings, half-hour selections from
+309 recordings were transcribed and annotated for the purpose of
+developing the algorithm, and an additional 60 minutes from each of 70
+recordings were transcribed and annotated for testing the result
+{[}ibid{]}.
 
 The resulting LENA software takes each audio recording and processes it
 incrementally in short windows, extracting a variety of acoustic
 features which are used to classify the audio stream into segments of at
 least 600 ms in length (or longer for some of the categories) using a
-Minimum Duration Gaussian Mixture Model (MDGMM, {[}Xu et al, 2008{]}).
+Minimum Duration Gaussian Mixture Model (MDGMM, ({\textbf{???}})).
 Silence may be included to \enquote{pad} segments to this minimum
 duration. The segments are classified according to a set of broad
 speaker classifications - Male Adult, Female Adult, \enquote{Key} Child
@@ -249,7 +251,7 @@ passed through a further likelihood test and labeled as \enquote{Near}
 (high probability) or \enquote{Far} (low probability), yielding the
 following classes: MAN/MAF, FAN/FAF, CHN/CHF, CXN/CXF, NON/NOF, TVN/TVF,
 OLN/OLF. Given the large number of acronyms and labels of various kinds,
-we provide a listing of relevant LENA abbreviations on Table xx; in what
+we provide a listing of relevant LENA abbreviations on Table 1; in what
 follows, we highlight the specific labels that we evaluate in the
 present work in bold.
 
@@ -265,20 +267,17 @@ sub-segments. A further metric, Conversational turn counts (CTC),
 reflects the number of alternations between an adult and the key child
 (or vice versa), bounded by 5 s of non-speech.
 
-Table xx. A partial listing of common LENA abbreviations and their
-meanings.
-
 \subsubsection{Previous validation work}\label{previous-validation-work}
 
-A recent systematic review (Cristia, Bulgarelli, \& Bergelson,
-submitted) found 23 papers, containing 28 studies, reporting on the
-accuracy of LENA's labels and derived metrics (AWC, CVC, CTC). They
-conclude there are \enquote{reasonably good results {[}overall{]}: over
-61\% for recall and precision based on 11-12 non-independent studies;
-correlations for AWC mean r=.79, on n=11, with a mean RER{[}Relative
-Error Rate{]}=10\% on n=11; CVC mean r=.76, n=5, with a mean RER=1\% on
-n=5. The exception to this general trend towards good performance was
-CTC, with a mean r=.31, n=5, RER=-64\% on n=2.}
+A recent systematic review ({\textbf{???}}) found 23 papers, containing
+28 studies, reporting on the accuracy of LENA's labels and derived
+metrics (AWC, CVC, CTC). They conclude there are \enquote{reasonably
+good results {[}overall{]}: over 61\% for recall and precision based on
+11-12 non-independent studies; correlations for AWC mean r=.79, on n=11,
+with a mean RER{[}Relative Error Rate{]}=10\% on n=11; CVC mean r=.76,
+n=5, with a mean RER=1\% on n=5. The exception to this general trend
+towards good performance was CTC, with a mean r=.31, n=5, RER=-64\% on
+n=2.}
 
 While this systematic review sought to take stock of the current
 literature using LENA reportings, there were several limitations that
@@ -288,7 +287,7 @@ the validity report was not fully evaluated by peer review. Even if the
 study may have appeared in a peer-reviewed report, the LENA validation
 was often a secondary goal to support a different research objective,
 and therefore often lacked methodological details or even full results.
-For instance, Seidl et al. report on validation of LENA labels among
+For instance, ({\textbf{???}}) report on validation of LENA labels among
 children at familial risk for autism in a short appendix to the journal;
 in this Appendix, only confusions between female adult and child are
 mentioned -- suggesting that confusions between key child and any other
@@ -370,21 +369,20 @@ a function of e.g.~child age and language.
 \subsubsection{Corpora}\label{corpora}
 
 The data for the evaluation comes from two different projects. The
-largest one is the ACLEW project (Bergelson et al., 2017b Databrary
-volume; Soderstrom et al AMPPS under review); in this paper we focus on
-four different corpora of child daylong recordings that have been pooled
-together, sampled, and annotated in a coordinated manner. These four
-corpora are: the Bergelson corpus (\enquote{BER}) from US English
-families from the upstate New York area (Bergelson, 2016), the LuCiD
-Language 0--5 corpus (\enquote{L05}) consisting of English-speaking
-families from Northwest England (Rowland et al., 2018), the McDivitt and
-Winnipeg corpora ( \enquote{MCD}) of Canadian English families (McDivitt
-\& Soderstrom, 2016), and the Warlaumont corpus (\enquote{WAR}) of US
-English from Merced, California (Warlaumont et al., 2016). Some
-recordings in BER, and all recordings in MCD and WAR are available from
-HomeBank repository (VanDam et al., 2016). The second project contains a
-single corpus collected from Tsimane' speaking families in Bolivia
-(Scaff et al., in prep.; here \enquote{TSI}).
+largest one is the ACLEW project {[}({\textbf{???}}); Soderstrom et al
+AMPPS under review{]}; in this paper we focus on four different corpora
+of child daylong recordings that have been pooled together, sampled, and
+annotated in a coordinated manner. These four corpora are: the Bergelson
+corpus (\enquote{BER}) from US English families from the upstate New
+York area ({\textbf{???}}), the LuCiD Language 0--5 corpus
+(\enquote{L05}) consisting of English-speaking families from Northwest
+England (Rowland et al., 2018), the McDivitt and Winnipeg corpora (
+\enquote{MCD}) of Canadian English families ({\textbf{???}}), and the
+Warlaumont corpus (\enquote{WAR}) of US English from Merced, California
+({\textbf{???}}). Some recordings in BER, and all recordings in MCD and
+WAR are available from HomeBank repository ({\textbf{???}}). The second
+project contains a single corpus collected from Tsimane' speaking
+families in Bolivia (Scaff et al., in prep.; here \enquote{TSI}).
 
 Key properties of the five corpora are summarized in Table 2. Each
 corpus consists of daylong (4--16 hour) at-home recordings; each corpus
@@ -418,11 +416,11 @@ minutes of speech per key child (collapsing across all speaker
 categories).
 
 We chose to sample 1 or 2 minutes at a time (Tsimane, and ACLEW corpora,
-respectively) because conversations are likely to be bursty (Goh \&
-Barbasi; cf.~Slone et al Fausey et al ICIS18 session). That is, it is
-likely the case that speech is not produced at a periodic rate (e.g.,
-one phrase every 20 seconds), but rather it occurs in bursts (a
-conversation is followed by a long period of silence between the
+respectively) because conversations are likely to be bursty
+{[}({\textbf{???}}); cf.~Slone et al Fausey et al ICIS18 session{]}.
+That is, it is likely the case that speech is not produced at a periodic
+rate (e.g., one phrase every 20 seconds), but rather it occurs in bursts
+(a conversation is followed by a long period of silence between the
 conversational partners, followed by another bout of conversation,
 perhaps with different interlocutors, followed by silence, and so on).
 In this context, imagine that you sample a 5-second stretch. If you find
@@ -445,7 +443,7 @@ variation in speech quantity.
 
 In the 5 corpora, the 1- or 2-min samples were annotated for all
 hearable utterance boundaries and talker ID. In ACLEW corpora
-\footnote{see Casillas et al., 2017a, 2017b for the general annotation protocol, and Soderstrom et al., submitted to AMPPS, for an introduction to the databases},
+\footnote{see @casillas2017a and  @casillas2017b for the general annotation protocol, and Soderstrom et al., submitted to AMPPS, for an introduction to the databases},
 talker IDs reflected unique individual talkers, but were coded in such a
 way to readily allow mapping onto LENAs talker categories (e.g.~key
 child, other children, female adult, male adult). In the TSI corpus,
@@ -455,11 +453,13 @@ classified on the basis of broad age and sex into male adult, female
 adult, and other children. The ACLEW datasets had other coding levels
 which will not be discussed here.
 
+Table 2. Key properties of the five corpora
+
 \subsubsection{Processing}\label{processing}
 
 Several different time units are needed to clarify how different metrics
-are calculated (see Figure XX). Clips refer to the 1- or 2-minute
-samples extracted from recordings. This is the basic unit at which child
+are calculated (see Figure 1). Clips refer to the 1- or 2-minute samples
+extracted from recordings. This is the basic unit at which child
 vocalization counts and conversational turn counts can be established.
 In addition, since most previous work evaluating adult word counts did
 so at the clip level, we do so here as well.
@@ -547,9 +547,9 @@ active at the same time, according to the human annotators, have been
 mapped to the class \enquote{overlap} post hoc. This allows us to
 compare this Overlap class to LENA's OLN (and, for the precision/recall
 analysis introduced next, OLF) by the LENA model. Therefore, the
-confusion rate is computed based on the matches in Table XX.
+confusion rate is computed based on the matches in Table 3.
 
-Table XX: Correspondances between LENA and our human annotation.
+Table 3: Correspondances between LENA and our human annotation.
 *Electronic voices were only annotated in the ACLEW dataset. Although
 some Tsimane' families listen to the radio, radio speech was not
 annotated in the TSI corpus.
@@ -591,7 +591,7 @@ transcribed (and thus lacks word counts). In contrast, annotators for
 the four ACLEW corpora were proficient in the language spoken in the
 daylong recording, and transcribed all adult speech based using
 canonical lexical forms (e.g. \enquote{wanna}, not \enquote{want to}) in
-keeping with minCHAT format (MacWhinney).
+keeping with minCHAT format ({\textbf{???}}).
 
 Reference adult word counts were determined by counting all
 unambiguously transcribed words spoken by adult talkers. This was
@@ -1112,7 +1112,7 @@ and other child speech were correctly tagged by LENA. How does LENA fare
 compared to other speech technology systems in terms of classification
 accuracy? Although none have been tested on precisely the same data,
 there are indications that state-of-the-art speech technology can match
-LENA even without extensive training. For instance, Sell et al. 2017
+LENA even without extensive training. For instance, ({\textbf{???}})
 obtained a diarization error rate of 60\% (vs.~79\% obtained here) on a
 different random sampling of the BER dataset from which the present work
 also draws (albeit focusing on clips that had some speech, which likely
@@ -1291,27 +1291,26 @@ good quality audio output, so we recommend that researchers always
 download the audio file in any case, so that it is available for future
 analysis. First, we recommend a literature search, to determine whether
 a similar sample has been studied in the past for which there exists
-reliability data (see for example, Cristia et al, submitted, for a
-systematic review). If no studies exist, draw 10 x 2 minutes randomly
-from 10 children. This is about 3h20min of data, which takes roughly 60h
-to annotate in our experience. We recommend training annotators using
-ACLEW Annotation Scheme \url{https://osf.io/b2jep/} and then using
-DiViMe (divime.readthedocs.io, Le Franc et al 2018 Interspeech) to
-estimate the accuracy for the sample. Extract the classification
-accuracy measures used here (\% misses, \% false alarms, \% confusions)
-from the annotated data and sum it to provide a total diarization error
-rate using the recipes provided in that package. The supplementary
-materials to the present paper contain scripts that allow users to
-extract CVC, CTC, and AWC from LENA and annotations made using AAS.
-Separately, estimate the accuracy needed for the study. For instance,
-suppose we have an evaluation of an intervention where we expect
-treatment children to hear 20\% more speech than controls, or an
-individual differences study where we expect that the lower 5th of the
-children hear 20\% less speech than the top 5th. If the intended measure
-used to compare groups has an error rate larger than the effect
-predicted (e.g.~the CVC error rate we find here), a different algorithm
-or outcome metric is recommended (see DiViMe for some alternative
-algorithms).
+reliability data (see for example, ({\textbf{???}}) for a systematic
+review). If no studies exist, draw 10 x 2 minutes randomly from 10
+children. This is about 3h20min of data, which takes roughly 60h to
+annotate in our experience. We recommend training annotators using ACLEW
+Annotation Scheme \url{https://osf.io/b2jep/} and then using DiViMe
+(divime.readthedocs.io, ({\textbf{???}})) to estimate the accuracy for
+the sample. Extract the classification accuracy measures used here (\%
+misses, \% false alarms, \% confusions) from the annotated data and sum
+it to provide a total diarization error rate using the recipes provided
+in that package. The supplementary materials to the present paper
+contain scripts that allow users to extract CVC, CTC, and AWC from LENA
+and annotations made using AAS. Separately, estimate the accuracy needed
+for the study. For instance, suppose we have an evaluation of an
+intervention where we expect treatment children to hear 20\% more speech
+than controls, or an individual differences study where we expect that
+the lower 5th of the children hear 20\% less speech than the top 5th. If
+the intended measure used to compare groups has an error rate larger
+than the effect predicted (e.g.~the CVC error rate we find here), a
+different algorithm or outcome metric is recommended (see DiViMe for
+some alternative algorithms).
 
 \subsubsection{Conclusions}\label{conclusions}
 
@@ -1328,7 +1327,7 @@ addressed. For example, we have not investigated how accurately LENA
 detects individual variation across children or families. It would be
 particularly useful to know whether LENA can classify children with the
 sensitivity and specificity needed for accurate identification of
-language disorders. Oller et al, 2010 used LENA to differentiate
+language disorders. ({\textbf{???}}) used LENA to differentiate
 vocalizations from 232 typically developing children and children with
 autism or language delay with a high degree of accuracy. However, key to
 this was the use of additional algorithms, not yet available with LENA,
@@ -1340,30 +1339,30 @@ Even if it turns out that LENA is not accurate enough to classify
 children precisely, it may be accurate enough to capture the rank order
 of individual children's language growth, which can provide useful
 information about the relative language level of children in a sample or
-population (see e.g.~Gilkerson et al, 2017)). Similarly, LENA may be
-able to track a child's development relatively accurately over time;iIt
-may not capture accurately the precise number of child vocalisations
-produced over time, but it may track developmental trajectory (e.g.~the
-slope of growth) relatively well. Finally, although our results suggest
-that aspects of LENA's output may be relatively robust to differences
-across languages/dialects, we need more evidence of how it fares when
-tracking the language, and language environment, of multilingual
-children in multilingual homes (see Orena et al (date??) for some
-evidence that LENA is reliable in French-English bilingual environments
-although, as in the present paper, it underestimated adult word count).
-More work is needed to investigate these research questions.
+population (see e.g. ({\textbf{???}})). Similarly, LENA may be able to
+track a child's development relatively accurately over time;iIt may not
+capture accurately the precise number of child vocalisations produced
+over time, but it may track developmental trajectory (e.g.~the slope of
+growth) relatively well. Finally, although our results suggest that
+aspects of LENA's output may be relatively robust to differences across
+languages/dialects, we need more evidence of how it fares when tracking
+the language, and language environment, of multilingual children in
+multilingual homes (see ({\textbf{???}})) for some evidence that LENA is
+reliable in French-English bilingual environments although, as in the
+present paper, it underestimated adult word count). More work is needed
+to investigate these research questions.
 
 \subsection{Acknowledgments}\label{acknowledgments}
 
 This work was supported by a Trans-Atlantic Platform \enquote{Digging
 into Data} collaborative grant (ACLEW:Analyzing Child Language
 Experiences Around The World; ANR-16-DATA-0004 ACLEW (AC); HJ- 253479-17
-(EB), SSHRC-869-2016-0003(MS)). We acknowledge further support from
+(EB), SSHRC-869-2016-0003 (MS)). We acknowledge further support from
 (ANR-17-CE28-0007 LangAge, ANR-14-CE30-0003 MechELex, ANR-17-EURE-0017);
 and the J. S. McDonnell Foundation Understanding Human Cognition Scholar
 Award (AC); Social Sciences and Humanities Research Council of Canada
 Insight Grant (435-2015-0628; MS); NIH (DP5 OD019812-01; EB), and the
-Economic and Social Sciences Research Council (ES/L008955/1; CR)
+Economic and Social Sciences Research Council (ES/L008955/1; CR).
 
 \newpage
 

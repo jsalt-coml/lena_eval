@@ -22,7 +22,7 @@ abstract: >
 keywords          : ""
 wordcount         : ""
 
-bibliography      : ["LENASysRev.bib"]
+bibliography      : ["empty.bib"]
 
 figsintext        : yes
 figurelist        : no
@@ -36,7 +36,6 @@ class             : "man"
 header-includes:
 - \usepackage{booktabs}
 - \usepackage{makecell}
-- \usepackage[table]{xcolor}
 output            : papaja::apa6_pdf
 
 ---
@@ -61,6 +60,7 @@ dodiv=function(x) x/sum(x, na.rm=T)
 
 ```
 
+
 While nearly all humans eventually become competent users of their language(s), documenting the experiential context of early acquisition is crucial for both theoretical and applied reasons. Regarding theory, there are many open questions about what kinds of experiences and interactions are necessary, sufficient, or optimal for supporting language development. Moreover, the ability to accurately and quickly assess an infant's state of development at a given point in time is of central importance for clinical purposes, both for children with known risks of language delays and disorders, and those who might not be identified based on risk factors. Reliable assessments are also crucial for measuring intervention efficacy. 
 
 One approach that has been making its way into the mainstream literature across applied and basic research on language and cognition relies on day-long recordings gathered with LENA(R) products [e.g. @Greenwood2011; @Oller; @Gilkerson2017, inter alia?), analyzed by LENA's automated, closed-source algorithms. As we summarize below, this approach has many advantages, which may explain its expanding popularity. While dozens of papers over the past decade have used LENA's automated output, only a handful include validity estimates [e.g. @Weisleder2013a; @zimmerman2009; d'Apice et al 2019], even fewer where validity estimation was the primary focus of the paper (e.g. Ganek & Eriks-Brophy, Bulgarelli & Bergelson in press @ BRM, @Lehet2018 for a fuller report, see @Cristia]. As a result, few studies report sufficient details about validation accuracy for one or more metrics, limiting systematic review or meta-analytic assessment [@Cristia]
@@ -81,13 +81,13 @@ The resulting LENA software takes each audio recording and processes it incremen
 	
 After this broad speaker classification step, Female or Male Adult "Near" segments (FAN and MAN) are further processed using an adaptation of the Sphinx Phone Decoder [Lamere et al, 2003] in order to form an automated estimate of the number of words in each segment (adult word count, or **AWC**). Key Child (CHN) segments are further processed to sub-classify into vegetative noises (VEG), crying (CRY), and speech-like vocalization (VOC). LENA provides the count (child vocalization count, or CVC) and duration of these VOC sub-segments. A further metric, Conversational turn counts (CTC), reflects the number of alternations between an adult and the key child (or vice versa), bounded by 5 s of non-speech. 
 
-```{r tab-abb, echo = FALSE, results="asis"}
+```{r tab-abb, echo = FALSE, results="asis",eval=F}
 
 read.csv("../paper_rmd/figures/table_1.csv",header=F)->abbreviations_table
 colnames(abbreviations_table)<-c("Abbreviations","Meanings")
 
 kable(abbreviations_table, "latex", booktabs = T, caption = "A partial listing of common LENA abbreviations and their meanings.") %>%
-  kable_styling(latex_options = "striped", full_width = F) %>%
+#  kable_styling(latex_options = "striped", full_width = F) %>%
   column_spec(1, width = "10em") %>%
   column_spec(2, width = "30em")
 ```
@@ -132,7 +132,7 @@ We chose to sample 1 or 2 minutes at a time (Tsimane, and ACLEW corpora, respect
 In the 5 corpora, the 1- or 2-min samples were annotated for all hearable utterance boundaries and talker ID. In ACLEW corpora \footnote{see @casillas2017a and  @casillas2017b for the general annotation protocol, and Soderstrom et al., submitted to AMPPS, for an introduction to the databases}, talker IDs reflected unique individual talkers, but were coded in such a way to readily allow mapping onto LENAs talker categories (e.g. key child, other children, female adult, male adult). In the TSI corpus, only the key child and one female adult whose voice recurred throughout the day were individually identified, with all other talkers being classified on the basis of broad age and sex into male adult, female adult, and other children. The ACLEW datasets had other coding levels which will not be discussed here. 
 
 Table 2. Key properties of the five corpora
-```{r tab-corp, echo = FALSE, results="asis"}
+```{r tab-corp, echo = FALSE, results="asis",eval=F}
 
 read.csv("../paper_rmd/figures/table_2.csv",header=T)->datasets_table
 colnames(datasets_table) <- c("Corpus", "# Children", "# Clips", "Clip dur \n (in seconds)", "Age mean (range) in months", "Location")
@@ -177,7 +177,7 @@ In the human annotation, there is no class representing overlapping speech as su
 
 
 Table 3: Correspondances between LENA and our human annotation. *Electronic voices were only annotated in the ACLEW dataset. Although some Tsimane' families listen to the radio, radio speech was not annotated in the TSI corpus.
-```{r tab-tsicor, echo = FALSE, results="asis"}
+```{r tab-tsicor, echo = FALSE, results="asis",eval=F}
 Lena <- c("CHN", "CXN", "FAN", "MAN", "TVN*", "OLN")
 Human <- c("CHI", "OCH", "FA", "MA", "E*", "OL")
 
@@ -239,7 +239,7 @@ sumref=rowSums(all)
 ```
 
 ```{r DIAER,echo=F}
-read.csv(paste0(thisdir,"/gold/diaer_gold_no_ele_lena_sil_no_tv_no_oln_report.csv"))->py
+read.csv(paste0(thisdir,"/diaer_gold_no_ele_lena_sil_no_tv_no_oln_report.csv"))->py
 #dim(py) #873 clips
 #summary(py)
 
@@ -286,9 +286,9 @@ These three metrics can be added together into a single "diarization error rate"
 
 ```{r cf-dm,echo=F}
 
- read.csv("../LENA_eval_201906/gold/diaer_lena_sil.csv")->pysil
- read.csv("../LENA_eval_201906/gold/diaer_lena_far.csv")->pyfar
- read.csv("../LENA_eval_201906/gold/diaer_gold_no_ele_lena_sil_no_tv_report.csv")->pynotv
+ read.csv("../LENA_eval_201906/diaer_lena_sil.csv")->pysil
+ read.csv("../LENA_eval_201906/diaer_lena_far.csv")->pyfar
+ read.csv("../LENA_eval_201906/diaer_gold_no_ele_lena_sil_no_tv_report.csv")->pynotv
 
  pysil$type<-"pysil"
 pyfar$type<-"pyfar"
@@ -495,6 +495,7 @@ abline(lm(gold~lena,data=awc,subset=c(awc$gold>0 & awc$lena>0)),lty=2)
 ```
 
 
+
 One child in the SOD corpus was learning French. We have included this child to increase power, but results without this one child are nearly identical.  The association between clip-level LENA and human AWC was strong: the Pearson correlation between the two was r=`r round(cor.awc.all$estimate,3)` (p=`r signif(cor.awc.all$p.value,3)`) when all clips were taken into account, and r=`r round(cor.awc.noZeros$estimate,3)` (p=`r signif(cor.awc.noZeros$p.value,3)`)  when only clips with some child speech (i.e., excluding `r sum(awc$gold>0 & awc$lena>0)` clips with 0 counts in both LENA and human annotations) were considered. This suggests that the LENA system captures  differences in terms of number of child vocalizations across clips well. The absolute error rate ranged from `r min(aer)` to `r max(aer)`, with a mean of `r mean(aer)` and a median of `r median(aer)`. The absolute error rate excluding clips where both human and LENA counts were zero ranged from `r min(aer_no_zeros)` to `r max(aer_no_zeros)`, with a mean of `r mean(aer_no_zeros)` and a median of `r median(aer_no_zeros)`. As for  relative error rates, these require the number in the denominator to be non-null. For this analysis, therefore, we need to remove the `r sum(awc$gold>0)` clips in which the human annotator said there were no child-adult or adult-child turns  whatsoever. When we do this, the mean relative error rate ranged from `r min(rer)` to `r max(rer)`, with a mean of `r mean(rer)` and a median of `r median(rer)`
 
 
@@ -503,7 +504,7 @@ One child in the SOD corpus was learning French. We have included this child to 
 The preceding sections include results that are wholesale, over all corpora. However, we have reason to believe that performance could be higher for the corpora collected in North America (BER, WAR, SOD) than those collected in other English-speaking countries (L05) or non-English speaking populations (TSI). Additionally, our age ranges are wide, and in the case of TSI children, some of the children are older than the oldest children in the LENA training set. To assess whether accuracy varies as a function of corpora and child age, we fit mixed models as follows.
 
 ```{r lmer-dm, echo=F}
-read.csv(paste0(thisdir,"/gold/diaer_gold_no_ele_lena_sil_no_tv_no_oln_report.csv"))->py
+read.csv(paste0(thisdir,"/diaer_gold_no_ele_lena_sil_no_tv_no_oln_report.csv"))->py
 
 #other fixes and addtions
 py=subset(py,item!="TOTAL")
@@ -684,10 +685,9 @@ There are, however, a number of areas of research that we have not addressed.  F
 Even if it turns out that LENA is not accurate enough to classify children precisely, it may be accurate enough to capture the rank order of individual children's language growth, which can provide useful information about the relative language level of children in a sample or population (see e.g. @Gilkerson2017). Similarly, LENA may be able to track a child's development relatively accurately over time;iIt may not capture accurately the precise number of child vocalisations produced over time, but it may track developmental trajectory (e.g. the slope of growth) relatively well. Finally, although our results suggest that aspects of LENA's output may be relatively robust to differences across languages/dialects, we need more evidence of how it fares when tracking the language, and language environment, of multilingual children in multilingual homes (see @orena_2019) for some evidence that LENA is reliable in French-English bilingual environments although, as in the present paper, it underestimated adult word count). More work is needed to investigate these research questions.
 
 
-
 ## Acknowledgments
 
-This work was supported by a Trans-Atlantic Platform "Digging into Data" collaborative grant (ACLEW:Analyzing Child Language Experiences Around The World; ANR-16-DATA-0004 ACLEW (AC); HJ- 253479-17 (EB), SSHRC-869-2016-0003(MS)). We acknowledge further support from (ANR-17-CE28-0007 LangAge, ANR-14-CE30-0003 MechELex, ANR-17-EURE-0017); and the J. S. McDonnell Foundation Understanding Human Cognition Scholar Award (AC); Social Sciences and Humanities Research Council of Canada Insight Grant (435-2015-0628; MS); NIH (DP5 OD019812-01; EB), and the Economic and Social Sciences Research Council (ES/L008955/1; CR) 	
+This work was supported by a Trans-Atlantic Platform "Digging into Data" collaborative grant (ACLEW:Analyzing Child Language Experiences Around The World; ANR-16-DATA-0004 ACLEW (AC); HJ- 253479-17 (EB), SSHRC-869-2016-0003 (MS)). We acknowledge further support from (ANR-17-CE28-0007 LangAge, ANR-14-CE30-0003 MechELex, ANR-17-EURE-0017); and the J. S. McDonnell Foundation Understanding Human Cognition Scholar Award (AC); Social Sciences and Humanities Research Council of Canada Insight Grant (435-2015-0628; MS); NIH (DP5 OD019812-01; EB), and the Economic and Social Sciences Research Council (ES/L008955/1; CR). 	
 
 \newpage
 
