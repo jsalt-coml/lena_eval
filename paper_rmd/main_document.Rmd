@@ -1,6 +1,6 @@
 ---
 title: "A thorough evaluation of the Language Environment Analysis (LENATM) system"
-shorttitle        : "IN PREP - LENA EVAL"
+shorttitle        : "LENA evaluation"
 
 author: 
   - name          : "many"
@@ -33,9 +33,11 @@ lineno            : no
 lang              : "english"
 class             : "man"
 
+classoption: table    
 header-includes:
-- \usepackage{booktabs}
-- \usepackage{makecell}
+  - \usepackage{array}
+  - \usepackage{float}
+
 output            : papaja::apa6_pdf
 
 ---
@@ -81,7 +83,7 @@ The resulting LENA software takes each audio recording and processes it incremen
 	
 After this broad speaker classification step, Female or Male Adult "Near" segments (FAN and MAN) are further processed using an adaptation of the Sphinx Phone Decoder [Lamere et al, 2003] in order to form an automated estimate of the number of words in each segment (adult word count, or **AWC**). Key Child (CHN) segments are further processed to sub-classify into vegetative noises (VEG), crying (CRY), and speech-like vocalization (VOC). LENA provides the count (child vocalization count, or CVC) and duration of these VOC sub-segments. A further metric, Conversational turn counts (CTC), reflects the number of alternations between an adult and the key child (or vice versa), bounded by 5 s of non-speech. 
 
-```{r tab-abb, echo = FALSE, results="asis",eval=F}
+```{r tab-abb, echo = FALSE, results="asis"}
 
 read.csv("../paper_rmd/figures/table_1.csv",header=F)->abbreviations_table
 colnames(abbreviations_table)<-c("Abbreviations","Meanings")
@@ -131,14 +133,14 @@ We chose to sample 1 or 2 minutes at a time (Tsimane, and ACLEW corpora, respect
 
 In the 5 corpora, the 1- or 2-min samples were annotated for all hearable utterance boundaries and talker ID. In ACLEW corpora \footnote{see @casillas2017a and  @casillas2017b for the general annotation protocol, and Soderstrom et al., submitted to AMPPS, for an introduction to the databases}, talker IDs reflected unique individual talkers, but were coded in such a way to readily allow mapping onto LENAs talker categories (e.g. key child, other children, female adult, male adult). In the TSI corpus, only the key child and one female adult whose voice recurred throughout the day were individually identified, with all other talkers being classified on the basis of broad age and sex into male adult, female adult, and other children. The ACLEW datasets had other coding levels which will not be discussed here. 
 
-Table 2. Key properties of the five corpora
-```{r tab-corp, echo = FALSE, results="asis",eval=F}
+
+```{r tab-corp, echo = FALSE, results="asis"}
 
 read.csv("../paper_rmd/figures/table_2.csv",header=T)->datasets_table
-colnames(datasets_table) <- c("Corpus", "# Children", "# Clips", "Clip dur \n (in seconds)", "Age mean (range) in months", "Location")
+colnames(datasets_table) <- c("Corpus", "Children", "Clips", "Clip dur \n (in seconds)", "Age mean (range) in months", "Location")
 
 kable(datasets_table, "latex", caption = "Key properties of the five corpora", booktabs = T, linesep = "", align = rep("c", 5)) %>%
-  kable_styling(latex_options = "striped",  full_width = F) %>%
+#  kable_styling(latex_options = "striped",  full_width = F) %>%
   column_spec(1, width = "1cm") %>%
   column_spec(2, width = "2.5cm") %>%
   column_spec(3, width = "1.5cm") %>%
@@ -176,18 +178,16 @@ The original coding was converted using custom-written python scripts into rttm 
 In the human annotation, there is no class representing overlapping speech as such. For the sake of completeness and full comparison with the LENA model, time where two or more different speech sources were active at the same time, according to the human annotators, have been mapped to the class "overlap" post hoc. This allows us to compare this Overlap class to LENA's OLN (and, for the precision/recall analysis introduced next, OLF) by the LENA model. Therefore, the confusion rate is computed based on the matches in Table 3.
 
 
-Table 3: Correspondances between LENA and our human annotation. *Electronic voices were only annotated in the ACLEW dataset. Although some Tsimane' families listen to the radio, radio speech was not annotated in the TSI corpus.
-```{r tab-tsicor, echo = FALSE, results="asis",eval=F}
+
+```{r tab-tsicor, echo = FALSE, results="asis"}
 Lena <- c("CHN", "CXN", "FAN", "MAN", "TVN*", "OLN")
 Human <- c("CHI", "OCH", "FA", "MA", "E*", "OL")
 
 cor_tsi <- data.frame(Lena, Human)
-kable(cor_tsi, "latex", caption = "Correspondances between LENA and our human annotation.", booktabs = T) %>%
-  kable_styling(latex_options = "striped", position = "center",full_width = F)  %>%
+kable(cor_tsi, "latex", caption = "Correspondances between LENA and our human annotation. *Electronic voices were only annotated in the ACLEW dataset. Although some Tsimane' families listen to the radio, radio speech was not annotated in the TSI corpus.", booktabs = T) %>%
+#  kable_styling(latex_options = "striped", position = "center",full_width = F)  %>%
   column_spec(1, width = "2cm") %>%
-  column_spec(2, width = "2cm") %>%
-  footnote(symbol = c("Electronic voices were only annotated in the ACLEW dataset", 
-                      "Although some Tsimane' families listen to the radio, radio speech was not annotated in the TSI corpus."), footnote_as_chunk = T)
+  column_spec(2, width = "2cm") 
 #apa_table(cor_tsi, note = "Electronic voices were only annotated in the ACLEW dataset. \n Although some Tsimane' families listen to the radio, radio speech was not annotated in the TSI corpus.", caption = "Correspondances between LENA and our human annotation."  )
 
 ```

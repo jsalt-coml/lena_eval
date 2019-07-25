@@ -154,8 +154,8 @@ researchers make this determination for their goals.}
 
 
 
-  \usepackage{booktabs}
-  \usepackage{makecell}
+  \usepackage{array}
+  \usepackage{float}
 
 \begin{document}
 
@@ -268,6 +268,31 @@ further processed to sub-classify into vegetative noises (VEG), crying
 sub-segments. A further metric, Conversational turn counts (CTC),
 reflects the number of alternations between an adult and the key child
 (or vice versa), bounded by 5 s of non-speech.
+
+\begin{table}[t]
+
+\caption{\label{tab:tab-abb}A partial listing of common LENA abbreviations and their meanings.}
+\centering
+\begin{tabular}{>{\raggedright\arraybackslash}p{10em}>{\raggedright\arraybackslash}p{30em}}
+\toprule
+Abbreviations & Meanings\\
+\midrule
+FAN, MAN, CHN, CXN & Basic “meaningful speech” (near and clear speech) categories used by LENA for further processing: Female Adult Near, Male Adult Near, Key Child Near and Other Child Near categories respectively.\\
+NON, TVN, OLN, SIL & Basic non-speech categories: Noise Near,  Television Near, Overlap Near, Silence.\\
+FAF, MAF, etc. & “Far” (low probability) versions of each category.\\
+Key child & Child wearing recorder\\
+AWC & Adult Word Count (processed over FAN and MAN)\\
+\addlinespace
+CVC & Child Vocalization Count (processed over VOCs within CHN)\\
+CTC & Conversational Turn Count (processed over FAN/MAN and CHN)\\
+VOC & Key child speech-like vocalization within CHN\\
+CRY & Key child crying within CHN\\
+VEG & Key child vegetative noise within CHN\\
+\addlinespace
+AVA & A measure of vocal maturity processed over VOC\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsubsection{Previous validation work}\label{previous-validation-work}
 
@@ -456,7 +481,23 @@ classified on the basis of broad age and sex into male adult, female
 adult, and other children. The ACLEW datasets had other coding levels
 which will not be discussed here.
 
-Table 2. Key properties of the five corpora
+\begin{table}[t]
+
+\caption{\label{tab:tab-corp}Key properties of the five corpora}
+\centering
+\begin{tabular}{>{\centering\arraybackslash}p{1cm}>{\centering\arraybackslash}p{2.5cm}>{\centering\arraybackslash}p{1.5cm}>{\centering\arraybackslash}p{3cm}>{\centering\arraybackslash}p{3.5cm}>{\centering\arraybackslash}p{3.5cm}}
+\toprule
+Corpus & Children & Clips & Clip dur 
+ (in seconds) & Age mean (range) in months & Location\\
+\midrule
+WAR & 10 & 150 & 120 & 6.3 (3-9) & Western US\\
+BER & 10 & 150 & 120 & 11.2 (7-17) & Northeast US\\
+SOD & 9 & 150 & 120 & 12.3 (2-32) & Western Canada\\
+L05 & 10 & 150 & 120 & 20 (11-31) & Northwest England\\
+TSI & 10 & 272 & 60 & 34 (15-58) & Northern Bolivia\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsubsection{Processing}\label{processing}
 
@@ -552,10 +593,24 @@ compare this Overlap class to LENA's OLN (and, for the precision/recall
 analysis introduced next, OLF) by the LENA model. Therefore, the
 confusion rate is computed based on the matches in Table 3.
 
-Table 3: Correspondances between LENA and our human annotation.
-*Electronic voices were only annotated in the ACLEW dataset. Although
-some Tsimane' families listen to the radio, radio speech was not
-annotated in the TSI corpus.
+\begin{table}[t]
+
+\caption{\label{tab:tab-tsicor}Correspondances between LENA and our human annotation. *Electronic voices were only annotated in the ACLEW dataset. Although some Tsimane' families listen to the radio, radio speech was not annotated in the TSI corpus.}
+\centering
+\begin{tabular}{>{\raggedright\arraybackslash}p{2cm}>{\raggedright\arraybackslash}p{2cm}}
+\toprule
+Lena & Human\\
+\midrule
+CHN & CHI\\
+CXN & OCH\\
+FAN & FA\\
+MAN & MA\\
+TVN* & E*\\
+\addlinespace
+OLN & OL\\
+\bottomrule
+\end{tabular}
+\end{table}
 
 Please remember that the overlap category is not defined the same way as
 the LENA overlap category. For LENA, overlap between any two categories
