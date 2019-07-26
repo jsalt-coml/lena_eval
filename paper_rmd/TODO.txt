@@ -1,0 +1,3 @@
+add evaluation of voc versus nonvoc
+CVC is only over VOC regions --> extract them and recalculate 
+is CTC for any CHN or only VOC ones?
