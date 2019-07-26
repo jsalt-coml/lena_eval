@@ -1,3 +1,10 @@
 add evaluation of voc versus nonvoc
 CVC is only over VOC regions --> extract them and recalculate 
+also extract the actual counts from lena
 is CTC for any CHN or only VOC ones?
+improve Fig 1
+change pyannote evaluation to identification task
+create transparent treatment chain for AWC
+recalculate AWC results without the French kid (1499)
+change how AWC is done, over clip rather than utterances
+recalculate total speech duration for all corpora
