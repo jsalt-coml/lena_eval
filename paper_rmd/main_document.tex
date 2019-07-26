@@ -465,8 +465,9 @@ be excluded. The tenth day for this corpus was a second day by one of
 the 9 included children. From each daylong file, fifteen 2-minute
 non-overlapping audio (with a 5-minute context window) were randomly
 sampled from the entire daylong timeline for manual annotation. This
-30-minute sample corresponded to approximately 1 minute of annotated
-speech per key child (collapsing across all speaker categories).
+30-minute sample corresponded to approximately 5-5.6 minutes of
+annotated speech per daylong file (collapsing across all speaker
+categories).
 
 The TSI corpus consisted of 1 or 2 recordings from 12 children, out of
 the 25 children recorded from field work that year; the other 13 had
@@ -477,8 +478,9 @@ minutes to allow the family to acclimate to the recorder, and then
 extracted 1 minute (with a 5-minute context window) every 60 minutes,
 until the end of the recording was reached. This resulted in 4 to 16
 minutes of manually annotated audio per child per recording (mean =
-12.64 minutes), and an average of 3 minutes of speech per key child
-(collapsing across all speaker categories).
+12.64 minutes), and an average of 3.4 minutes of speech per key child
+(collapsing across all speaker categories, and multiple days if
+present).
 
 We chose to sample 1 or 2 minutes at a time (TSI, and ACLEW corpora,
 respectively) because conversations are likely to be bursty (Goh \&
@@ -1209,41 +1211,34 @@ yielded the best results in Section \enquote{False alarms, misses,
 confusion}) from corpus, child age, and the interaction as fixed
 effects, declaring child ID as random effect, on clips where there was
 some speech according to the human annotator. We followed up with an
-Analysis of Variance (type 2) to assess significance. In none of these
+Analysis of Variance (type III) to assess significance. In none of these
 analyses was corpus, child age, or their interaction significant.
 
 For CVC, we fit a mixed model where CVC according to the human was
 predicted from CVC according to LENA\textsuperscript{TM}, in interaction
 with corpus and age, as fixed factors, declaring child ID as random
-effect. An Analysis of Variance (type 2) found a triple interaction,
+effect. An Analysis of Variance (type 3) found a triple interaction,
 suggesting that the predicted value of LENA\textsuperscript{TM} with
-respect to human CVC depended on both the corpus and the child age; and
-a two-way interaction between CVC by LENA\textsuperscript{TM} and
-corpus. To investigate these further, we fit a model where CVC according
-to the human was predicted from CVC according to
-LENA\textsuperscript{TM} in interaction with age (as fixed factors, with
-child ID as random) within each corpus separately. This revealed a
-significant interaction between LENA\textsuperscript{TM} CVC and age for
-BER (indicating that the predictive value of LENA\textsuperscript{TM}
-CVC increased with child age), whereas for the other four corpora this
-interaction was not significant, nor was the main effect of age, and
-only the LENA\textsuperscript{TM} CVC emerged as a significant predictor
-of variance in child vocalization counts derived from human
-annotation.\href{For\%20both\%20BER\%20and\%20WAR,\%20the\%20variance\%20associated\%20to\%20the\%20child\%20ID\%20random\%20factor\%20was\%20zero.\%20This\%20suggests\%20a\%20mixed\%20model\%20was\%20not\%20necessary,\%20as\%20child\%20ID\%20is\%20not\%20explaining\%20any\%20additional\%20variance,\%20but\%20it\%20does\%20not\%20alter\%20the\%20interpretation\%20in\%20the\%20main\%20text.}{1}
+respect to human CVC depended on both the corpus and the child age; as
+well as all two-way interactions. To investigate these further, we fit a
+model where CVC according to the human was predicted from CVC according
+to LENA\textsuperscript{TM} in interaction with age (as fixed factors,
+with child ID as random) within each corpus separately. This revealed a
+significant interaction between LENA\textsuperscript{TM} CVC and age was
+only found for BER (indicating that the predictive value of
+LENA\textsuperscript{TM} CVC increased with child age); and that an
+effect of age was only found for SOD (indicating that CVC went up with
+age in this corpus). As for the main effect of LENA\textsuperscript{TM}
+CVC, which would be consistent with a predictive value of this metric
+with respect to human CVC, this emerged as a significant predictor in
+all corpora but
+BER.\href{For\%20both\%20BER\%20and\%20WAR,\%20the\%20variance\%20associated\%20to\%20the\%20child\%20ID\%20random\%20factor\%20was\%20zero.\%20This\%20suggests\%20a\%20mixed\%20model\%20was\%20not\%20necessary,\%20as\%20child\%20ID\%20is\%20not\%20explaining\%20any\%20additional\%20variance\%20in\%20this\%20corpora,\%20but\%20this\%20does\%20not\%20alter\%20the\%20interpretation\%20in\%20the\%20main\%20text.}{1}
 
 For CTC, we fit a mixed model where CTC according to the human was
 predicted from CTC according to LENA\textsuperscript{TM}, in interaction
 with corpus and age, as fixed factors, declaring child ID as random
-effect. An Analysis of Variance (type 2) found a two-way interaction
-between CTC by LENA\textsuperscript{TM} and corpus. To investigate this
-further, we fit the same regressions within each corpus
-separately.\href{For\%20both\%20TSI\%20and\%20WAR,\%20the\%20variance\%20associated\%20to\%20the\%20child\%20ID\%20random\%20factor\%20was\%20zero.\%20This\%20suggests\%20a\%20mixed\%20model\%20was\%20not\%20necessary,\%20as\%20child\%20ID\%20is\%20not\%20explaining\%20any\%20additional\%20variance,\%20but\%20it\%20does\%20not\%20alter\%20the\%20interpretation\%20in\%20the\%20main\%20text.}{2}
-These follow-up analyses revealed that CTC by LENA\textsuperscript{TM}
-varied in its strength of prediction of human-tagged CTC across corpora
-( BER estimate = 1.16, SE of estimate = 0.16, t = 7.41; L05 (estimate =
-1.62, SE of estimate = 0.21, t = 11.74) TSI estimate = 0.94, SE of
-estimate = 0.08, t = 11.74; SOD estimate = 0.96, SE of estimate = 0.22,
-t = 4.46; WAR estimate = 1.68, SE of estimate = 0.14, t = 12.22).
+effect. An Analysis of Variance (type 3) found no main effects or
+interactions.
 
 \subsection{Discussion}\label{discussion}
 
@@ -1328,7 +1323,7 @@ While the median error rate for CVC, CTC, and AWC was an encouraging
 adult words altogether. When such clips were excluded in the relative
 error analyses, median error rates rose substantially. Relative to
 humans, the LENA\textsuperscript{TM} system missed roughly half of the
-relevant data for CVC, CTC, and AWC ( -44\%, -82\%, and -18\% relative
+relevant data for CVC, CTC, and AWC (-44\%, -82\%, and -18\% relative
 error rates, respectively). Thus, LENA\textsuperscript{TM}
 systematically underestimates the raw counts of its main quantitative
 measures - particularly child vocalizations and conversational turns,
@@ -1364,8 +1359,10 @@ challenges in creating new datasets for training and testing speech
 technology, if it indeed turns out to be the case that automated speech
 processing (e.g.~diarization) for daylong recordings is relatively
 language- or dialect-agnostic in its accuracy, it may be possible to use
-existing American English corpora with high hopes of
-generalizability.\href{To\%20be\%20clear,\%20given\%20that\%20we\%20were\%20unable\%20to\%20computer\%20AWC\%20for\%20Tsimane',\%20we\%20are\%20only\%20able\%20to\%20speak\%20to\%20generalizability\%20across\%20samples\%20and\%20dialects\%20of\%20English\%20for\%20that\%20metric}{3}
+existing American English corpora with high hopes of generalizability.
+Please note, however, that since we were unable to computer AWC for
+Tsimane', we are only able to speak to generalizability across samples
+and dialects of English for that metric.
 
 In sum, LENA\textsuperscript{TM} performs relatively well in terms of
 overall accuracy, but there are pockets in the system (e.g.~identifying
@@ -1467,7 +1464,7 @@ AWC accuracy was variable across two 12-hour recordings: 1\% lower than
 human transcription for one child, but 27\% lower for a second child.
 This same report notes that AWC accuracy quickly plateaus as recording
 time increases beyond one hour, leveling to 5-10\% in recording
-\textgreater{}2 hours {[}LTR-05-2{]}.
+\textgreater{}2 hours (D. Xu, Yapanel, \& Gray, 2009).
 
 Thus, it is important for further work to help establish the
 systematicity in LENA\textsuperscript{TM}'s estimates: if underestimates
@@ -1496,28 +1493,31 @@ for how to go about this. Note that this requires downloading the audio
 However, the LENA\textsuperscript{TM} recorder itself produces good
 quality audio output, so we recommend that researchers always download
 the audio file in any case, so that it is available for future analysis.
+
 First, we recommend a literature search, to determine whether a similar
 sample has been studied in the past for which there exists reliability
-data (see for example, A. Cristia et al. (2019) for a systematic
-review). If no studies exist, draw 10 x 2 minutes randomly from 10
-children. This is about 3h20min of data, which takes roughly 60h to
-annotate in our experience. We recommend training annotators using ACLEW
-Annotation Scheme \url{https://osf.io/b2jep/} and then using DiViMe
-(divime.readthedocs.io, Le Franc et al. (2018)) to estimate the accuracy
+data (see for example, A. Cristia et al., 2019 for a systematic review).
+If no studies exist, draw 10 x 2 minutes randomly from 10 children. This
+is about 3h20min of data, which takes roughly 60h to annotate in our
+experience. We recommend training annotators using ACLEW Annotation
+Scheme \url{https://osf.io/b2jep/} and then using DiViMe
+(divime.readthedocs.io, Le Franc et al., 2018) to estimate the accuracy
 for the sample. Extract the classification accuracy measures used here
 (\% misses, \% false alarms, \% confusions) from the annotated data and
 sum it to provide a total diarization error rate using the recipes
 provided in that package. The supplementary materials to the present
 paper contain scripts that allow users to extract CVC, CTC, and AWC from
-LENA\textsuperscript{TM} and annotations made using AAS. Separately,
-estimate the accuracy needed for the study. For instance, suppose we
-have an evaluation of an intervention where we expect treatment children
-to hear 20\% more speech than controls, or an individual differences
-study where we expect that the lower 5th of the children hear 20\% less
-speech than the top 5th. If the intended measure used to compare groups
-has an error rate larger than the effect predicted (e.g.~the CVC error
-rate we find here), a different algorithm or outcome metric is
-recommended (see DiViMe for some alternative algorithms).
+LENA\textsuperscript{TM} and annotations made using AAS.
+
+Separately, estimate the accuracy needed for the study. For instance,
+suppose we have an evaluation of an intervention where we expect
+treatment children to hear 20\% more speech than controls, or an
+individual differences study where we expect that the lower 5th of the
+children hear 20\% less speech than the top 5th. If the intended measure
+used to compare groups has an error rate larger than the effect
+predicted (e.g.~the CVC error rate we find here), a different algorithm
+or outcome metric is recommended (see DiViMe for some alternative
+algorithms).
 
 \subsubsection{Conclusions}\label{conclusions}
 
@@ -1548,16 +1548,16 @@ Even if it turns out that LENA\textsuperscript{TM} is not accurate
 enough to classify children precisely, it may be accurate enough to
 capture the rank order of individual children's language growth, which
 can provide useful information about the relative language level of
-children in a sample or population (see e.g. J. Gilkerson et al.
-(2017)). Similarly, LENA\textsuperscript{TM} may be able to track a
+children in a sample or population (see, e.g., J. Gilkerson et al.,
+2017). Similarly, LENA\textsuperscript{TM} may be able to track a
 child's development relatively accurately over time;iIt may not capture
 accurately the precise number of child vocalisations produced over time,
-but it may track developmental trajectory (e.g.~the slope of growth)
+but it may track developmental trajectory (e.g., the slope of growth)
 relatively well. Finally, although our results suggest that aspects of
 LENA\textsuperscript{TM}'s output may be relatively robust to
 differences across languages/dialects, we need more evidence of how it
 fares when tracking the language, and language environment, of
-multilingual children in multilingual homes (see Orena (2019)) for some
+multilingual children in multilingual homes (see Orena, 2019) for some
 evidence that LENA\textsuperscript{TM} is reliable in French-English
 bilingual environments although, as in the present paper, it
 underestimated adult word count). More work is needed to investigate
@@ -1760,6 +1760,13 @@ doi:\href{https://doi.org/10.1177/0956797613488145}{10.1177/0956797613488145}
 Xu, D., Yapanel, U., \& Gray, S. (2009). Reliability of the LENA
 Language Environment Analysis system in young children's natural home
 environment. \emph{LENA Foundation Technical Report}, (February), 1--16.
+
+\hypertarget{ref-Xu2009a}{}
+Xu, D., Yapanel, U., \& Gray, S. (2009). Reliability of the LENATM
+Language Environment Analysis System in young children's natural home
+environment (LENA Technical Report LTR-05-2). \emph{LENA Foundation},
+(February), 1--16. Retrieved from
+\href{http://lena.org/wp-content/uploads/2016/07/LTR-05-2\%7B/_\%7DReliability.pdf}{http://lena.org/wp-content/uploads/2016/07/LTR-05-2\{\textbackslash{}\_\}Reliability.pdf}
 
 \hypertarget{ref-zimmerman2009}{}
 Zimmerman, F. J., Gilkerson, J., Richards, J. A., Christakis, D. A., Xu,
