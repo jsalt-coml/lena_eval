@@ -13,6 +13,49 @@ names(corpora)<-c(substr(corpora[1:4],1,1),"C")
 
 ```
 
+## Going from eaf's to rttm's (ACLEW) -- MY WAY
+WARNING WARNING WARNING human step so there could be an error:
+I used ELAN to extract all root tiers: speakers + code
+
+The rest is by command line
+
+```{bash genaclewgoldbeg,eval=F}
+
+grep -v "code" gold/raw_master/export_onoff_code_speakers.txt | tr "\r" "\n" | sed 's/\r$//'> gold/raw_master/speakers.txt
+grep "code" gold/raw_master/export_onoff_code_speakers.txt | awk '{print $2 "," $3 "," $NF}' > gold/raw_master/chunks.txt
+
+
+```
+
+```{r genaclewgold,eval=F}
+aclewdat=read.csv("ACLEW_list_of_corpora.csv")
+speakers <- read.delim("~/Documents/gitrepos/lena_eval/LENA_eval_201906/gold/raw_master/speakers.txt", header=FALSE)
+colnames(speakers)=c("s","s2","beg","end","dur","c","f")
+read.csv("gold/raw_master/chunks.txt",header=F)->chunks
+for(i in 1:dim(chunks)[1]){
+  #get chunk info
+  on=chunks[i,1]
+  off=chunks[i,2]
+  filen=chunks[i,3]
+  
+  #select
+  myrows=subset(speakers,beg>on & end<off & f==filen)
+  
+  
+  #sort by beg time
+  myrows=myrows[order(myrows$beg),]
+  
+  #round needed cols, clean filen, get cor name
+  myrows$beg=round(myrows$beg,2)
+  myrows$dur=round(myrows$dur,2)
+  filen=gsub(".eaf","",filen)
+  cor=aclewdat[aclewdat$aclew_id==filen,"labname"]
+  
+  write.table(cbind("SPEAKER",paste0(as.character(cor),"_",filen,"_",on,"_",off),1,myrows$beg,myrows$dur,"<NA>", "<NA>",as.character(myrows$s), "<NA>"),file=paste0("gold/",as.character(cor),"_",filen,"_",on,"_",off,".rttm"),row.names=F,col.names = F,sep=" ",quote=F)
+}
+```
+
+
 ## Going from eaf's to rttm's (ACLEW) -- NOT FINISHED, GET MARVIN'S INPUT
 
 https://github.com/srvk/DiViMe/blob/master/utils/adjust_timestamps.py
@@ -751,7 +794,7 @@ python cut_lena.py
 
 ## Create csv's with pyannote.metrics
 
-```{bash pyannote, eval=F}
+```{bash pyannote}
 
 source activate pyannote-lena 
 
@@ -803,7 +846,7 @@ mv gold/mapped_no_ele/diaer__report.csv diaer_gold_no_ele_lena_sil_no_tv_no_oln_
 
 These contain the same info as the lena and gold rttms, but each line represents a 100 ms frame, and all frames are accounted for (whereas in standard rttms silence is not tagged). The following lines must be ran on a terminal (because they give an error here, not sure why).
 
-```{bash runpy, eval=F}
+```{bash runpy}
 rm -r -f */frame/
 python frame_cutter.py --i lena/mapped_far/
 mkdir lena/frame/
@@ -888,14 +931,10 @@ write.table(confusion_all,file=paste0("all_cm.txt"))
 
 ```
 
-
-
-
 ## Generate CTC & CVC
 
-Logic is:
+Logic is to do the following for the LENA & Gold and pair the output values
 
-- Do the following for the LENA & Gold and pair the output values
 - Read in each rttm
 - Sort it so that it's ordered in time
 - Get CHI's CVC
