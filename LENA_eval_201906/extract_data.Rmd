@@ -850,6 +850,10 @@ mv lena/mapped lena/mapped_sil_no_tv_no_oln
 python labels_mapper.py -p gold/ -m gold_no_ele -o
 mv gold/mapped gold/mapped_no_ele
 
+#a gold version with no electronics and no overlap
+python labels_mapper.py -p gold/ -m gold_no_ele 
+mv gold/mapped gold/mapped_no_ele_no_ovl
+
 #this is our main gold
 python labels_mapper.py -p gold/ -m gold -o
 
@@ -867,11 +871,11 @@ mv gold/mapped/diaer__report.csv diaer_lena_sil.csv
 python compute_metrics.py -ref gold/mapped_no_ele/ -hyp lena/mapped_sil_no_tv/ -t diarization -m diaer 
 mv gold/mapped_no_ele/diaer__report.csv diaer_gold_no_ele_lena_sil_no_tv_report.csv
 
-python compute_metrics.py -ref gold/mapped_no_ele/ -hyp lena/mapped_sil_no_tv_no_oln/ -t diarization -m diaer 
-mv gold/mapped_no_ele/diaer__report.csv diaer_gold_no_ele_lena_sil_no_tv_no_oln_report.csv
+python compute_metrics.py -ref gold/mapped_no_ele_no_ovl/ -hyp lena/mapped_sil_no_tv_no_oln/ -t diarization -m diaer 
+mv gold/mapped_no_ele_no_ovl/diaer__report.csv diaer_gold_no_ele_no_ovl_lena_sil_no_tv_no_oln_report.csv
 
-python compute_metrics.py -ref gold/mapped_no_ele/ -hyp lena/mapped_sil_no_tv_no_oln/ -t detection  -m deter
-mv gold/mapped_no_ele/deter__report.csv deter_gold_no_ele_lena_sil_no_tv_no_oln_report.csv
+python compute_metrics.py -ref gold/mapped_no_ele_no_ovl/ -hyp lena/mapped_sil_no_tv_no_oln/ -t detection  -m deter
+mv gold/mapped_no_ele_no_ovl/deter__report.csv deter_gold_no_ele_no_ovl_lena_sil_no_tv_no_oln_report.csv
 
 ```
 

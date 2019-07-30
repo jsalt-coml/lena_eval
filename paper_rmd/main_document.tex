@@ -116,18 +116,26 @@
   \shorttitle{LENA\textsuperscript{TM} evaluation}
 
 
-  \author{many\textsuperscript{1}}
+  \author{Alejandrina Cristia\textsuperscript{1}, Marvin Lavechin\textsuperscript{1}, Camila Scaff\textsuperscript{1}, Melanie Soderstrom\textsuperscript{2}, Caroline Rowland\textsuperscript{3}, Okko Räsänen\textsuperscript{4}, John Bunce\textsuperscript{2,5}, Anne Warlaumont\textsuperscript{6}, \& Elika Bergelson\textsuperscript{7}}
 
-  % \def\affdep{{""}}%
-  % \def\affcity{{""}}%
+  % \def\affdep{{"", "", "", "", "", "", "", "", ""}}%
+  % \def\affcity{{"", "", "", "", "", "", "", "", ""}}%
 
   \affiliation{
     \vspace{0.5cm}
-          \textsuperscript{1}   }
+          \textsuperscript{1} Laboratoire de Sciences Cognitives et de Psycholinguistique, Département
+d'études cognitives, ENS, EHESS, CNRS, PSL University\\
+          \textsuperscript{2} Department of Psychology, University of Manitoba, Canada\\
+          \textsuperscript{3} Max Planck Institute for Psycholinguistics, Netherlands\\
+          \textsuperscript{4} Unit of Computing Sciences, Tampere University, Finland\\
+          \textsuperscript{5} \\
+          \textsuperscript{6} Psychology, University of California, Los Angeles, USA\\
+          \textsuperscript{7} Psychology \& Neuroscience, Duke University, Durham, North Carolina, USA  }
 
   \authornote{
-    Correspondence concerning this article should be addressed to many, .
-    E-mail:
+    Correspondence concerning this article should be addressed to
+    Alejandrina Cristia, 29, rue d'Ulm, 75005 Paris, France. E-mail:
+    \href{mailto:alecristia@gmail.com}{\nolinkurl{alecristia@gmail.com}}
   }
 
 
@@ -550,10 +558,10 @@ clips may have zero or more utterances. Unlike LENA\textsuperscript{TM},
 however, a given point in time may be associated with multiple speakers.
 Given that there need not be a one-to-one correspondence between
 LENA\textsuperscript{TM} segments and human utterances, we need to
-define smaller time units that can be used to check for agreement. In
-this paper, we use 10 ms frames. This is the basic time unit used for
-all classification accuracy estimations, which are introduced in more
-detail in the next subsection.
+define smaller time units that can be used to check for classification
+agreement. In this paper, we use 10 ms frames. This is the basic time
+unit used for all classification accuracy estimations, which are
+introduced in more detail in the next subsection.
 
 \subsubsection{\texorpdfstring{LENA\textsuperscript{TM} classification
 accuracy}{LENATM classification accuracy}}\label{lenatm-classification-accuracy}
@@ -604,7 +612,7 @@ according to the human annotation:
 \item
   confusion rate = C/T,
 \item
-  DER = (FA+M+C)/T,
+  DER = (FA+M+C)/T
 \end{itemize}
 
 In the human annotation, there is no class representing overlapping
@@ -796,13 +804,20 @@ can deal well with long stretches of silence, because we want to measure
 in an unbiased manner how much speech children hear. Unfortunately, in
 the 34\% of clips that had no speech whatsoever, the false alarm, miss,
 and confusion rates are all undefined, because the denominator is zero.
-In all likelihood, this leads to an overestimation of
-LENA\textsuperscript{TM}'s performance, because potential false alarms
-in these files are not counted against the system. It also occurred that
-there was just a little speech; in this case, the denominator is very
-small, and therefore the ratio for these two metrics ended up being a
-very large number. Since means are not robust to outliers, we report on
-medians.
+To be able to take them into account nonetheless, we defined the
+following rules: If in one clip there was no speech according to the
+human annotator, and LENA said there was speech, then the false alarm
+rate was 100\%, and the miss and confusion rates were zero. If on the
+contrary, when both the human and the LENA said there was no speech,
+then all the error rates where zero. It also occurred that there was
+just a little speech; in this case, the denominator is very small, and
+therefore the ratio for these two metrics ended up being a very large
+number. To be maximally informative, then, we report on results in three
+ways: Overall false alarm, miss, and confusion rates are calculated over
+all clips together, thus giving more weight to clips with more speech;
+means across clips represent central tendency when giving equal weight
+to clips with more versus less or no speech; and finally, since means
+are not robust to outliers, we report on medians across all clips.
 
 As mentioned briefly above, there were, a priori, several ways of
 analyzing the data:
@@ -836,25 +851,33 @@ categories found in the human annotation are FEM, MAL, CHI, OCH; in the
 LENA\textsuperscript{TM} annotation, only CHN, FAN, MAN, and CXN are
 considered speakers (with all far categories, TVN, and OLN all mapped
 onto silence). In this setting, LENA\textsuperscript{TM}'s false alarm
-(i.e., saying that a non-silence category is active when none is) had a
-median of 6\%, whereas the miss rate had a median of 33\%. The confusion
-rate, as mentioned above, is only calculated for the correctly detected
-speech (i.e., not the speech that was missed, which counts towards the
-miss rate, nor the speech that was falsely identified, which is
-considered as a false alarm). The confusion rate was very low, with a
-median of 9\%. These three metrics are added together to yield a median
-diarization error rate over the clips that had some speech of 80\%.
+(i.e., saying that a non-silence category is active when none is) was
+overall 13\%, and had a mean across all clips of 26\% and a median of
+5\%. The miss rate was overall 56\%, and had a mean across all clips of
+37\% and a median of 37\%. The confusion rate, as mentioned above, is
+only calculated for the correctly detected speech (i.e., not the speech
+that was missed, which counts towards the miss rate, nor the speech that
+was falsely identified, which is considered as a false alarm). The
+confusion rate was very low, overall 9\%, and had a mean across all
+clips of 8\% and a median of 6\%. These three metrics are added together
+to yield the diarization error rate; the overall diarization error rate
+was 77\%, and had a mean across all clips of 68\% and a median of 69\%.
 
-In the next best performing case, electronic voices in the human
-annotation are still mapped onto silence but overlap is not, so that the
-human categories considered were CHI, FEM, MAL, OCH, and overlap; and
-the LENA\textsuperscript{TM} categories considered were CHN, FAN, MAN,
-CXN, and OLN (with all far classes and TVN mapped onto silence post
-hoc). In this setting, LENA\textsuperscript{TM}'s false alarm, missed,
-and confusion rate medians were 32\%, 22\%, and 27\% respectively, for a
-total median diarization error of 81\%. Performance likely degrades
-because OLN is not picking up the same regions as the overlapping speech
-found in the human annotations.
+To simplify, the following re-analyses focus on the medians over all
+clips, which both capture performance across al samples all the while
+not being overly sensitive to outliers. In the next best performing
+case, electronic voices in the human annotation are still mapped onto
+silence but overlap is not, so that the human categories considered were
+CHI, FEM, MAL, OCH, and overlap; and the LENA\textsuperscript{TM}
+categories considered were CHN, FAN, MAN, CXN, and OLN (with all far
+classes and TVN mapped onto silence post hoc). In this setting,
+LENA\textsuperscript{TM}'s false alarm, missed, and confusion rate
+medians were 32\%, 22\%, and 27\% respectively, for a total median
+diarization error of 81\%. Although the miss rate is reduced when OLN is
+considered as speech, overall performance degrades because OLN is not
+picking up the same regions as the overlapping speech found in the human
+annotations, leading to considerably higher false alarm and confusion
+rates.
 
 Next, we allowed the electronic voices segmented by humans, and TVN
 among the LENA\textsuperscript{TM} speaker categories, to be considered
@@ -863,9 +886,11 @@ the human categories considered were CHI, FEM, MAL, OCH, overlap, and
 electronic; and the LENA\textsuperscript{TM} categories considered were
 CHN, FAN, MAN, CXN, OLN, and TVN. LENA\textsuperscript{TM}'s false
 alarm, missed, and confusion rate medians were 40\%, 19\%, and 29\%
-respectively, for a total median diarization error of 88\%. Performance
-likely degrades because TVN is not picking up the electronic speech
-segmented by ACLEW annotators.
+respectively, for a total median diarization error of 88\%. Again, the
+miss rate drops slightly as we allow one more class to be considered
+speech, but this does not make up for the higher false alarm and
+confusion rate, likely because TVN is not defined similarly to the
+electronic speech segmented by ACLEW annotators.
 
 Finally, we declared the maximum possible number of categories: The
 human categories considered were still CHI, FEM, MAL, OCH, overlap, and
@@ -875,7 +900,7 @@ LENA\textsuperscript{TM}'s false alarm, missed, and confusion rate
 medians were 71\%, 7\%, and 41\% respectively, for a total median
 diarization error of 119\%. Thus, performance degrades considerable when
 all the \enquote{far} classes are treated as speech, leading to huge
-apparent false alarm rates.
+apparent false alarm rates and increased confusion rates.
 
 \subsubsection{\texorpdfstring{LENA\textsuperscript{TM} classification
 accuracy: Precision and
@@ -883,13 +908,13 @@ recall}{LENATM classification accuracy: Precision and recall}}\label{lenatm-clas
 
 By now, we have established that the best performance (when
 \enquote{far} labels such as CHF and OLF are mapped onto silence, as are
-TVN and OLN), the overall relative diarization error rate is about 80\%,
-due mainly to missing speech (33\%), with false alarms (6\%) and
-confusion between talker categories (9\%) constituting a relatively
-small proportion of errors. These metrics may be insufficient for our
-readers for two reasons. First, these metrics give more importance to
-correctly classifying segments as speech versus non-speech (false alarms
-+ misses) than confusing talkers (confusion). Second, many
+TVN and OLN), the median diarization error rate is about 69\%, due
+mainly to missing speech (37\%), with false alarms (5\%) and confusion
+between talker categories (6\%) constituting a relatively small
+proportion of errors. These metrics may be insufficient for our readers
+for two reasons. First, these metrics give more importance to correctly
+classifying segments as speech versus non-speech (false alarms + misses)
+than confusing talkers (confusion). Second, many
 LENA\textsuperscript{TM} adopters use the system not to make decisions
 on the sections labeled as non-speech, but rather on sections labeled as
 speech, and particularly those labeled adults and key child. The metrics
@@ -946,9 +971,9 @@ and 4\% were due to confusions with other speaker tags. Inspection of
 the rest of the confusion matrix shows that, other than silence, this is
 the most precise LENA\textsuperscript{TM} tag.
 
-Precision for CHN comes in second place, at 49\%; thus, fewer than half
-of the frames labeled as being the key child are, in fact, the key
-child. The majority of the frames, LENA\textsuperscript{TM} incorrectly
+Precision for CHN comes in second place, at 49\%; thus, nearly half of
+the frames labeled as being the key child are, in fact, the key child.
+The majority of the frames that LENA\textsuperscript{TM} incorrectly
 tagged as being the key child are actually silence (or rather, lack of
 speech) according to the human annotator (25\%), with the remaining
 errors being due to confusion with other categories: About 15\% of them
@@ -1006,23 +1031,23 @@ row add up to 100\%. The number below indicates number of frames in that
 intersection of LENA and human classes.}
 \end{figure}
 
-Again, we start with an example to facilitate the interpretation of this
-figure: The best performance for a talker category this time is CHN:
-Nearly half of the original frames humans tagged as being uttered by the
-key child were captured by the LENA\textsuperscript{TM} under the CHN
-tag. Among the remaining regions that humans labeled as being the key
-child, 18\% was captured by LENA\textsuperscript{TM}'s CXN category and
-23\% by its OLN tag, with the remainder spread out across several
-categories. This result can be taken to suggest that an analysis
-pipeline that uses the LENA\textsuperscript{TM} system to capture the
-key child's vocalizations by extracting only CHN regions will get nearly
-half of the key child's speech. Where additional human vetting is
-occuring in the pipeline, such researchers may consider additionally
-pulling out segments labeled as CXN, since this category actually
-contains a further 18\% of the key child's speech. Moreover, as we saw
-above, over a third of these LENA\textsuperscript{TM} tags corresponds
-to the key child, which means that human coders who are re-coding these
-regions could filter out the two thirds that do not.
+Again, we start with an example to facilitate the interpretation of
+Figure 3: The best performance for a talker category this time is CHN:
+40\% of the original frames humans tagged as being uttered by the key
+child were captured by the LENA\textsuperscript{TM} under the CHN tag.
+Among the remaining regions that humans labeled as being the key child,
+18\% was captured by LENA\textsuperscript{TM}'s CXN category and 23\% by
+its OLN tag, with the remainder spread out across several categories.
+This result can be taken to suggest that an analysis pipeline that uses
+the LENA\textsuperscript{TM} system to capture the key child's
+vocalizations by extracting only CHN regions will get nearly half of the
+key child's speech. Where additional human vetting is occuring in the
+pipeline, such researchers may consider additionally pulling out
+segments labeled as CXN, since this category actually contains a further
+18\% of the key child's speech. Moreover, as we saw above, over a third
+of these LENA\textsuperscript{TM} tags corresponds to the key child,
+which means that human coders who are re-coding these regions could
+filter out the two thirds that do not.
 
 Many colleagues also use the LENA\textsuperscript{TM} as a first pass to
 capture female adult speech via their FAN label. Only 28\% of the female
@@ -1035,14 +1060,14 @@ of the female speech as possible, perhaps a solution may be to also pull
 out OLN regions, since these capture a further 27\% of the original
 female adult speech and, out of the OLN tags, 25\% are indeed female
 adults (meaning that human annotators re-coding these regions need to
-filter out 4 out of 5 clips, on average).
+filter out 3 out o4 5 clips, on average).
 
 For the remaining two near speaker labels (MAN, CXN), recall averaged
 12\%, meaning that less than a quarter of male adult and other child
 speech is being captured by LENA\textsuperscript{TM}. In fact, most of
 these speakers' contributions are being tagged by the
-LENA\textsuperscript{TM} as OLN (mean across MAN and CXN 35\%) or
-silence (mean across MAN and CXN 7\%), although the remaining sizable
+LENA\textsuperscript{TM} as OLN (mean across MAN and CXN 35\%) or TV
+(mean across MAN and CXN 13\%), although the remaining sizable
 proportion of misses is actually distributed across many categories.
 
 Finally, as with precision, the \enquote{far} categories show worse
@@ -1062,7 +1087,7 @@ accuracy}\label{child-vocalization-counts-cvc-accuracy}
 Given the inaccuracy of far LENA\textsuperscript{TM} tags, and in order
 to follow the LENA\textsuperscript{TM} system procedure, we only counted
 vocalizations attributed to CHN and ignored those attributed to CHF. As
-shown in Figure (CVC), there is a strong association between clip-level
+shown in Figure 4, there is a strong association between clip-level
 counts estimated via the LENA\textsuperscript{TM} system and those found
 in the human annotations: the Pearson correlation between the two was r
 = 0.80 (p = 0.00) when all clips were taken into account, and r = 0.75
@@ -1119,11 +1144,11 @@ count, and applied the same rule the LENA\textsuperscript{TM} does,
 where a turn can be from the key child to an adult or vice versa, and
 should happen within 5 seconds to be counted. The association between
 clip-level LENA\textsuperscript{TM} and human CTC was weaker than that
-found for CVC: the Pearson correlation between the two was r = 0.59 (p =
-0.00) when all clips were taken into account, and r = 0.45 (p = 0.00)
-when only clips with some child speech (i.e., excluding 381 clips with 0
-counts in both LENA\textsuperscript{TM} and human annotations) were
-considered.
+found for CVC (Figure 5): the Pearson correlation between the two was r
+= 0.59 (p = 0.00) when all clips were taken into account, and r = 0.45
+(p = 0.00) when only clips with some child speech (i.e., excluding 381
+clips with 0 counts in both LENA\textsuperscript{TM} and human
+annotations) were considered.
 
 The absolute error rate ranged from -75 to 20, with a mean of -9.29 and
 a median of -3. The absolute error rate excluding clips where both human
@@ -1154,13 +1179,13 @@ words.}
 \end{figure}
 
 The association between clip-level LENA\textsuperscript{TM} and human
-AWC was strong: the Pearson correlation between the two was r=0.75
-(p=0.00) when all clips were taken into account, and r=0.69 (p=0.00)
-when only clips with some child speech (i.e., excluding 309 clips with 0
-counts in both LENA\textsuperscript{TM} and human annotations) were
-considered. This suggests that the LENA\textsuperscript{TM} system
-captures differences in terms of number of child vocalizations across
-clips well.
+AWC was strong (Figure 6): the Pearson correlation between the two was
+r=0.75 (p=0.00) when all clips were taken into account, and r=0.69
+(p=0.00) when only clips with some child speech (i.e., excluding 309
+clips with 0 counts in both LENA\textsuperscript{TM} and human
+annotations) were considered. This suggests that the
+LENA\textsuperscript{TM} system captures differences in terms of number
+of child vocalizations across clips well.
 
 The absolute error rate ranged from -211 to 157, with a mean of -0.20
 and a median of 0. The absolute error rate excluding clips where both
@@ -1199,10 +1224,20 @@ mixed models as follows.
 \centering
 \includegraphics{main_document_files/figure-latex/der-fig-1.pdf}
 \caption{\label{fig:der-fig}Diarization error rate as a function of corpus
-and child age (divided into quartiles). Only corpus-quartile
-combinations with more than 2 children are shown. Central tendency is
-median. Error bars indicate standard deviation over observations divided
-by the square root of the number of infants.}
+and child age (divided into quartiles). Each point represents the
+results averaged over all clips extracted from the data of one child.
+Colors indicate to which corpus that child belongs: BER in blue, L05 is
+green, SOD in black, TSI in gray, and WAR in purple}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics{main_document_files/figure-latex/der-fig2-1.pdf}
+\caption{\label{fig:der-fig2}Diarization error rate as a function of corpus
+and child age. Each point represents the results averaged over all clips
+extracted from the data of one child. Colors indicate to which corpus
+that child belongs: BER in blue, L05 is green, SOD in black, TSI in
+gray, and WAR in purple.}
 \end{figure}
 
 We predicted false alarm, miss, and confusion rates (when all
@@ -1223,28 +1258,33 @@ respect to human CVC depended on both the corpus and the child age; as
 well as all two-way interactions. To investigate these further, we fit a
 model where CVC according to the human was predicted from CVC according
 to LENA\textsuperscript{TM} in interaction with age (as fixed factors,
-with child ID as random) within each corpus separately. This revealed a
-significant interaction between LENA\textsuperscript{TM} CVC and age was
-only found for BER (indicating that the predictive value of
-LENA\textsuperscript{TM} CVC increased with child age); and that an
-effect of age was only found for SOD (indicating that CVC went up with
-age in this corpus). As for the main effect of LENA\textsuperscript{TM}
-CVC, which would be consistent with a predictive value of this metric
-with respect to human CVC, this emerged as a significant predictor in
-all corpora but
-BER.\href{For\%20both\%20BER\%20and\%20WAR,\%20the\%20variance\%20associated\%20to\%20the\%20child\%20ID\%20random\%20factor\%20was\%20zero.\%20This\%20suggests\%20a\%20mixed\%20model\%20was\%20not\%20necessary,\%20as\%20child\%20ID\%20is\%20not\%20explaining\%20any\%20additional\%20variance\%20in\%20this\%20corpora,\%20but\%20this\%20does\%20not\%20alter\%20the\%20interpretation\%20in\%20the\%20main\%20text.}{1}
+with child ID as random) within each corpus separately. This revealed in
+SOD a significant interaction between LENA\textsuperscript{TM} CVC and
+age(indicating that the predictive value of LENA\textsuperscript{TM} CVC
+decreased with child age); and a main effect of age (consistent with CVC
+going up with age in this corpus). As for the main effect of
+LENA\textsuperscript{TM} CVC, which would be consistent with a
+predictive value of this metric with respect to human CVC, this emerged
+as a significant predictor in all corpora.
 
 For CTC, we fit a mixed model where CTC according to the human was
 predicted from CTC according to LENA\textsuperscript{TM}, in interaction
 with corpus and age, as fixed factors, declaring child ID as random
-effect. An Analysis of Variance (type 3) found no main effects or
-interactions.
+effect. An Analysis of Variance (type 3) found a main effect of the
+LENA\textsuperscript{TM} CTC estimates and a main effect of corpus, but
+no significant interactions.
 
 Finally, for AWC, we fit a mixed model where AWC according to the human
 was predicted from AWC according to LENA\textsuperscript{TM}, in
 interaction with corpus and age, as fixed factors, declaring child ID as
-random effect. As with CTC, an Analysis of Variance (type 3) found no
-main effects or interactions.
+random effect. An Analysis of Variance (type III) found a three-way
+interaction, which was investigated by fitting additional mixed models
+to each corpus separately. An interaction between LENA AWC and age was
+found for BER and SOD, although this was due to a decreased predictive
+value of the LENA AWC with respect to the human AWC for older infants in
+the former but the opposite in the latter. The positive association
+between LENA and human AWC was, however, significant for all four
+corpora.
 
 \subsection{Discussion}\label{discussion}
 
@@ -1274,30 +1314,30 @@ accuracy, using established speech and talker segmentation metrics
 (false alarm rate, miss rate, confusion rate, and the composite
 diarization error rate), and evaluated the pattern of errors in more
 detail, by assessing how LENA\textsuperscript{TM} and human annotators
-agreed (precision and recall). The overall diarization error rate was
-relatively high (79\%), mainly due to a high miss rate (missing or
-excluding speech that was there; 49\%). The false alarm rate
-(identifying non-speech/silence as speech; 12\%) and confusion rate
-(identifying voice type; 10\%) were low.
+agreed (precision and recall). The median diarization error rate was
+relatively high (69\%), mainly due to a high miss rate (missing or
+excluding speech that was there; 37\%). The false alarm rate
+(identifying non-speech/silence as speech; 5\%) and confusion rate
+(identifying voice type; 6\%) were low.
 
-However, this low overall confusion rate (10\%) hides considerable
-errors affecting the interpretation of the output. In terms of precision
-(to what extent do LENA\textsuperscript{TM} tags contain what they say
-they contain), the system performed relatively well at identifying
-female voices (52\% of frames tagged by LENA\textsuperscript{TM} as FAN
-were coded as female adult by the human coders), and reasonably well at
-identifying the target child (39\% of frames tagged by
+However, this low overall confusion rate hides considerable errors
+affecting the interpretation of the output. In terms of precision (to
+what extent do LENA\textsuperscript{TM} tags contain what they say they
+contain), the system performed relatively well at identifying female
+voices (69\% of frames tagged by LENA\textsuperscript{TM} as FAN were
+coded as female adult by the human coders), and reasonably well at
+identifying the target child (49\% of frames tagged by
 LENA\textsuperscript{TM} as CHN were correct). However, the system
-performed substantially worse with other talker types (e.g.~8\% and 6\%
+performed substantially worse with other talker types (e.g.~9\% and 8\%
 for MAN and CXN, respectively); that is, less than a tenth of the frames
 that LENA\textsuperscript{TM} tagged as being speech spoken by these
 speakers actually correspond to them.
 
 In terms of recall (how accurately LENA\textsuperscript{TM} captured the
 human annotations), performance for the key child's vocalizations was
-relatively robust; almost half of the frames tagged by humans being key
-child speech were captured by LENA\textsuperscript{TM} under the CHN
-tag. However, recall was poorer for other talkers: only a third of adult
+relatively robust; close to half of the frames tagged by humans being
+key child speech were captured by LENA\textsuperscript{TM} under the CHN
+tag. However, recall was poorer for other talkers: only 28\% of adult
 female near speech (FAN) and less than 20\% of adult male and other
 child speech were correctly tagged by LENA\textsuperscript{TM}.
 
@@ -1310,12 +1350,12 @@ annotations for AWC and CVC, with weaker performance for CTC. However,
 such correlational analyses do not establish whether
 LENA\textsuperscript{TM} systematically over- or under-estimates. For
 this we examined several error rates. While the median absolute error
-rate for CVC, CTC, and AWC was an encouraging 0\%, this was partly due
-to many clips lacking vocalizations, turns, or adult words altogether.
-By and large, LENA\textsuperscript{TM} systematically underestimates the
-raw counts of its main quantitative measures - particularly child
-vocalizations and conversational turns, and to a lesser extent, adult
-words, which showed more erratic error patterns.
+rate for CVC and AWC was an encouraging 0, and for CVC just -4, this was
+partly due to many clips lacking vocalizations, turns, or adult words
+altogether. By and large, LENA\textsuperscript{TM} systematically
+underestimates the raw counts of its main quantitative measures -
+particularly child vocalizations and conversational turns, and to a
+lesser extent, adult words, which showed more erratic error patterns.
 
 That said, LENA\textsuperscript{TM} results were surprisingly robust to
 dialect, language, and child age, as we found out in our final set of
@@ -1328,16 +1368,22 @@ children older than those included in the LENA\textsuperscript{TM}
 training set. Contrary to our predictions, there were no significant
 differences in rates of false alarms, misses, or confusion by corpus,
 child age or their interaction, nor were there differences between North
-American and other corpora in terms of CTC or AWC. For CVC,
-LENA\textsuperscript{TM}'s predictions varied across corpora in a way
-that could not be easily captured by age or dialect. For instance,
-LENA\textsuperscript{TM}'s CVC accuracy increased with age for BER
-whereas it seemed stable in the other corpora. One caveat is in order
-for all of these apparently null effects: Absence of a significant
-difference across corpora and child age may be due to the presence of
-quite considerable within-corpus variance combined with relatively small
-human-coded samples from each corpora. Indeed, further work on bigger
-samples would be needed to ensure sufficient power.
+American and other corpora in terms of CTC. For CVC and AWC,
+LENA\textsuperscript{TM}'s predictions varied across corpora and age in
+a way that could not be easily captured by age or dialect. For instance,
+LENA\textsuperscript{TM}'s CVC accuracy decreased with age for SOD
+whereas it seemed stable in the other corpora. We do not find such
+effects compelling because there are only a few children in each corpus,
+and each is typically represented by a single recording, and thus some
+significant effects may be found by sheer chance. Notice that SOD
+overlaps in age range with L05 and yet only in the former was the
+interaction with age found. More generally, one caveat is in order for
+all of these apparently null or unstable effects: Absence of a
+significant difference across corpora and child age may be due to the
+presence of quite considerable within-corpus variance combined with
+relatively small human-coded samples from each corpora. Indeed, further
+work on bigger samples (more data per child, more children per corpus)
+would be needed to ensure sufficient power and precision.
 
 In the meanwhile, we must conclude that there were very few systematic
 language, dialect, and age effects. This is a promising finding for
@@ -1361,48 +1407,48 @@ male adult voices, establishing absolute numbers of child-adult turns)
 where the results of the algorithms are quite unreliable. Thus, whether
 LENA\textsuperscript{TM} results are good enough for a given research,
 educational, or clinical study depends largely on the goals of each
-particular study. For example, we can describe precision rates of 52\%
-(52\% of frames tagged by LENA\textsuperscript{TM} as FAN were coded as
-female adult by human coders) and 39\% (39\% of frames tagged as target
+particular study. For example, we can describe precision rates of 69\%
+(69\% of frames tagged by LENA\textsuperscript{TM} as FAN were coded as
+female adult by human coders) and 49\% (49\% of frames tagged as target
 child were also tagged as such by human coders) as being reasonably
 good. We do this partly because these rates are much higher than
-LENA\textsuperscript{TM}'s precision rates for other speakers (all below
-10\%) but also partly because our frame-based criteria is more stringent
-than many coding schemes previously applied. However, that said, whether
-a particular accuracy rate can be considered good enough, will depend on
-the purpose of the study. As a result, we next provide a set of
-recommendations to help researchers make this determination for their
-goals.
+LENA\textsuperscript{TM}'s precision rates for other speakers (MAN 9\%,
+CXN 8\%) but also partly because our frame-based criteria is more
+stringent than many coding schemes previously applied. However, that
+said, whether a particular accuracy rate can be considered good enough,
+will depend on the purpose of the study. As a result, we next provide a
+set of recommendations to help researchers make this determination for
+their goals.
 
 \subsubsection{\texorpdfstring{What research goals can one pursue given
 LENA\textsuperscript{TM}'s
 performance?}{What research goals can one pursue given LENATM's performance?}}\label{what-research-goals-can-one-pursue-given-lenatms-performance}
 
 In the present corpora, LENA\textsuperscript{TM}'s false alarm rate
-(i.e., identifying speech where there was none) was very low (median of
-12\%) while its miss rate (missing speech that was actually there) was
-relatively high (median of 49\%). This makes LENA\textsuperscript{TM}
-more suitable for studies in which it is extremely important not to
-\enquote{invent} speech that is not there but less suitable for studies
-in which capturing most, if not all, of the speech produced is crucial.
-Based on these findings, LENA\textsuperscript{TM} would be a good tool
-for finding \enquote{high talk volume} parts of the day for a) careful
-further transcription (e.g.~of low-frequency events like a certain
-grammatical construction of interest), b) annotation of specific speech
-characteristics (e.g.~mean length of utterance), or c) comparing
-relative talk volume across samples. However, we advise caution in using
-LENA\textsuperscript{TM} when raw quantity of speech is crucial for the
-research question, or when small differences in talk volume might have
-very significant theoretical consequences; this is often the case in
-clinical populations where children's own vocalizations can be an
-important diagnosis-relevant characteristic (e.g., in children who are
-deaf or hard of hearing, individuals with ASD, speech apraxia, etc.).
+(i.e., identifying speech where there was none) was very low while its
+miss rate (missing speech that was actually there) was relatively high.
+This makes LENA\textsuperscript{TM} more suitable for studies in which
+it is extremely important not to \enquote{invent} speech that is not
+there but less suitable for studies in which capturing most, if not all,
+of the speech produced is crucial. Based on these findings,
+LENA\textsuperscript{TM} would be a good tool for finding \enquote{high
+talk volume} parts of the day for a) careful further transcription
+(e.g.~of low-frequency events like a certain grammatical construction of
+interest), b) annotation of specific speech characteristics (e.g.~mean
+length of utterance), or c) comparing relative talk volume across
+samples. However, we advise caution in using LENA\textsuperscript{TM}
+when raw quantity of speech is crucial for the research question, or
+when small differences in talk volume might have very significant
+theoretical consequences; this is often the case in clinical populations
+where children's own vocalizations can be an important
+diagnosis-relevant characteristic (e.g., in children who are deaf or
+hard of hearing, individuals with ASD, speech apraxia, etc.).
 
 Similarly, although LENA\textsuperscript{TM}\enquote{s overall confusion
 rate (i.e.~incorrectly identifying talkers, such as giving a 'mother}
-tag for a \enquote{child} utterance) was very low (10\% of all frames),
-this does not fully convey the level of accuracy for speech sections,
-particularly when considering every talker type. In terms of precision,
+tag for a \enquote{child} utterance) was very low, this does not fully
+convey the level of accuracy for speech sections, particularly when
+considering every talker type. In terms of precision,
 LENA\textsuperscript{TM}'s female adult and key child categorization was
 quite accurate, whereas precision was lower for male adults and other
 children, such that the vast majority of the frames labeled as male
@@ -1421,9 +1467,9 @@ mothers, LENA\textsuperscript{TM} tags are relatively unreliable and on
 our view, merit further manual vetting in most use cases. As another
 example, if the goal is to capture as many of the key child's
 vocalisations as possible, it might be worthwhile to pull out segments
-LENA\textsuperscript{TM} labelled as non-target child (of which 22\% was
-target child speech) as well, with human coders brought in to filter out
-non-target child speech.
+LENA\textsuperscript{TM} labelled as non-target child (of which 33.27\%
+was target child speech) as well, with human coders brought in to filter
+out non-target child speech.
 
 However, while we recommend LENA\textsuperscript{TM} users to be very
 careful in their use of LENA\textsuperscript{TM} diarization and
