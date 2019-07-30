@@ -29,40 +29,45 @@ grep "code" gold/raw_master/export_onoff_code_speakers.txt | awk '{print $2 "," 
 
 ```{r genaclewgold,eval=F}
 aclewdat=read.csv("ACLEW_list_of_corpora.csv")
+aclewdat$aclew_id=ifelse(nchar(aclewdat$aclew_id)==2,paste0("00",aclewdat$aclew_id),ifelse(nchar(aclewdat$aclew_id)==3,paste0("0",aclewdat$aclew_id), aclewdat$aclew_id))
 speakers <- read.delim("~/Documents/gitrepos/lena_eval/LENA_eval_201906/gold/raw_master/speakers.txt", header=FALSE)
 colnames(speakers)=c("s","s2","beg","end","dur","c","f")
 read.csv("gold/raw_master/chunks.txt",header=F)->chunks
 for(i in 1:dim(chunks)[1]){
   #get chunk info
-  on=chunks[i,1]
-  off=chunks[i,2]
+  on=round(chunks[i,1])
+  off=round(chunks[i,2])
   filen=chunks[i,3]
   
-  #select
-  myrows=subset(speakers,beg>on & end<off & f==filen)
+  #select with some margin to allow for annotations that straddle the boundary
+  myrows=subset(speakers,beg>=(on-1) & end<=(off+1) & f==filen)
   
+  #fix for annotations that straddle the chunk boundary
+  myrows$beg[myrows$beg<=on]<-on
+  myrows$end[myrows$end>=off]<-off
   
-  #sort by beg time
-  myrows=myrows[order(myrows$beg),]
-  
-  #round needed cols, clean filen, get cor name
-  myrows$beg=round(myrows$beg,2)
+  nentries=dim(myrows)[1]
+    #round needed cols, clean filen, get cor name,get on and off in right format
+  myrows$beg=round(myrows$beg-on,2) #note, also fixing onset time here
   myrows$dur=round(myrows$dur,2)
   filen=gsub(".eaf","",filen)
-  cor=aclewdat[aclewdat$aclew_id==filen,"labname"]
+  cor=aclewdat[aclewdat$aclew_id==filen,"labname"][1]
   
-  write.table(cbind("SPEAKER",paste0(as.character(cor),"_",filen,"_",on,"_",off),1,myrows$beg,myrows$dur,"<NA>", "<NA>",as.character(myrows$s), "<NA>"),file=paste0("gold/",as.character(cor),"_",filen,"_",on,"_",off,".rttm"),row.names=F,col.names = F,sep=" ",quote=F)
+  if(nchar(on)!=6) while(nchar(on)<6) on=paste0(0,on)
+  if(nchar(off)!=6) while(nchar(off)<6) off=paste0(0,off)
+       #sort by beg time
+  myrows=myrows[order(myrows$beg),]
+ 
+  if(nentries>0){
+  
+  write.table(cbind("SPEAKER",paste0(as.character(cor),"_",filen,"_",on,"_",off),1,myrows$beg,myrows$dur,"<NA>", "<NA>",as.character(myrows$s), "<NA>", "<NA>"), file=paste0("gold/",as.character(cor),"_",filen,"_",on,"_",off,".rttm"),row.names=F,col.names = F,sep=" ",quote=F)
+  } else file.create(paste0("gold/",as.character(cor),"_",filen,"_",on,"_",off,".rttm"))
+
 }
 ```
 
 
-## Going from eaf's to rttm's (ACLEW) -- NOT FINISHED, GET MARVIN'S INPUT
 
-https://github.com/srvk/DiViMe/blob/master/utils/adjust_timestamps.py
-
-or perhaps
-
-https://github.com/srvk/DiViMe/blob/master/utils/eafAAS2rttm_folder.sh
 
 
 ## Going from textgrid to rttm's (TSI) NEED TO FINISH THIS
@@ -76,6 +81,8 @@ Then, we need to change the naming convention from the one that had child_sib_mo
 https://github.com/srvk/DiViMe/blob/master/utils/change_tsi_lena_names.py
 
 Finally, it turns out that whatever technique we used before did not create empty rttms for files with no speech. The following code generated them using the rttms from the divime paper.
+
+ The following lines must be ran on a terminal (because they give an error here, not sure why).
 
 ```{bash make_empty_tsi,eval=F}
 
@@ -91,8 +98,11 @@ for j in /Users/acristia/Documents/gitrepos/divime_brm/yunnew/*.rttm ; do
 done
 ```
 
-
+WARNING WARNING WARNING human step so there could be an error:
 For ACLEW, I downloaded the raw folders from github, then used ELAN to generate a tab-sep file that has the on off times for all files for all folders.
+
+ The following lines must be ran on a terminal (because they give an error here, not sure why).
+
 
 ```{bash make_emptyaclew,eval=F}
 
@@ -733,26 +743,42 @@ done
 WAR_1130_002520_002820.rttm created
 ROW_1735_001919_002039.rttm created # weird on and off times... changed BY HAND to 20 / 40
 
+
+UPDATE: after missing utterances bug discovered, I had to put the following LENA files in quarantine because apparently there was no gold for them, so they should not have been extracted (that is, they probably emerge from some other bug):
+ROW_1735_001920_002040.rttm
+WAR_1130_002640_002760.rttm
+
 ## Going from LENA's .its to rttm's: tsi
 
 
 For the tsi files, took from shared folder with Camila called tsi_its, containing a lot more its than the ones we have annotation for, and sitting on top of that folder (ie above its subfolder) I did the following to get the right name:
 
+ The following lines must be ran on a terminal (because they give an error here, not sure why).
+
+
 ```{bash rename-tsi,eval=F}
-grep "LENA" tsi_key_info_r.csv | while read -r line; do itsname=`echo $line | cut -f 1 -d ","` ; newname=`echo $line | cut -f 4 -d ","` ;  cp its/$itsname.its ${newname}.its ; done
+
+grep "LENA" tsi_key_info_r.csv | while read -r line; do itsname=`echo $line | cut -f 1 -d ","` ; newname=`echo $line | cut -f 4 -d ","` ;  cp tsi_its/$itsname.its lena/TSI/${newname}.its ; done
+
 ```
 
 Notice there is one file missing:
 cp: its/e20170714_181139_009458.its: No such file or directory
 This is because this file was lost.
 
-Then move the newly named its files into lena/TSI and run the following is used to generate a huge rttm that has the whole day.
+Then run the following is used to generate a huge rttm that has the whole day.
+
+ The following lines must be ran on a terminal (because they give an error here, not sure why).
+
 
 ```{bash its2rttm,eval=F}
 ./its2rttm.sh lena/TSI/
 ```
 
 Finally, for TSI, we use the golds to generate the corresponding sections in LENA's rttms.
+
+ The following lines must be ran on a terminal (because they give an error here, not sure why).
+
 
 ```{bash gold2shortlena,eval=F}
 for j in gold/*.rttm ; do mv $j $j.unsorted ; done
@@ -783,8 +809,9 @@ moved all C24 second day to gives_error folder
 
 ## Going from LENA's .its to rttm's: ACLEW
 
-I'm not sure how those three steps were done for the ACLEW files. The next script used the wav files' names, generated in "Going from eaf's to rttm's", to extract sections of the .its files for ACLEW.
+I'm not sure how those three steps were done for the ACLEW files. The next script is a hack that used the wav files' names, generated in "Going from eaf's to rttm's", to extract sections of the .its files for ACLEW.
 
+The following lines must be ran on a terminal (because they give an error here, not sure why).
 
 ```{bash cutlena,eval=F}
 python cut_lena.py
@@ -794,10 +821,13 @@ python cut_lena.py
 
 ## Create csv's with pyannote.metrics
 
-```{bash pyannote}
+The following lines must be ran on a terminal (because they give an error here, not sure why).
+
+
+```{bash pyannote, eval=F}
 
 source activate pyannote-lena 
-
+  
 # pip install pyannote-metrics # only needed first time
 
 # After having activated pyannote-lena environment
@@ -840,13 +870,16 @@ mv gold/mapped_no_ele/diaer__report.csv diaer_gold_no_ele_lena_sil_no_tv_report.
 python compute_metrics.py -ref gold/mapped_no_ele/ -hyp lena/mapped_sil_no_tv_no_oln/ -t diarization -m diaer 
 mv gold/mapped_no_ele/diaer__report.csv diaer_gold_no_ele_lena_sil_no_tv_no_oln_report.csv
 
+python compute_metrics.py -ref gold/mapped_no_ele/ -hyp lena/mapped_sil_no_tv_no_oln/ -t detection  -m deter
+mv gold/mapped_no_ele/deter__report.csv deter_gold_no_ele_lena_sil_no_tv_no_oln_report.csv
+
 ```
 
 ## Generate frame-based rttms
 
 These contain the same info as the lena and gold rttms, but each line represents a 100 ms frame, and all frames are accounted for (whereas in standard rttms silence is not tagged). The following lines must be ran on a terminal (because they give an error here, not sure why).
 
-```{bash runpy}
+```{bash runpy, eval=F}
 rm -r -f */frame/
 python frame_cutter.py --i lena/mapped_far/
 mkdir lena/frame/

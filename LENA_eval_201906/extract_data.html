@@ -202,36 +202,41 @@ grep -v &quot;code&quot; gold/raw_master/export_onoff_code_speakers.txt | tr &qu
 grep &quot;code&quot; gold/raw_master/export_onoff_code_speakers.txt | awk '{print $2 &quot;,&quot; $3 &quot;,&quot; $NF}' &gt; gold/raw_master/chunks.txt
 </code></pre>
 <pre class="r"><code>aclewdat=read.csv(&quot;ACLEW_list_of_corpora.csv&quot;)
+aclewdat$aclew_id=ifelse(nchar(aclewdat$aclew_id)==2,paste0(&quot;00&quot;,aclewdat$aclew_id),ifelse(nchar(aclewdat$aclew_id)==3,paste0(&quot;0&quot;,aclewdat$aclew_id), aclewdat$aclew_id))
 speakers &lt;- read.delim(&quot;~/Documents/gitrepos/lena_eval/LENA_eval_201906/gold/raw_master/speakers.txt&quot;, header=FALSE)
 colnames(speakers)=c(&quot;s&quot;,&quot;s2&quot;,&quot;beg&quot;,&quot;end&quot;,&quot;dur&quot;,&quot;c&quot;,&quot;f&quot;)
 read.csv(&quot;gold/raw_master/chunks.txt&quot;,header=F)-&gt;chunks
 for(i in 1:dim(chunks)[1]){
   #get chunk info
-  on=chunks[i,1]
-  off=chunks[i,2]
+  on=round(chunks[i,1])
+  off=round(chunks[i,2])
   filen=chunks[i,3]
   
-  #select
-  myrows=subset(speakers,beg&gt;on &amp; end&lt;off &amp; f==filen)
+  #select with some margin to allow for annotations that straddle the boundary
+  myrows=subset(speakers,beg&gt;=(on-1) &amp; end&lt;=(off+1) &amp; f==filen)
   
+  #fix for annotations that straddle the chunk boundary
+  myrows$beg[myrows$beg&lt;=on]&lt;-on
+  myrows$end[myrows$end&gt;=off]&lt;-off
   
-  #sort by beg time
-  myrows=myrows[order(myrows$beg),]
-  
-  #round needed cols, clean filen, get cor name
-  myrows$beg=round(myrows$beg,2)
+  nentries=dim(myrows)[1]
+    #round needed cols, clean filen, get cor name,get on and off in right format
+  myrows$beg=round(myrows$beg-on,2) #note, also fixing onset time here
   myrows$dur=round(myrows$dur,2)
   filen=gsub(&quot;.eaf&quot;,&quot;&quot;,filen)
-  cor=aclewdat[aclewdat$aclew_id==filen,&quot;labname&quot;]
+  cor=aclewdat[aclewdat$aclew_id==filen,&quot;labname&quot;][1]
   
-  write.table(cbind(&quot;SPEAKER&quot;,paste0(as.character(cor),&quot;_&quot;,filen,&quot;_&quot;,on,&quot;_&quot;,off),1,myrows$beg,myrows$dur,&quot;&lt;NA&gt;&quot;, &quot;&lt;NA&gt;&quot;,as.character(myrows$s), &quot;&lt;NA&gt;&quot;),file=paste0(&quot;gold/&quot;,as.character(cor),&quot;_&quot;,filen,&quot;_&quot;,on,&quot;_&quot;,off,&quot;.rttm&quot;),row.names=F,col.names = F,sep=&quot; &quot;,quote=F)
+  if(nchar(on)!=6) while(nchar(on)&lt;6) on=paste0(0,on)
+  if(nchar(off)!=6) while(nchar(off)&lt;6) off=paste0(0,off)
+       #sort by beg time
+  myrows=myrows[order(myrows$beg),]
+ 
+  if(nentries&gt;0){
+  
+  write.table(cbind(&quot;SPEAKER&quot;,paste0(as.character(cor),&quot;_&quot;,filen,&quot;_&quot;,on,&quot;_&quot;,off),1,myrows$beg,myrows$dur,&quot;&lt;NA&gt;&quot;, &quot;&lt;NA&gt;&quot;,as.character(myrows$s), &quot;&lt;NA&gt;&quot;, &quot;&lt;NA&gt;&quot;), file=paste0(&quot;gold/&quot;,as.character(cor),&quot;_&quot;,filen,&quot;_&quot;,on,&quot;_&quot;,off,&quot;.rttm&quot;),row.names=F,col.names = F,sep=&quot; &quot;,quote=F)
+  } else file.create(paste0(&quot;gold/&quot;,as.character(cor),&quot;_&quot;,filen,&quot;_&quot;,on,&quot;_&quot;,off,&quot;.rttm&quot;))
+
 }</code></pre>
-</div>
-<div id="going-from-eafs-to-rttms-aclew-not-finished-get-marvins-input" class="section level2">
-<h2>Going from eaf’s to rttm’s (ACLEW) – NOT FINISHED, GET MARVIN’S INPUT</h2>
-<p><a href="https://github.com/srvk/DiViMe/blob/master/utils/adjust_timestamps.py" class="uri">https://github.com/srvk/DiViMe/blob/master/utils/adjust_timestamps.py</a></p>
-<p>or perhaps</p>
-<p><a href="https://github.com/srvk/DiViMe/blob/master/utils/eafAAS2rttm_folder.sh" class="uri">https://github.com/srvk/DiViMe/blob/master/utils/eafAAS2rttm_folder.sh</a></p>
 </div>
 <div id="going-from-textgrid-to-rttms-tsi-need-to-finish-this" class="section level2">
 <h2>Going from textgrid to rttm’s (TSI) NEED TO FINISH THIS</h2>
@@ -240,6 +245,7 @@ for(i in 1:dim(chunks)[1]){
 <p>Then, we need to change the naming convention from the one that had child_sib_mother to just child:</p>
 <p><a href="https://github.com/srvk/DiViMe/blob/master/utils/change_tsi_lena_names.py" class="uri">https://github.com/srvk/DiViMe/blob/master/utils/change_tsi_lena_names.py</a></p>
 <p>Finally, it turns out that whatever technique we used before did not create empty rttms for files with no speech. The following code generated them using the rttms from the divime paper.</p>
+<p>The following lines must be ran on a terminal (because they give an error here, not sure why).</p>
 <pre class="bash"><code>
 for j in /Users/acristia/Documents/gitrepos/divime_brm/yunnew/*.rttm ; do
    name=$(basename $j)
@@ -251,7 +257,8 @@ for j in /Users/acristia/Documents/gitrepos/divime_brm/yunnew/*.rttm ; do
        echo &quot;$name created&quot;
     fi
 done</code></pre>
-<p>For ACLEW, I downloaded the raw folders from github, then used ELAN to generate a tab-sep file that has the on off times for all files for all folders.</p>
+<p>WARNING WARNING WARNING human step so there could be an error: For ACLEW, I downloaded the raw folders from github, then used ELAN to generate a tab-sep file that has the on off times for all files for all folders.</p>
+<p>The following lines must be ran on a terminal (because they give an error here, not sure why).</p>
 <pre class="bash"><code>
 cat /Users/acristia/Documents/gitrepos/lena_eval/LENA_eval_201906/gold/raw_master/allonoff.txt | while read -r line ; do
    on=`echo $line | awk '{printf(&quot;%06d\n&quot;, $2)}'`
@@ -880,15 +887,21 @@ for j in /Users/acristia/Documents/gitrepos/lena_eval/LENA_eval_201906/gold/[BRS
     fi
 done</code></pre>
 <p>WAR_1130_002520_002820.rttm created ROW_1735_001919_002039.rttm created # weird on and off times… changed BY HAND to 20 / 40</p>
+<p>UPDATE: after missing utterances bug discovered, I had to put the following LENA files in quarantine because apparently there was no gold for them, so they should not have been extracted (that is, they probably emerge from some other bug): ROW_1735_001920_002040.rttm WAR_1130_002640_002760.rttm</p>
 </div>
 <div id="going-from-lenas-.its-to-rttms-tsi" class="section level2">
 <h2>Going from LENA’s .its to rttm’s: tsi</h2>
 <p>For the tsi files, took from shared folder with Camila called tsi_its, containing a lot more its than the ones we have annotation for, and sitting on top of that folder (ie above its subfolder) I did the following to get the right name:</p>
-<pre class="bash"><code>grep &quot;LENA&quot; tsi_key_info_r.csv | while read -r line; do itsname=`echo $line | cut -f 1 -d &quot;,&quot;` ; newname=`echo $line | cut -f 4 -d &quot;,&quot;` ;  cp its/$itsname.its ${newname}.its ; done</code></pre>
+<p>The following lines must be ran on a terminal (because they give an error here, not sure why).</p>
+<pre class="bash"><code>
+grep &quot;LENA&quot; tsi_key_info_r.csv | while read -r line; do itsname=`echo $line | cut -f 1 -d &quot;,&quot;` ; newname=`echo $line | cut -f 4 -d &quot;,&quot;` ;  cp tsi_its/$itsname.its lena/TSI/${newname}.its ; done
+</code></pre>
 <p>Notice there is one file missing: cp: its/e20170714_181139_009458.its: No such file or directory This is because this file was lost.</p>
-<p>Then move the newly named its files into lena/TSI and run the following is used to generate a huge rttm that has the whole day.</p>
+<p>Then run the following is used to generate a huge rttm that has the whole day.</p>
+<p>The following lines must be ran on a terminal (because they give an error here, not sure why).</p>
 <pre class="bash"><code>./its2rttm.sh lena/TSI/</code></pre>
 <p>Finally, for TSI, we use the golds to generate the corresponding sections in LENA’s rttms.</p>
+<p>The following lines must be ran on a terminal (because they give an error here, not sure why).</p>
 <pre class="bash"><code>for j in gold/*.rttm ; do mv $j $j.unsorted ; done
 for j in gold/*.rttm.unsorted ; do sorted=`echo $j | sed &quot;s/.unsorted//&quot;`  ; awk  '{printf(&quot;%s %s %s %.2f %.2f %s %s %s %s %s\n&quot;,$1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)}' $j |  sort -n -k4 &gt; $sorted ; done
 
@@ -906,15 +919,17 @@ for j in lena/*.rttm.unsorted ; do sorted=`echo $j | sed &quot;s/.unsorted//&quo
 </div>
 <div id="going-from-lenas-.its-to-rttms-aclew" class="section level2">
 <h2>Going from LENA’s .its to rttm’s: ACLEW</h2>
-<p>I’m not sure how those three steps were done for the ACLEW files. The next script used the wav files’ names, generated in “Going from eaf’s to rttm’s”, to extract sections of the .its files for ACLEW.</p>
+<p>I’m not sure how those three steps were done for the ACLEW files. The next script is a hack that used the wav files’ names, generated in “Going from eaf’s to rttm’s”, to extract sections of the .its files for ACLEW.</p>
+<p>The following lines must be ran on a terminal (because they give an error here, not sure why).</p>
 <pre class="bash"><code>python cut_lena.py
  </code></pre>
 </div>
 <div id="create-csvs-with-pyannote.metrics" class="section level2">
 <h2>Create csv’s with pyannote.metrics</h2>
+<p>The following lines must be ran on a terminal (because they give an error here, not sure why).</p>
 <pre class="bash"><code>
 source activate pyannote-lena 
-
+  
 # pip install pyannote-metrics # only needed first time
 
 # After having activated pyannote-lena environment
@@ -956,6 +971,9 @@ mv gold/mapped_no_ele/diaer__report.csv diaer_gold_no_ele_lena_sil_no_tv_report.
 
 python compute_metrics.py -ref gold/mapped_no_ele/ -hyp lena/mapped_sil_no_tv_no_oln/ -t diarization -m diaer 
 mv gold/mapped_no_ele/diaer__report.csv diaer_gold_no_ele_lena_sil_no_tv_no_oln_report.csv
+
+python compute_metrics.py -ref gold/mapped_no_ele/ -hyp lena/mapped_sil_no_tv_no_oln/ -t detection  -m deter
+mv gold/mapped_no_ele/deter__report.csv deter_gold_no_ele_lena_sil_no_tv_no_oln_report.csv
 </code></pre>
 </div>
 <div id="generate-frame-based-rttms" class="section level2">
@@ -1039,76 +1057,76 @@ for(corpus in corpora){#corpus=&quot;ROW&quot;
 }</code></pre>
 <pre><code>## [1] &quot;BER&quot;
 ##       FAN  FAF   CHN  CHF   CXN  CXF   MAN   MAF    OLN   OLF   TVN   TVF
-## FEM 61546 4019  2208   98  4220  785 16061  1473  52136 11935  4056  2109
-## CHI  3558  114 39067  234  7450   83   122   348  19355  3391  6052   677
-## OCH  3236  176  1815   84 10647  223    71    95  16357  3555   429   249
-## MAL  1644  545   204    0   594    0 18101  2761  13349  4431  6983   535
-## OVL 15590  694  8988   53  5149  265  5217   140  32346  3296  2542  1053
-## ELE  4176 1500   255    0  2378  326  4681  1939  13306 12592 11338  3244
-## SIL 29594 5311 24883 3010 14659 2834 11606 13769 139686 88287 81335 28932
+## FEM 71311 4864  2634  153  6186 1029 16997  1863  62930 13877  5688  2632
+## CHI  4571  115 49927  264  9290  199   122   364  22842  4182  7994   893
+## OCH  3772  372  1998  138 11623  222   323   340  19207  4203   513   373
+## MAL  1891  588   260   27   594   17 20901  2967  15312  4860 12062   573
+## OVL 18848  861 11372   52  6297  295  5916   140  38560  4042  3239  1130
+## ELE  4445 1616   461   49  2787  754  4680  2371  16170 20746 13498  5719
+## SIL 14506 3943 10768 2796  8320 2000  6920 12480 111514 75577 69741 25479
 ##        SIL
-## FEM  13698
-## CHI   4647
-## OCH   2814
-## MAL   4420
-## OVL   1215
-## ELE   7170
-## SIL 863881
+## FEM  15594
+## CHI   5525
+## OCH   4078
+## MAL   4508
+## OVL   1523
+## ELE  13964
+## SIL 852653
 ## [1] &quot;Nb frames : 1800000&quot;
 ## [1] &quot;ROW&quot;
-##       FAN   FAF   CHN  CHF   CXN  CXF   MAN   MAF    OLN   OLF   TVN   TVF
-## FEM 43244  3139  4215  178  6983  623  3093   555  41371  6850   638  1071
-## CHI  2260   238 54316  386 15163  167   173   232  18764  1733  1983   546
-## OCH   984   336  3873  358 20279 1021   321   231   9548  1522  1103  1139
-## MAL  2475    39   834    0   547   99 16626   856  12371  2106   148   429
-## OVL  8119    22  5435   39  5096   74  1240    35  21713  1170   138   362
-## ELE  1417  1019   129  156  4267  822    43   380   1783  2998  5605  2723
-## SIL 30177 13132 40501 4185 31627 3360 16903 18286 163879 63853 70780 31805
+##       FAN  FAF   CHN  CHF   CXN  CXF   MAN   MAF    OLN   OLF   TVN   TVF
+## FEM 54260 7346  5449  238  8713  851  4270  2801  48797 11518   921  2253
+## CHI  2612  478 64026  630 22651  183   222   732  23360  2707  2204   790
+## OCH  1498  481  4820  370 26116 1088   441   719  14677  2429  1163  1828
+## MAL  3005  344   953   17   566   99 24493  3921  13979  2840   208   682
+## OVL 10492  457  6880   39  6371   87  1637   413  25916  2018   339   652
+## ELE  2087 1571   158  156  5609 1162   156   582   3310  3215 12500  5628
+## SIL 13858 7187 24154 3852 13535 2555  7180 11407 137576 54911 63060 26041
 ##        SIL
-## FEM   7794
-## CHI   6650
-## OCH   4707
-## MAL   2853
-## OVL    417
-## ELE   9354
-## SIL 929786
-## [1] &quot;Nb frames : 1800000&quot;
+## FEM  11011
+## CHI   7928
+## OCH   6219
+## MAL   4211
+## OVL    626
+## ELE  13558
+## SIL 912947
+## [1] &quot;Nb frames : 1788000&quot;
 ## [1] &quot;SOD&quot;
-##       FAN   FAF   CHN  CHF   CXN  CXF   MAN   MAF    OLN    OLF    TVN
-## FEM 57966  7063  7002  179  9576 1717  5997  4285  48641  15008  16115
-## CHI  2219   246 32760  229 16968  835   111    32  15682   1689   2061
-## OCH   439   356  1288   33  3211  320   199   462   6752   2205   1774
-## MAL  1189   119   272   64   167   10  1683   758   3720    644   1153
-## OVL  8973  1755  5747   93  4654  472  1884   222  13448   2184   1954
-## ELE    47   147   246   15   486  980     0   850   1357   3338      0
-## SIL 40762 13136 36580 2912 20394 5266 12450 35692 213175 123825 105846
+##       FAN   FAF   CHN  CHF   CXN  CXF   MAN   MAF    OLN    OLF   TVN
+## FEM 77303 10281 12945  222 12703 3150  7932  7536  75155  22018 18648
+## CHI  2443   435 40918  283 18448  976   146  1249  23230   2593  5111
+## OCH   441   359  1351   33  4178  465   209   371  16397   2938  3474
+## MAL  1415   119   272   90   227   10  1925   932   5581   1173  1994
+## OVL  9012  1057  6781   75  4649  301  1763   352  22335   2504  1939
+## ELE   103   950   398   15   669 1345    11   930   1870   4705   442
+## SIL 20878  9621 21230 2807 14582 3353 10338 30931 158207 112962 97295
 ##       TVF    SIL
-## FEM  5023  17615
-## CHI  1776   2826
-## OCH   928   1424
-## MAL   411    823
-## OVL  1955   4427
-## ELE  2452  16022
-## SIL 51471 760758
+## FEM  9130  22870
+## CHI  1954   3275
+## OCH  1109   3332
+## MAL   826   1173
+## OVL   842   1307
+## ELE  3530  27323
+## SIL 46625 744615
 ## [1] &quot;Nb frames : 1800000&quot;
 ## [1] &quot;WAR&quot;
-##       FAN  FAF   CHN  CHF   CXN  CXF   MAN   MAF    OLN   OLF    TVN   TVF
-## FEM 48667 2642  4081  257  3530  715  4560  3339  34573  7910   7921  1778
-## CHI  2554  456 73067  563  4053  383   483   495  19839  4128   3407  1450
-## OCH  3177  248  3071   15 12501  649    51   560   9835  2675   3351  1312
-## MAL  5541 1101   539  159   369  155 16474  3620  10384  2251   4489  2681
-## OVL  9060  273  7906   39  2907    4  2325   584  18674  1707   2003   393
-## ELE   719 1378   410   60   152   86    51   569   2440  5630    755  1761
-## SIL 26288 9497 42681 2860 19147 4182 12687 23176 154134 85640 121151 48881
+##       FAN  FAF   CHN  CHF   CXN  CXF   MAN   MAF    OLN   OLF   TVN   TVF
+## FEM 56801 2921  5847  262  3820  791  5525  3841  50132 10384 10841  1950
+## CHI  2762  456 84137  587  5256  384   732   523  23997  4831  3455  1536
+## OCH  3446  267  4035   43 17536 1061   165   589  12883  3595  4398  1739
+## MAL  5086 1101   624  158   435  155 17580  3618  10713  2877  8994  2919
+## OVL  9627  338  9445   39  3691   44  2358   625  21214  1996  8477   434
+## ELE   719 1406   410   60   431   86    51   569   2439  5906 14975  2103
+## SIL 15141 9006 25423 2804 10871 3653  8458 22578 115684 79916 91937 47372
 ##        SIL
-## FEM  11808
-## CHI  11247
-## OCH   3263
-## MAL   9064
-## OVL   1747
-## ELE   9323
-## SIL 827279
-## [1] &quot;Nb frames : 1800000&quot;
+## FEM  15577
+## CHI  12909
+## OCH   4563
+## MAL   9071
+## OVL   1797
+## ELE  10108
+## SIL 827901
+## [1] &quot;Nb frames : 1788000&quot;
 ## [1] &quot;TSI&quot;
 ##       FAN   FAF   CHN  CHF   CXN   CXF  MAN   MAF    OLN   OLF    TVN
 ## FEM 26381  4080  1988  208  6340   507 1961   514  12561  4286   6483
@@ -1130,29 +1148,28 @@ for(corpus in corpora){#corpus=&quot;ROW&quot;
 <pre class="r"><code>print(&quot;All&quot;)</code></pre>
 <pre><code>## [1] &quot;All&quot;</code></pre>
 <pre class="r"><code>print(confusion_all)</code></pre>
-<pre><code>##        FAN   FAF    CHN   CHF    CXN   CXF   MAN    MAF    OLN    OLF
-## FEM 237804 20943  19494   920  30649  4347 31672  10166 189282  45989
-## CHI  17301  1790 249015  1889  55116  1756  1158   1299  93681  13365
-## OCH  13447  2188  16097   606  67518  4474   847   1664  55720  13068
-## MAL  15471  2589   3406   260   2211   315 59313  10104  45697  10994
-## OVL  43140  2769  29547   224  19514   933 10844   1062  89262   8570
-## ELE   6359  4044   1040   231   7283  2214  4775   3738  18886  24558
-## SIL 147835 59015 164480 18882 110670 25778 59334 102945 793201 404837
-##        TVN    TVF     SIL
-## FEM  35213  11239   58744
-## CHI  18321   5198   32809
-## OCH   9323   5094   17900
-## MAL  17107   4416   20627
-## OVL   6895   3795    7966
-## ELE  17698  10180   41869
-## SIL 578689 196237 4213085</code></pre>
+<pre><code>##        FAN   FAF    CHN   CHF   CXN   CXF   MAN   MAF    OLN    OLF    TVN
+## FEM 286056 29492  28863  1083 37762  6328 36685 16555 249575  62083  42581
+## CHI  19098  2220 288813  2241 67127  2030  1491  3060 113470  16737  23582
+## OCH  14768  2551  18254   700 80333  5097  1343  2335  76392  16276  12214
+## MAL  16019  2937   3666   329  2356   332 71328 13547  51458  13312  27592
+## OVL  49377  2738  35949   205 22716   845 11852  1611 111106  10773  14252
+## ELE   7354  5543   1427   280  9496  3347  4898  4452  23789  34572  41415
+## SIL  85397 47696 101410 18174 72151 21697 38584 89418 645308 366598 521610
+##        TVF     SIL
+## FEM  17223   72881
+## CHI   5922   37076
+## OCH   6515   23884
+## MAL   5360   22430
+## OVL   3090    5413
+## ELE  16980   64953
+## SIL 180665 4169497</code></pre>
 <pre class="r"><code>write.table(confusion_all,file=paste0(&quot;all_cm.txt&quot;))</code></pre>
 </div>
 <div id="generate-ctc-cvc" class="section level2">
 <h2>Generate CTC &amp; CVC</h2>
-<p>Logic is:</p>
+<p>Logic is to do the following for the LENA &amp; Gold and pair the output values</p>
 <ul>
-<li>Do the following for the LENA &amp; Gold and pair the output values</li>
 <li>Read in each rttm</li>
 <li>Sort it so that it’s ordered in time</li>
 <li>Get CHI’s CVC</li>
