@@ -2,6 +2,8 @@
 LENA_eval_201906/tsi_its/
 LENA_eval_201906/__MACOSX/
 LENA_eval_201906/wav/
+LENA_eval_201906/gold/_aclew_bugged/
+LENA_eval_201906/tsi_its/
 paper_rmd/main_document_files/
 LENA_eval_201906/*.zip
 LENA_eval_201906/temp.txt
@@ -13,8 +15,9 @@ LENA_eval_201901/
 LENA_eval_201902/
 LENA_eval_201906/gold/
 LENA_eval_201906/lena/
-LENA_eval_201906/*.csv
 LENA_eval_201906/*.png
+LENA_eval_201906/tsi_key_info.csv
+LENA_eval_201906/tsi_key_info_r.csv
 *.png
 
 
