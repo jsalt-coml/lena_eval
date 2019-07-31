@@ -19,11 +19,11 @@ author:
   - name: Okko Räsänen
     affiliation: "4,5"
   - name: John Bunce
-    affiliation: "2,6"
+    affiliation: "2,"
   - name: Anne Warlaumont
-    affiliation: "7"
+    affiliation: "6"
   - name: Elika Bergelson
-    affiliation: "8"
+    affiliation: "7"
 
 affiliation:
   - id            : "1"
@@ -37,10 +37,8 @@ affiliation:
   - id: "5"
     institution: "Department of Signal Processing and Acoustics, Aalto University, Finland"
   - id: "6"
-    institution: ""
-  - id: "7"
     institution: "Psychology, University of California, Los Angeles, USA"
-  - id: "8"
+  - id: "7"
     institution: "Psychology & Neuroscience, Duke University, Durham, North Carolina, USA"
 
 
@@ -49,8 +47,7 @@ abstract: >
     In the previous decade, dozens of studies involving thousands of children across several research disciplines have made use of a combined daylong audio-recorder and automated algorithmic analysis called the LENA^TM^ system, which aims to assess children's language environment. While the system's prevalence in the language acquisition domain is steadily growing, there are only scattered validation efforts, on only some of its key characteristics. Here, we assess the LENA^TM^ system's accuracy across all of its key measures: speaker classification, adult word counts (AWC), child vocalization counts (CVC), and conversational turn counts (CTC). Our assessment is based on manual annotation of clips that have been randomly or periodically sampled out of daylong recordings, collected from (a) populations similar to LENA^TM^'s original training data (North American English-learning children aged 3-36 months), (b) children learning another dialect of English (UK), and (c) slightly older children growing up in a different linguistic and socio-cultural setting (Tsimane' learners in rural Bolivia).  We find reasonably high accuracy in some measures (AWC, CTC), with more problematic levels of performance in others (CTC, precision and recall of male adults and other children). We find little difference in accuracy as a function of child age, dialect, or socio-cultural setting. Whether LENA^TM^ results are accurate enough for a given research, educational, or clinical application depends largely on the specifics at hand. We therefore conclude with a set of recommendations to help researchers make this determination for their goals. 
 
 
-keywords          : ""
-wordcount         : ""
+keywords          : "Speech technology; human transcription; English; Tsimane'; Reliability; Agreement; Method comparison; Measurement error;Child vocalization count; Adult word count; Conversational turn count; LENA system"
 
 bibliography      : ["lena_eval.bib"]
 
@@ -142,9 +139,8 @@ First, to maximally avoid potential bias in our annotations, we used random or p
 
 Third, to gain traction on generalizability, rather than focusing on a single sample that either mirrors or diverges from LENA^TM^s original population, we included five corpora. Three corpora sampled from the same population, language, dialect, and age group the LENA^TM^ softawer was developed with. A fourth corpus was chosen to allow an extension to a different dialect of English. The fifth corpus constituted an extension to a totally different recording condition (a rural setting, with large families and many children present, in a typologically different language). The age range also varies a great deal, and it is slightly higher  in this last corpus.
 
-Finally, the present study relies on a collaborative annotation effort across several labs. Critically, this means that we can 'fairly' compare annotations across our corpora: annotation decisions were either identical or conceptually comparable, and all analyses were identical. This allows us to more readily answer questions regarding differences in reliability as a function of e.g. child age and language. Also, by looking at corpora that were not annotated in exactly the same way, we can better infer the likelihood with which our results will generalize to other corpora, even if they are not annotated exactly in the same way. 
+Finally, the present study relies on a collaborative effort across several labs. Annotation decisions were identical for four of the corpora; and conceptually comparable to the fifth. This allows us to more readily answer questions regarding differences in reliability as a function of e.g. child age and language. Also, by looking at corpora that were not annotated in exactly the same way, we can better infer the likelihood with which our results will generalize to other corpora, provided the annotation scheme is conceptually comparable. 
 
-<!-- I find this last sentence confusing and seems to contradict the first part of the paragraph. Melanie -->
 
 ## Methods
 
@@ -173,17 +169,17 @@ Despite these differences, all five corpora consists of long (4–16 hour) recor
 
 The TSI corpus consisted of 1 or 2 recordings from 12 children, out of the 25 children recorded from field work that year; the other 13 had been recorded using other devices (not the LENA^TM^ hardware). From these  files, 1-minute segments were sampled in a periodic fashion. That is, for each recording, we skipped the first 33 minutes to allow the family to acclimate to the recorder, and then extracted 1 minute of audio (with a 5-minute context window) every 60 minutes, until the end of the recording was reached. This resulted in a total of 4.5 hours of audio, and 0.7 hours of speech (collapsing across all speaker categories).
 
-We chose to sample 1 or 2 minutes at a time (TSI, and ACLEW corpora, respectively) because conversations are likely to be bursty [@goh2008burstiness]. That is, it is likely the case that speech is not produced at a periodic rate (e.g., one phrase every 20 seconds), but rather it occurs in bursts (a conversation is followed by a long period of silence between the conversational partners, followed by another bout of conversation, perhaps with different interlocutors, followed by silence, and so on). In this context, imagine that you sample a 5-second stretch. If you find speech in that stretch, then it is likely you have by chance fallen on a conversation bout; if you do not find speech, then you have likely found a silence bout. If you were to extend that selection out to several minutes, then it is likely that you will simply add more material from the same type (i.e. conversation bout or silence bout). As a result, any sampling method that favors medium-sized stretches (5-15 minutes) will tend to end up with samples that are internally homogeneous (throughout the 5 minutes, there is a conversation), but highly heterogeneous as a collection if sampling is random throughout the day. This in turn would lead to artificially high correlations between LENA^TM^ and human metrics in all dependent variables (e.g., since probably little speech, fewer turns, and fewer child vocalizations will be found in silent bouts and more in conversational ones). Thus, our strategy of sampling randomly/periodically and in short stretches is more likely to capture finer-grained variation in speech quantity.
+We chose to sample 1 or 2 minutes at a time (TSI, and ACLEW corpora, respectively) because conversations are likely to be bursty [@goh2008burstiness]. That is, it is likely the case that speech is not produced at a periodic rate (e.g., one phrase every 20 seconds), but rather it occurs in bursts (a conversation is followed by a long period of silence between the conversational partners, followed by another bout of conversation, perhaps with different interlocutors, followed by silence, and so on). In this context, imagine that you sample a 5-second stretch. If you find speech in that stretch, then it is likely you have by chance fallen on a conversation bout; if you do not find speech, then you have likely found a silence bout. If you were to extend that selection out to several minutes, then it is likely that you will simply add more material from the same type (i.e. conversation bout or silence bout). As a result, any sampling method that favors medium-sized stretches (5-15 minutes) will tend to end up with samples that are internally homogeneous (throughout the 5 minutes, there is a conversation, or there is silence throughout). If smaller clips are sampled out, this heterogeneity is still captured, but (keeping the total length of audio extracted fixed) the number of clips that can be extracted is larger, thus likely increasing the likelihood that results will generalize to a new section of the audio.
 
-In the 5 corpora, the 1- or 2-min samples were annotated for all hearable utterance boundaries and talker ID. In ACLEW corpora \footnote{see @casillas2017a and  @casillas2017b for the general annotation protocol, and @soderstrom, for an introduction to the databases.}, talker IDs reflected unique individual talkers, but were coded in such a way to readily allow mapping onto LENA^TM^s talker categories (e.g. key child, other child 1, female adult 1, female adult 2). In the TSI corpus, only the key child and one female adult whose voice recurred throughout the day were individually identified, with all other talkers being classified on the basis of broad age and sex into male adult, female adult, and other children. The ACLEW datasets had other coding levels which will not be discussed here. 
+In the 5 corpora, the 1- or 2-min samples were annotated for all hearable utterance boundaries and talker ID. In ACLEW corpora [see @casillas2017a and  @casillas2017b for the general annotation protocol, and @soderstrom, for an introduction to the databases], talker IDs reflected unique individual talkers, but were coded in such a way to readily allow mapping onto LENA^TM^s talker categories (e.g. key child, other child 1, female adult 1, female adult 2). In the TSI corpus, only the key child and one female adult whose voice recurred throughout the day were individually identified, with all other talkers being classified on the basis of broad age and sex into male adult, female adult, and other children. The ACLEW datasets had other coding levels which will not be discussed here. 
 
-<!-- I think the references in the footnote are not being parsed correctly by rmd.- Melanie -->
+
 
 ### Processing
 
 Several different time units are needed to clarify how each metric is calculated (see Figure 1). Clips refer to the 1- or 2-minute samples extracted from recordings. This is the basic unit at which child vocalization counts and conversational turn counts can be established. In addition, since most previous work evaluating adult word counts did so at the clip level, we do so here as well.
 
-![Levels at which performance is evaluated.](fig_levels.jpg)
+![Levels at which performance is evaluated.](fig_levels.pdf)
 
 The other metrics require a more detailed explanation, conveyed graphically in Figure 1. The stretch of time that has been assigned to a speech or non-speech class by LENA^TM^ is a _segment_. In one clip, there may be just one long segment (e.g., the whole clip has been assigned to Silence by LENA^TM^); or there may be more (e.g., the first 5 seconds are attributed to the key child, then there is a 50-second Silence segment, and the final 5 seconds are attributed to a Female Adult). In LENA^TM^'s automated analysis, only one of these categories may be active at a given point in time. In contrast, we typically speak of utterances or vocalizations to refer to stretches of speech detected by humans and assigned to different talkers. Again, clips may have zero or more utterances. Unlike LENA^TM^, however, a given point in time may be associated with multiple speakers. 
 Given that there need not be a one-to-one correspondence between LENA^TM^ segments and human utterances, we need to define smaller time units that can be used to check for classification agreement. In this paper, we use 10 ms frames. This is the basic time unit used for all classification accuracy estimations, which are introduced in more detail in the next subsection.
@@ -238,7 +234,7 @@ Users may also wish to interpret the absolute number of vocalizations or turns f
 
 The relative error rate puts this bias in relation to the actual number of vocalizations tagged by the human coder: (NL-NH)/NL. For instance, imagine that we find that LENA^TM^ errs by 10 vocalizations on average according to the average absolute error rate; this means that, on average across short clips like the ones used here, the numbers by LENA^TM^ would be off by 10 vocalizations. We may think this number is small; by using the relative error rate, we can check whether it is small relative to the actual number found: An error of 10 vocalizations would seem less problematic if there are 100 vocalizations on average (LENA^TM^ would be just 10% off) than if there are 10 (LENA^TM^ would be doubling the number of vocalizations). As with the absolute error rate, the sign of this difference indicates whether LENA^TM^ tends to over- or under-estimate these counts.
 
-Finally, the relative absolute error rate is calculated with the formula abs(NL-NH)/NL, where abs indicates that one takes the absolute of the difference. As a result, it cannot be used to assess systematic under- or over-estimation biases, but rather gives an idea of how accurate the estimates are at the clip level (statistically speaking). To convey this intuitively, one could find absolute error rates and relative error rates that are 0 because Otherwise the estimates could be half -100 vocalizations off (for absolute error rates) or -100% off (for the relative error rates), with the other half behaving in the exact opposite fashion. 
+Finally, the relative absolute error rate is calculated with the formula abs(NL-NH)/NL, where abs indicates that one takes the absolute of the difference. As a result, it cannot be used to assess systematic under- or over-estimation biases, but rather gives an idea of how accurate the estimates are at the clip level (statistically speaking). To convey this intuitively, one could find absolute error rates and relative error rates that are 0 because half of the samples are -100 vocalizations off (for the absolute error rate) or -100% off (for the relative error rates), with the other half behave in the exact opposite fashion. 
 
 
 ### AWC evaluation
@@ -247,7 +243,7 @@ For the AWC portion of this evaluation, we could only use transcriptions from th
 
 Reference adult word counts were determined by counting all unambiguously transcribed words spoken by adult talkers. This was achieved by first discarding all non-lexical transcript entries such as non-linguistic communicative sounds, paralinguistic markers, and markers indicating incomprehensible speech. In addition, all utterances from the key child and other children were omitted from the Adult Word Count. The remaining orthographic entries separated by whitespaces were then counted as gold standard target words for LENA^TM^ to detect. One child in the SOD corpus was learning French. Given our definition of orthographic words with no language-specific processing, we have included this child to increase power, but results without them are nearly identical.  
 
-As for LENA^TM^ word counts, the regions sampled for manual annotation were not guaranteed to perfectly align with LENA^TM^ segments, and human utterances need not align with them either. Of all LENA^TM^ segments overlapping with human vocalizations, 14% had only partial overlap with the annotations. To match LENA^TM^ AWCs with the annotated word counts, words from the partially overlapping LENA^TM^ utterances were included in proportion to the amount of overlap between the LENA^TM^ turn and the reference segment in question (e.g., if 10% of a LENA^TM^ segment  overlapped with a manually-annotated utterance, 10% of the total LENA^TM^ AWC estimate for that segment was included in the LENA^TM^ word count estimate for that utterance). 
+As for LENA^TM^ word counts, the regions sampled for manual annotation were not guaranteed to perfectly align with LENA^TM^ segments. Of all LENA^TM^ segments found within the extracted clips, 14% straddled a clip boundary (i.e., the segment began before the clip started; or it ended after the extracted clip ended). To match LENA^TM^ AWCs with the annotated word counts, words from these straddling LENA^TM^ segments were included in proportion to the length of the LENA^TM^ segment included in the clip (e.g., if 10% of the duration of a LENA^TM^ segment fell within a clip, 10% of the LENA^TM^ AWC estimate for that segment was included in the LENA^TM^ word count estimate for that clip). 
 
 AWC were evaluated using Pearson correlations and error rates, similarly to CVC and CTC.
 
@@ -367,7 +363,7 @@ We therefore turn to precision and recall. Looking at precision of speech catego
 	
 This subsection shows confusion matrices, containing information on precision and recall, for each key category. For this analysis, we collapsed over all human annotations that contained overlap between two speakers into a category called "overlap". Please remember that this category is not defined the same way as the LENA^TM^ overlap category. For LENA^TM^, overlap between any two categories falls within overlap -- i.e., CHN+TV would be counted towards overlap; whereas for us, only overlap between two talker categories (e.g., key child and female adult) counts as overlap.
 
-```{r ggprec, fig.cap="Precision: Confusion matrix between LENA (x axis) and human annotations (y axis). In each cell, the top number indicates the percentage of all frames in that LENA category (column) that are labeled as a given class by the human (row); cells in a given column add up to 100%. The number below indicates number of frames in that intersection of LENA and human classes."}
+```{r ggprec-fig, fig.cap="Precision: Confusion matrix between LENA (x axis) and human annotations (y axis). In each cell, the top number indicates the percentage of all frames in that LENA category (column) that are labeled as a given class by the human (row); cells in a given column add up to 100%. The number below indicates number of frames in that intersection of LENA and human classes."}
 
 prop_cat=data.frame(apply(all,2,dodiv)*100) #generates precision because columns
 #colSums(prop_cat)
@@ -381,7 +377,7 @@ ggplot(data = stall, mapping = aes(y = stall$human, x=stall$LENA)) +
   geom_tile(aes(fill= rescale(stall$pr)), colour = "white") +
   geom_text(aes(label = paste(round(stall$pr),"%")), vjust = -1,size=2) + 
   geom_text(aes(label = stall$n), vjust = 1,size=2) + 
-  scale_fill_gradient(low = "white", high = "purple", name = "Proportion") +
+  scale_fill_gradient(low = "white", high = "red", name = "Proportion") +
   xlab("LENA(TM)") + ylab("Human")
 ```
 
@@ -390,13 +386,13 @@ We start by explaining how to interpret one cell in Figure 2: Focus on the cross
 
 Precision for CHN comes in second place, at `r round(stall$pr[stall$LENA=="CHN" & stall$human=="CHI"])`%; thus, nearly half of the frames labeled as being the key child are, in fact, the key child. The majority of the frames that LENA^TM^ incorrectly tagged as being the key child are actually silence (or rather, lack of speech) according to the human annotator (`r round(stall$pr[stall$LENA=="CHN" & stall$human=="SIL"])`%), with the remaining errors being due to confusion with other categories: About `r round(stall$pr[stall$LENA=="CHN" & stall$human=="FEM"])`% of them are actually a female adult; `r round(stall$pr[stall$LENA=="CHN" & stall$human=="OCH"])`% are another child; and `r round(stall$pr[stall$LENA=="CHN" & stall$human=="OVL"])`% are regions of overlap across speakers, according to our human coders. 
 
-MAN and CXN score similarly, `r round(stall$pr[stall$LENA=="MAN" & stall$human=="MAL"])` and `r round(stall$pr[stall$LENA=="CXN" & stall$human=="OCH"])`% respectively, meaning that less than a tenth of the areas LENA^TM^ tagged as being these speakers actually correspond to them. As with the key child, most errors are due to LENA^TM^ tagging silent frames as these categories. However, in this case confusion with other speaker tags is far from negligible. In fact, the most common speaker tag in the human annotation among the regions that LENA^TM^ tagged as being MAN were actually female adult speech (`r round(stall$pr[stall$LENA=="MAN" & stall$human=="FEM"])`%); and, for CXN, it was not uncommon to find a CXN tag for a frame human listeners identified as a female adult (`r round(stall$pr[stall$LENA=="CXN" & stall$human=="FEM"])`%) or the key child (`r round(stall$pr[stall$LENA=="CXN" & stall$human=="OCH"])`%). In a nutshell, this suggests extreme caution before undertaking any analyses that rely on the precision of MAN and CXN, since most of what is being tagged as such is silence or other speakers.
+MAN and CXN score similarly, `r round(stall$pr[stall$LENA=="MAN" & stall$human=="MAL"])`% and `r round(stall$pr[stall$LENA=="CXN" & stall$human=="OCH"])`% respectively, meaning that less than a tenth of the areas LENA^TM^ tagged as being these speakers actually correspond to them. As with the key child, most errors are due to LENA^TM^ tagging silent frames as these categories. However, in this case confusion with other speaker tags is far from negligible. In fact, the most common speaker tag in the human annotation among the regions that LENA^TM^ tagged as being MAN were actually female adult speech (`r round(stall$pr[stall$LENA=="MAN" & stall$human=="FEM"])`%); and, for CXN, it was not uncommon to find a CXN tag for a frame human listeners identified as a female adult (`r round(stall$pr[stall$LENA=="CXN" & stall$human=="FEM"])`%) or the key child (`r round(stall$pr[stall$LENA=="CXN" & stall$human=="OCH"])`%). In a nutshell, this suggests extreme caution before undertaking any analyses that rely on the precision of MAN and CXN, since most of what is being tagged as such is silence or other speakers.
 
 Another observation is that the "far" tags of the speaker categories do tend to more frequently correspond to what humans tagged as silence (`r round(mean(stall$pr[substr(stall$LENA,3,3)=="F" & stall$human=="SIL"]))`%) than the "near" tags (`r round(mean(stall$pr[substr(stall$LENA,3,3)=="N" & stall$human=="SIL"]))`%), and thus it is reasonable to exclude them from consideration. The relatively high proportion of near LENA^TM^ tags that correspond to regions that humans labeled as silence could be partially due to the fact that the LENA^TM^ system, in order to process a daylong recording quickly, does not make judgments on small frames independently, but rather imposes a minimum duration for all speaker categories, padding with silence in order to achieve it. Thus, any key child utterance that is shorter than .6 secs will contain as much silence as needed to achieve this minimum (and more for the other talker categories). Our system of annotation, whereby human annotators had no access whatsoever to the LENA^TM^ tags, puts us in an ideal situation to assess the impact of this design decision, because any annotation that starts from the LENA^TM^ segmentation should bias the human annotator to ignore such short interstitial silences to a greater extent than if they have no access to the LENA^TM^ tags.
 
 These analyses shed light on the extent to which we can trust the LENA^TM^ tags to contain what the name indicates. We now move on to recall, which indicates a complementary perspective: how much of the original annotations attributed to a given class was captured by the corresponding LENA^TM^ class.
 
-```{r ggrec, fig.cap="Recall: Confusion matrix between LENA (x axis) and human annotations (y axis). In each cell, the top number indicates the percentage of all frames that a human labeled as a given class (row) which were recovered in a given LENA category (column); cells in a given row add up to 100%. The number below indicates number of frames in that intersection of LENA and human classes."}
+```{r ggrec-fig, fig.cap="Recall: Confusion matrix between LENA (x axis) and human annotations (y axis). In each cell, the top number indicates the percentage of all frames that a human labeled as a given class (row) which were recovered in a given LENA category (column); cells in a given row add up to 100%. The number below indicates number of frames in that intersection of LENA and human classes."}
 
 prop_cat=data.frame(t(apply(all,1,dodiv)*100)) #generates recall because rows
 rec=stall
@@ -406,7 +402,7 @@ ggplot(data = rec, mapping = aes(y = rec$human, x=rec$LENA)) +
   geom_tile(aes(fill= rescale(rec$pr)), colour = "white") +
   geom_text(aes(label = paste(round(rec$pr),"%")), vjust = -1,size=2) + 
   geom_text(aes(label = rec$n), vjust = 1,size=2) + 
-  scale_fill_gradient(low = "white", high = "purple", name = "Proportion") +
+  scale_fill_gradient(low = "white", high = "red", name = "Proportion") +
   xlab("LENA(TM)") + ylab("Human")
 ```
 
@@ -436,7 +432,7 @@ Given the inaccuracy of far LENA^TM^ tags, and in order to follow the LENA^TM^ s
 
 
 
-```{r cvc-fig, ig.pos = "T!", fig.width=5.5, fig.height=5.5, fig.cap="Child Vocalization Counts according to LENA (x axis) and humans (y axis). Each point represents the CVC totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA^TM^ said zero child vocalizations."}
+```{r cvc-fig, ig.pos = "T!", fig.width=3.5, fig.height=3.5, fig.cap="Child Vocalization Counts according to LENA (x axis) and humans (y axis). Each point represents the CVC totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA^TM^ said zero child vocalizations."}
 
 plot(CVC_gold~CVC_n,data=cvtc,pch=20,col=alpha("black",.2),xlab="LENA CVC",ylab="Human CVC")
 abline(lm(CVC_gold~CVC_n,data=cvtc))
@@ -472,7 +468,7 @@ The absolute error rate ranged from `r min(aer)` to `r max(aer)`, with a mean of
 ### Conversational Turn Counts (CTC) accuracy 
 
 
-```{r ctc-fig, ig.pos = "T!", fig.width=5.5, fig.height=5.5, fig.cap="Conversational Turn Counts according to LENA (x axis) and humans (y axis). Each point represents the CTC totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA^TM^ said zero child-adult or adult-child turns"}
+```{r ctc-fig, ig.pos = "T!", fig.width=3.5, fig.height=3.5, fig.cap="Conversational Turn Counts according to LENA (x axis) and humans (y axis). Each point represents the CTC totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA^TM^ said zero child-adult or adult-child turns"}
 
 
 
@@ -503,7 +499,7 @@ Again, we only considered "near" speaker categories in the turn count, and appli
 The absolute error rate ranged from `r min(aer)` to `r max(aer)`, with a mean of `r mean(aer)` and a median of `r median(aer)`. The absolute error rate excluding clips where both human and LENA^TM^ counts were zero ranged from `r min(aer_no_zeros)` to `r max(aer_no_zeros)`, with a mean of `r mean(aer_no_zeros)` and a median of `r median(aer_no_zeros)`. As for  relative error rates, these require the number in the denominator to be non-null. For this analysis, therefore, we need to remove the `r sum(cvtc$CTC_gold==0)` clips in which the human annotator said there were no child-adult or adult-child turns  whatsoever. The mean relative error rate ranged from `r min(rer)`% to `r max(rer)`%, with a mean of `r mean(rer)`% and a median of `r median(rer)`%. Finally, the absolute relative error rate ranged from `r min(arer)`% to `r max(arer)`%, with a mean of `r mean(arer)`% and a median of `r median(arer)`%. For CTCs, as for CVCs, the LENA^TM^ seems to be underestimating counts rather systematically, leading to counts that are on average `r mean(rer)`% smaller than what they actually are.
 
 
-<!-- I think it is important to remind the reader here that the AWC results do not include the Tsimane data. - Melanie -->
+
 
 ### Adult Word Counts accuracy 
 
@@ -537,7 +533,7 @@ arer=abs(no_human_zeros$LENA-no_human_zeros$gold)/no_human_zeros$gold*100
 
 ```
 
-```{r awc-fig, ig.pos = "T!", fig.width=5.5, fig.height=5.5, fig.cap="Adult Word Counts according to LENA (x axis) and humans (y axis). Each point represents the AWC totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA^TM^ said there were no adult words."}
+```{r awc-fig, ig.pos = "T!", fig.width=3.5, fig.height=3.5, fig.cap="Adult Word Counts according to LENA (x axis) and humans (y axis). Each point represents the AWC totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA^TM^ said there were no adult words."}
 
 plot(gold~LENA,data=awc,pch=20,main="AWC",col=alpha("black",.2),xlab="LENA AWC",ylab="Human AWC")
 abline(lm(gold~LENA,data=awc))
@@ -546,9 +542,9 @@ abline(lm(gold~LENA,data=awc,subset=c(awc$gold>0 & awc$LENA>0)),lty=2)
 
 
 
-The association between clip-level LENA^TM^ and human AWC was strong (Figure 6): the Pearson correlation between the two was r=`r round(cor.awc.all$estimate,3)` (p=`r signif(cor.awc.all$p.value,3)`) when all clips were taken into account, and r=`r round(cor.awc.noZeros$estimate,3)` (p=`r signif(cor.awc.noZeros$p.value,3)`)  when only clips with some child speech (i.e., excluding `r sum(awc$gold>0 & awc$LENA>0)` clips with 0 counts in both LENA^TM^ and human annotations) were considered. This suggests that the LENA^TM^ system captures  differences in terms of number of child vocalizations across clips well. 
+The association between clip-level LENA^TM^ and human AWC in the four English-spoken corpora was strong (Figure 6): the Pearson correlation between the two was r=`r round(cor.awc.all$estimate,3)` (p=`r signif(cor.awc.all$p.value,3)`) when all clips were taken into account, and r=`r round(cor.awc.noZeros$estimate,3)` (p=`r signif(cor.awc.noZeros$p.value,3)`)  when only clips with some adult speech (i.e., excluding `r sum(awc$gold>0 & awc$LENA>0)` clips with 0 counts in both LENA^TM^ and human annotations) were considered. This suggests that the LENA^TM^ system captures  differences in terms of number of adult word counts across clips well. 
 
-The absolute error rate ranged from `r min(aer)` to `r max(aer)`, with a mean of `r mean(aer)` and a median of `r median(aer)`. The absolute error rate excluding clips where both human and LENA^TM^ counts were zero ranged from `r min(aer_no_zeros)` to `r max(aer_no_zeros)`, with a mean of `r mean(aer_no_zeros)` and a median of `r median(aer_no_zeros)`. As for  relative error rates, these require the number in the denominator to be non-null. For this analysis, therefore, we need to remove the `r sum(awc$gold>0)` clips in which the human annotator said there were no child-adult or adult-child turns  whatsoever. The mean relative error rate ranged from `r min(rer)`% to `r max(rer)`%, with a mean of `r mean(rer)`% and a median of `r median(rer)`%. Finally, the absolute relative error rate ranged from `r min(arer)`% to `r max(arer)`%, with a mean of `r mean(arer)`% and a median of `r median(arer)`%. Together, these results suggest that LENA^TM^ has a strong tendencey to underestimate AWC, but there are more random errors in both directions than in the other two counts. We can conclude this from the fact that in the other two counts, the relative error rate and the absolute relative error rate were quite similar, suggesting a stable (underestimation) tendency, whereas here the mean  and the median for the relative error rate diverge greatly and both of these are, sign set aside, much smaller than the absolute relative error rate.
+The absolute error rate ranged from `r min(aer)` to `r max(aer)`, with a mean of `r mean(aer)` and a median of `r median(aer)`. The absolute error rate excluding clips where both human and LENA^TM^ counts were zero ranged from `r min(aer_no_zeros)` to `r max(aer_no_zeros)`, with a mean of `r mean(aer_no_zeros)` and a median of `r median(aer_no_zeros)`. As for  relative error rates, these require the number in the denominator to be non-null. For this analysis, therefore, we need to remove the `r sum(awc$gold>0)` clips in which the human annotator said there were no child-adult or adult-child turns  whatsoever. The mean relative error rate ranged from `r min(rer)`% to `r max(rer)`%, with a mean of `r mean(rer)`% and a median of `r median(rer)`%. Finally, the absolute relative error rate ranged from `r min(arer)`% to `r max(arer)`%, with a mean of `r mean(arer)`% and a median of `r median(arer)`%. Together, these results suggest that the direction of errors is less stable than in the other two counts. We can conclude this from the fact that in the other two counts, the relative error rate and the absolute relative error rate were quite similar, suggesting a stable (underestimation) tendency, whereas here the mean  and the median for the relative error rate diverge greatly and both of these are, sign set aside, much smaller than the absolute relative error rate.
 
 
 ### Effects of age and differences across corpora 
@@ -594,20 +590,6 @@ for(dv in c("false.alarm..","missed.detection..","confusion..")){
 
 ```
 
-```{r der-fig, fig.cap="Diarization error rate as a function of corpus and child age (divided into quartiles). Each point represents the results averaged over all clips extracted from the data of one child. Colors indicate to which corpus that child belongs: BER in blue, L05 is green, SOD in black, TSI in gray, and WAR in purple "}
-#use median for the central tendency, interquartile range for the variance
-py<-within(py, quartile <- as.integer(cut(py$age, quantile(py$age, probs=0:4/4), include.lowest=TRUE)))
-
-bychild=aggregate(py$diarization.error.rate..,list(py$child,py$cor,py$quartile),median,na.rm=T)
-
-bychild$jitter=as.numeric(bychild$Group.3)+(as.numeric(bychild$Group.2)/8-mean(as.numeric(bychild$Group.2)/8))
-mycols=c("blue","darkgreen","black","gray","purple")
-
-names(mycols)<-levels(factor(bychild$Group.2))
-plot(bychild$x~bychild$jitter,ylim=range(0,115),pch=20,xlab="Age in months (quartiled)",xaxt="n",ylab="Diarization error rate",xlim=c(0.5,4.5),col=alpha(mycols[bychild$Group.2],.6))
-axis(1,at=0.5:4.5,labels=quantile(py$age, probs=0:4/4))
-
-```
 
 
 ```{r der-fig2, fig.cap="Diarization error rate as a function of corpus and child age. Each point represents the results averaged over all clips extracted from the data of one child. Colors indicate to which corpus that child belongs: BER in blue, L05 is green, SOD in black, TSI in gray, and WAR in purple. "}
@@ -623,7 +605,7 @@ plot(bychild$x~bychild$Group.3,ylim=range(0,115),pch=20,xlab="Age in months",yla
 
 ```
 
-We predicted false alarm, miss, and confusion rates (when all "F" categories, TV, and overlap were mapped onto silence, which yielded the best results in Section "False alarms, misses, confusion") from corpus, child age, and the interaction as fixed effects, declaring child ID as random effect, on clips where there was some speech according to the human annotator. We followed up with an Analysis of Variance (type III) to assess significance. In none of these analyses was corpus, child age, or their interaction significant.
+We predicted false alarm, miss, and confusion rates (when all "F" categories, TV, and overlap were mapped onto silence, which yielded the best results in Section "False alarms, misses, confusion") from corpus, child age, and the interaction as fixed effects, declaring child ID as random effect, on clips where there was some speech according to the human annotator. We followed up with an Analysis of Variance (type III) to assess significance. In none of these analyses was corpus, child age, or their interaction significant. Supporting this results visually, Figure 7 represents diarization error rate as a function of age and corpus for individual children.
 
 
 ```{r cvc-age, echo=F}
@@ -715,9 +697,9 @@ Similarly, although LENA^TM^'s overall confusion rate (i.e. incorrectly identify
 
 However, while we recommend LENA^TM^ users to be very careful in their use of LENA^TM^ diarization and classification, especially for certain talker classes, our results for LENA^TM^ count metrics suggest these derived counts may be accurate enough to serve well across a large variety of uses. To begin with, as far as it is possible to generalize from the limited range of samples tested here (children aged 2 to 58 months, learning North American English, UK English, or Tsimane') it seems that LENA^TM^'s performance does not vary a great deal across ages, dialects, language and home settings. Moreover, correlations between human and LENA^TM^ clip-level counts were high to very high, suggesting that the software accurately captures differences in counts across clips (even when error rates were also high). These  correlations remained quite high even when clips with counts equal to zero were removed from consideration, suggesting that LENA^TM^ captures gradience in vocalization counts. 
 
-However, our finding that LENA^TM^ generally underestimates the quantity of child vocalizations, child-adult turns, and adult words deserves further consideration.  While we feel caution is in order, further work is needed to fully understand the nature and extent of this limitation. Our clips were 1-2 minutes in length, and therefore they either tended to have very little speech or a lot of it. Error rates over hours could be smaller, because local errors average out; or greater, if the LENA^TM^ system systematically underestimates counts. In a LENA^TM^ technical report, AWC accuracy was variable across two 12-hour recordings: 1% lower than human transcription for one child, but 27% lower for a second child. This same report notes that AWC accuracy quickly plateaus as recording time increases beyond one hour, leveling to 5-10% in recordings greater than 2 hours in length [@Xu2009a]. 
+However, our finding that LENA^TM^ generally underestimates the quantity of child vocalizations, child-adult turns, and adult words deserves further consideration.  While we feel caution is in order, further work is needed to fully understand the nature and extent of this limitation. Our clips were 1--2 minutes in length, and therefore they either tended to have very little speech or a lot of it. Error rates over hours could be smaller, because local errors average out; or greater, if the LENA^TM^ system systematically underestimates counts. In a LENA^TM^ technical report, AWC accuracy was variable across two 12-hour recordings: 1% lower than human transcription for one child, but 27% lower for a second child. This same report notes that AWC accuracy quickly plateaus as recording time increases beyond one hour, leveling to 5-10% in recordings greater than 2 hours in length [@Xu2009a]. 
 
-Thus, it is important for further work to help establish the systematicity in LENA^TM^'s estimates: if underestimates are robust and systematic (as suggested by present results for CVC and CTC, but not AWC), it may be possible to develop a correction factor to compensate for this bias. However, this bias may be challenging to nail down precisely. For instance, a recent study in Finland documented an overestimate by LENA^TM^, suggested that this raw bias may be context specific [@Elo].  
+Thus, it is important for further work to help establish the systematicity in LENA^TM^'s estimates: if underestimates are robust and systematic (as suggested by present results for CVC and CTC, but not AWC), it may be possible to develop a correction factor to compensate for this bias. However, this bias may be challenging to nail down precisely and for AWC it may depend on the language in question. For instance, a recent study in Finland documented that LENA^TM^ largely overestimated AWC and only slightly underestimated child vocalization counts [@Elo].  
 
 
 
@@ -729,9 +711,8 @@ First, we recommend a literature search, to determine whether a similar sample h
 
 Separately, researchers should reflect about the accuracy needed for their question of interest. For instance, suppose we have an evaluation of an intervention where we expect treatment children to hear 20% more speech than controls, or an individual differences study where we expect that the lower fifth of the children hear 20% less speech than the top fifth. If the intended measure used to compare groups has an error rate larger than the effect predicted (such as the the CTC error rate we find here), a different algorithm or outcome metric would be necessary.
 
-###Conclusions
+### Conclusions
 
-<!-- For some reasons, this section header did not knit correctly for me. - Melanie -->
 
 In conclusion, in this study, we have provided a broad evaluation of LENA^TM^'s accuracy across its key outcome measures (classification, child vocalization counts, conversational turn counts, and adult word counts), and its generalizability across different dialects, languages, ages, and settings. We have provided some recommendations for how to use LENA^TM^ in future studies most effectively, and how to test the accuracy of the LENA^TM^ algorithms on particular samples of data.  
 
