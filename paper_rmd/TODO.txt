@@ -1,6 +1,5 @@
-switch TM to R next to LENA
-
 all the apostrophes in LENA^TM^'s get messed up - how can this be fixed?
+#eb: looks fixed!
 
 add evaluation of voc versus nonvoc
 
