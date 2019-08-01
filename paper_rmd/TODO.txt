@@ -4,6 +4,8 @@ all the apostrophes in LENA^TM^'s get messed up - how can this be fixed?
 make sure AC agrees with EBs recommended reviewers and that cover letter meets 
 BRM requirements
 
+add to caption for figure 1; not super clear
+
 AFTER IT COMES BACK:
 create proper links for table and figure numbering with @ref, @tab etc.
 

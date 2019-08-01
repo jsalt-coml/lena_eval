@@ -1,1 +1,6 @@
-﻿Corpus,#children,#clips,Clip dur (in seconds),Age mean (range) in months,LocationWAR,10,150,120,6.3 (3-9),Western USBER,10,150,120,11.2 (7-17),Northeast USSOD,9,150,120,12.3 (2-32),Western CanadaL05,10,150,120,20 (11-31),Northwest EnglandTSI,10,272,60,34 (15-58),Northern Bolivia
+Corpus,#children,#clips,Clip duration (s),*M* Age [range] (in mo.),Location
+WAR,10,150,120,6.3 [3-9],Western US
+BER,10,150,120,11.2 [7-17],Northeast US
+SOD,9,150,120,12.3 [2-32],Western Canada
+L05,10,150,120,20 [11-31],Northwest England
+TSI,10,272,60,34 [15-58],Northern Bolivia
