@@ -1,10 +1,9 @@
-all the apostrophes in LENA^TM^'s get messed up - how can this be fixed?
+some of the apostrophes in  LENA®’'s get messed up - how can this be fixed?
 #eb: ugh this is a papaja thing i think; probably easiest to search and replace in the tex at the end? we should file an issue
 
 make sure AC agrees with EBs recommended reviewers and that cover letter meets 
 BRM requirements
 
-add to caption for figure 1; not super clear
 
 AFTER IT COMES BACK:
 create proper links for table and figure numbering with @ref, @tab etc.
