@@ -6,6 +6,8 @@ BRM requirements
 
 
 AFTER IT COMES BACK:
+consider consolidating some repetitive text (e.g. ARE, RER, ARER) into tables
+
 create proper links for table and figure numbering with @ref, @tab etc.
 
 add evaluation of voc versus nonvoc
