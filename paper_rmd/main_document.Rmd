@@ -123,7 +123,7 @@ A recent systematic review [@Cristia] found 23 papers containing 28 studies that
 
 > "reasonably good results [overall]: over 61% for recall and precision based on 11-12 non-independent studies; correlations for AWC mean r=.79, on n=11, with a mean RER [i.e., Relative Error Rate]=10% on n=11; CVC mean r=.76, n=5, with a mean RER=1% on n=5. The exception to this general trend towards good performance was CTC, with a mean r=.31, n=5, RER=-64% on n=2." 
 
-The systematic review also identified several limitations of previous validation work. First, for the majority of included studies, the validitation component was not fully evaluated by peer review. Even if the study may have appeared in a pee-reviewed journal, the validation in itself was often a secondary goal to support a different research objective, and therefore often lacked methodological details or even full results. For instance, @Seidl2018 report on validation of LENA^®^ labels among children at familial risk for autism in a one-paragraph appendix to the paper, which only mentions confusions between female adult and child. This leaves unclear whether confusions between key child and any other category (other child, male adult, silence, etc.) were ignored considered to be as errors. While this approach may be reasonable for a given study's research goals, it has the undesirable side effect of creating the impression that LENA^®^ metrics are widely validated, while in fact validation methods may not have been reported or evaluated in detail.
+The systematic review also identified several limitations of previous validation work. First, for the majority of included studies, the validitation component was not fully evaluated by peer review. Even if the study may have appeared in a peer-reviewed journal, the validation in itself was often a secondary goal to support a different research objective, and therefore often lacked methodological details or even full results. For instance, @Seidl2018 report on validation of LENA^®^ labels among children at familial risk for autism in a one-paragraph appendix to the paper, which only mentions confusions between female adult and child. This leaves unclear whether confusions between key child and any other category (other child, male adult, silence, etc.) were ignored considered to be as errors. While this approach may be reasonable for a given study's research goals, it has the undesirable side effect of creating the impression that LENA^®^ metrics are widely validated, while in fact validation methods may not have been reported or evaluated in detail.
 Second, previous studies typically did not take silence, noise, or overlap into account in the reported confusion matrices or other accuracy measures, particularly within segments. That is, if a LENA^®^ segment labeled "key child" contained one second of silence and two seconds of speech by the key child, the full three second clip may be tagged as 'correct' though it was only 67% correct, leading to an overestimation of the accuracy of the "key child" label. 
 
 Third, a majority of previous validation studies used the LENA^®^ output itself to select the sections that would be annotated for validation [in @Cristia, this held for 14/25 studies that specified the method of selection]. For instance, clips may have been selected for manual annotation on the basis of high AWC and/or CTC according to the algorithm. This unfortunately leads to biased sampling: Since LENA^®^ only counts words within FAN and MAN segments and conversational turns involving FAN/MAN alternations with CHN in close proximity, high AWC or CTC can only occur in sections of the recording that are "clean" enough for the algorithm to parse; otherwise, most of the section would have been classified as overlap (OLN), which does not count towards AWC or CTC. This would tend to bias these reports toward a higher level of accuracy than would be obtained across the full recording. 
@@ -605,11 +605,11 @@ age_id = rbind(spreadsheet, spreadsheet_tsi)
 py=merge(py,age_id,by.x="child",by.y="child",all.x=T) #one row is lost... **ATTENTION BUG HERE**
 
 mymodels<- list()
-myanovas<- list()
+myANOVAs<- list()
 for(dv in c("false.alarm..","missed.detection..","confusion..")){
     #print(dv)
     mymodels[[dv]]<-lmer(py[,dv]~cor*age+(1|child),data=py)
-  myanovas[[dv]]<-Anova(mymodels[[dv]],type="III")
+  myANOVAs[[dv]]<-ANOVA(mymodels[[dv]],type="III")
 }
 
 ```
@@ -629,7 +629,7 @@ plot(bychild$x~bychild$Group.3,ylim=range(0,115),pch=20,xlab="Age in months",yla
 
 ```
 
-We predicted false alarm, miss, and confusion rates in clips where there was some speech according to the human annotatorwhen, with all "F" categories, TV, and overlap were mapped onto silence (which yielded the best results in Section "False alarms, misses, confusion" above.) Our predictors were corpus, child age, and their interaction as fixed effects, with child ID as a random effect. We followed up with a type III ANOVA to assess significance. Across all analyses, corpus, child age, and their interaction were never significant. Supporting this result visually, Figure 7 represents diarization error rate as a function of age and corpus for individual children.
+We predicted false alarm, miss, and confusion rates in clips where there was some speech according to the human annotator when, with all "F" categories, TV, and overlap were mapped onto silence (which yielded the best results in Section "False alarms, misses, confusion" above.) Our predictors were corpus, child age, and their interaction as fixed effects, with child ID as a random effect. We followed up with a Type III ANOVA to assess significance. Across all analyses, corpus, child age, and their interaction were never significant. Supporting this result visually, Figure 7 represents diarization error rate as a function of age and corpus for individual children.
 
 
 ```{r cvc-age, echo=F}
@@ -646,17 +646,17 @@ merge(cvtc,age_id,by="child")->cvtc
 
 mymodel<-lmer(CVC_gold~CVC_n*age*cor + (1|child), data=cvtc)
 #summary(mymodel)
-#Anova(mymodel,type="III")
+#ANOVA(mymodel,type="III")
 
 #there is a 3-way interaction between age, corpus, and the predictive value of LENA^®^'s counts with respect to the gold counts
 # to investigate this we fit the same reg within corpus
 
 mymodels<- list()
-myanovas<- list()
+myANOVAs<- list()
 for(thiscor in levels(cvtc$cor)){
   #print(thiscor)
  mymodels[[thiscor]]<-lmer(CVC_gold~CVC_n*age + (1|child), data=cvtc,subset=c(cor==thiscor))
- myanovas[[thiscor]]<-Anova(mymodels[[thiscor]],type="III")
+ myANOVAs[[thiscor]]<-ANOVA(mymodels[[thiscor]],type="III")
 }
 ```
 
@@ -667,34 +667,34 @@ For CVC, we fit a mixed model where CVC according to the human was predicted fro
 
 mymodel<-lmer(CTC_gold~CTC_n*age*cor + (1|child), data=cvtc)
 #summary(mymodel)
-#Anova(mymodel,type="III")
+#ANOVA(mymodel,type="III")
 
 ```
 
 
-For CTC, we fit a mixed model where CTC according to the human was predicted from CTC according to LENA^®^, in interaction with corpus and age, as fixed factors, declaring child ID as a random effect. This time our Type 3 ANOVA found a main effect of the LENA^®^ CTC estimates and a main effect of corpus, but no significant interactions. 
+For CTC, we fit a mixed model where CTC according to the human was predicted from CTC according to LENA^®^, in interaction with corpus and age, as fixed factors, declaring child ID as a random effect. This time our Type III ANOVA found a main effect of the LENA^®^ CTC estimates and a main effect of corpus, but no significant interactions. 
 
 ```{r awc-age, echo=F}
 
 mymodel<-lmer(gold~LENA*age*cor + (1|child), data=awc)
 #summary(mymodel)
-#Anova(mymodel,type="III")
+#ANOVA(mymodel,type="III")
 
 #there is a 3-way interaction between age, corpus, and the predictive value of LENA^®^'s counts with respect to the gold counts
 # to investigate this we fit the same reg within corpus
 
 mymodels<- list()
-myanovas<- list()
+myANOVAs<- list()
 for(thiscor in levels(awc$cor)){
   #print(thiscor)
  mymodels[[thiscor]]<-lmer(gold~LENA*age + (1|child), data=awc,subset=c(cor==thiscor))
- myanovas[[thiscor]]<-Anova(mymodels[[thiscor]],type="III")
+ myANOVAs[[thiscor]]<-ANOVA(mymodels[[thiscor]],type="III")
 }
 
 ```
 
 
-Finally, for AWC (which was only analyzable for the four ACLEW corpora), we fit a mixed model where AWC according to the human was predicted from AWC according to LENA^®^, in interaction with corpus and age, as fixed factors, declaring child ID as random effect. The Type 3 ANOVA revealed a three-way interaction, which was investigated by fitting additional mixed models to each corpus separately.  An interaction between LENA^®^ AWC and age was found for BER and SOD, due to a *decreased* predictive value of the LENA AWC with respect to the human AWC for older infants in the former but an *increase* in the latter. Notably, the positive association between LENA and human AWC was, significant for all four corpora.
+Finally, for AWC (which was only analyzable for the four ACLEW corpora), we fit a mixed model where AWC according to the human was predicted from AWC according to LENA^®^, in interaction with corpus and age, as fixed factors, declaring child ID as random effect. The Type III ANOVA revealed a three-way interaction, which was investigated by fitting additional mixed models to each corpus separately.  An interaction between LENA^®^ AWC and age was found for BER and SOD, due to a *decreased* predictive value of the LENA AWC with respect to the human AWC for older infants in the former but an *increase* in the latter. Notably, the positive association between LENA and human AWC was, significant for all four corpora.
 
 ## Discussion
 
