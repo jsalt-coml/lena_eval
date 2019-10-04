@@ -306,6 +306,25 @@ age_id = rbind(spreadsheet, spreadsheet_tsi)
 py=merge(py,age_id,by.x="child",by.y="child",all.x=T)
 ```
 
+```{r tabprops, echo=F}
+tab=matrix(nrow=7,ncol=3)
+tab[,1]=rbind(sum(sumref[grep("CHI",rownames(all))]),
+      sum(sumref[grep("FEM",rownames(all))]),
+      sum(sumref[grep("MAL",rownames(all))]),
+      sum(sumref[grep("OCH",rownames(all))]),
+      sum(sumref[grep("OVL",rownames(all))]),
+      sum(sumref[grep("ELE",rownames(all))]),
+      sum(sumref[grep("SIL",rownames(all))])
+)
+tab[,2]=round(tab[,1]/sum(sumref)*100)
+tab[,3]=round(tab[,1]/100/60)
+colnames(tab)<-c("Frames","Percentage","Minutes")
+rownames(tab)<-c("CHI","FEM","MAL","OCH","OVL","ELE","Other")
+#k,f,m,oc,o,e,s
+apa_table(tab,caption="Number of frames, percentage of frames, and number of minutes attributed to each category by the human annotators. Please note percentages do not add up to 100 due to rounding.")
+```
+
+
 Before starting, we provide some general observations based on the manual human annotations. The "Other" category (meaning no speech, potentially silence but also non-human noise) was extremely common, constituting `r round(sum(sumref[grep("SIL",rownames(all))])/sum(sumref)*100)`% of the 10 ms frames. In fact, `r round(sum(is.na(py$confusion..))/dim(py)[1]*100)`% of the 1-2 minute clips contained no speech by any of the  speaker types (according to the human annotators). As for speakers, female adults made up `r round(sum(sumref[grep("FEM",rownames(all))])/sum(sumref)*100)`% of the frames, the child contributed to `r round(sum(sumref[grep("CHI",rownames(all))])/sum(sumref)*100)`%, and male adult voices, other child voices, and electronic voices were only found in `r round(sum(sumref[grep("MAL",rownames(all))])/sum(sumref)*100)`% of the frames each. Overlap made up the remaining `r round(sum(sumref[grep("OVL",rownames(all))])/sum(sumref)*100)`% of frames. The following consequences ensue. If frame-based accuracy is sought, a system that classifies every frame as Other would be `r round(sum(sumref[grep("SIL",rownames(all))])/sum(sumref)*100)`% correct. This is of course not what we want, but it indicates that systems well adapted to this kind of speech should tend to have low false alarm rates, being very conservative as to when there is speech. If the system does say there is speech, then it had better say that this speech comes from female adults, who provide a great majority of the speech, nearly 3 times as much as the key child and 10 times more than other children or male adults. In fact, given that speech by male adults and other children is so rare, a system that makes a lot of mistakes in these categories may still have a good global performance, because males and other children jointly accounted for only 2% of the frames.
 
 ### LENA^®^ classification accuracy: False alarms, misses, confusion 
@@ -319,19 +338,12 @@ As mentioned briefly above, there were, *a priori*, several ways of analyzing th
 
 - collapsing LENA^®^ "near" and "far" together (e.g., mapping CHN and CHF onto a single CH category);
 - distinguishing the "near" and "far" categories (e.g., treating CHN and CHF as distinct "speakers");
-<<<<<<< HEAD
-- excluding TV as a speaker category, since it is conceptually not identical to the electronic voices detected by ACLEW human annotators; in this case, the TV labels would be mapped post hoc to "silence", as would the electronic voices in the human annotation;
-- omitting OLN as a speaker category, since it is not conceptually identical to the overlap derived from humans' annotating different speaker categories; in this case, the LENA^®^ system's  OL labels would be mapped post hoc to "silence", as would the regions of overlap in the human annotation.
-
-We thought it most informative to report on several of these options, albeit briefly. We start with the situation that yields the best LENA^®^ performance: mapping electronic voices and overlap in the human annotation onto silence, so that the categories found in the human annotation are FEM, MAL, CHI, OCH, alongside using only CHN, FAN, MAN, and CXN as speakers in the LENA^®^ annotation, (with all "far" categories, TVN, and OLN all mapped onto silence; see Tables 1 and 3). 
-  Calculated in this way, the LENA^®^ system's  *false alarm* rate (i.e., tagging a non-silence category when there wasn't one) was  `r round(median(pytot$false.alarm..,na.rm=T))`% overall, with a mean across all clips of `r round(mean(py$false.alarm..,na.rm=T))`% and a median of `r round(median(py$false.alarm..,na.rm=T))`%. The *miss rate* was `r round(median(pytot$missed.detection..,na.rm=T))`% overall, with a mean across all clips of `r round(mean(py$missed.detection..,na.rm=T))`% and a median of `r round(median(py$missed.detection..,na.rm=T))`%. The *confusion rate*, as mentioned above, is only calculated for the correctly detected speech (i.e., not speech that was missed, which counts towards the miss rate, nor the speech that was falsely identified, which is part of false alarms). The confusion rate was very low, `r round(median(pytot$confusion..,na.rm=T))`% overall, with a mean across all clips of `r round(mean(py$confusion..,na.rm=T))`% and a median of `r round(median(py$confusion..,na.rm=T))`%. These three metrics (*false alarms*, *misses*, and *confusions*) are summed to yield the *diarization error rate*. The overall diarization error rate was  `r round(median(pytot$diarization.error.rate..,na.rm=T))`%, with a mean across all clips of `r round(mean(py$diarization.error.rate..,na.rm=T))`% and a median of `r round(median(py$diarization.error.rate..,na.rm=T))`%.
-=======
 - excluding TV as a speaker category, since it is conceptually not identical to the electronic voices detected by ACLEW human annotators; in this case, the TV labels would be mapped post hoc to "Other", as would the electronic voices in the human annotation;
 - omitting OLN as a speaker category, since it is not conceptually identical to the overlap derived from humans' annotating different speaker categories; in this case, LENA^®^'s OL labels would be mapped post hoc to "Other", as would the regions of overlap in the human annotation.
 
 We thought it most informative to report on several of these options, albeit briefly. We start with the situation that yields the best LENA^®^ performance: mapping electronic voices and overlap in the human annotation onto Other, so that the categories found in the human annotation are FEM, MAL, CHI, OCH, alongside using only CHN, FAN, MAN, and CXN as speakers in the LENA^®^ annotation, (with all "far" categories, TVN, and OLN all mapped onto Other; see Tables 1 and 3). 
   Calculated in this way, LENA^®^'s *false alarm* rate (i.e., tagging a speech category when there was none) was  `r round(median(pytot$false.alarm..,na.rm=T))`% overall, with a mean across all clips of `r round(mean(py$false.alarm..,na.rm=T))`% and a median of `r round(median(py$false.alarm..,na.rm=T))`%. The *miss rate* was `r round(median(pytot$missed.detection..,na.rm=T))`% overall, with a mean across all clips of `r round(mean(py$missed.detection..,na.rm=T))`% and a median of `r round(median(py$missed.detection..,na.rm=T))`%. The *confusion rate*, as mentioned above, is only calculated for the correctly detected speech (i.e., not speech that was missed, which counts towards the miss rate, nor the speech that was falsely identified, which is part of false alarms). The confusion rate was very low, `r round(median(pytot$confusion..,na.rm=T))`% overall, with a mean across all clips of `r round(mean(py$confusion..,na.rm=T))`% and a median of `r round(median(py$confusion..,na.rm=T))`%. These three metrics (*false alarms*, *misses*, and *confusions*) are summed to yield the *diarization error rate*. The overall diarization error rate was  `r round(median(pytot$diarization.error.rate..,na.rm=T))`%, with a mean across all clips of `r round(mean(py$diarization.error.rate..,na.rm=T))`% and a median of `r round(median(py$diarization.error.rate..,na.rm=T))`%.
->>>>>>> c961be37b7f1aacdb697de7c952f1e7de64bb221
+
 
 ```{r cf-dm,echo=F}
 
@@ -361,15 +373,11 @@ medians[2:4]<-round(medians[2:4])
 medians$der=rowSums(medians[2:4])
 ```
 
-<<<<<<< HEAD
-For simplicity's sake, for the subsequent re-analyses using different mappings from talkers to categories as bulleted above, we focus on only *medians* over all clips, capturing performance across all samples without being overly sensitive to outliers. In the second-best performing case, electronic voices in the human annotation are still mapped onto silence but overlap is not, so that the human categories considered were CHI, FEM, MAL, OCH, and overlap; and the LENA^®^ categories considered were CHN, FAN, MAN, CXN, and OLN (with all "far" classes and TVN mapped onto silence). In this setting, the LENA^®^ system's  false alarm, miss, and confusion rate medians were  `r medians[medians$type=="pynotv",2]`%, `r medians[medians$type=="pynotv",3]`%, and `r medians[medians$type=="pynotv",4]`% respectively, for a total median diarization error rate of `r medians[medians$type=="pynotv",5]`%. Although the miss rate is reduced when OLN is considered speech, overall performance degraded because OLN was not picking out the same regions as the overlapping speech found in the human annotations, leading to considerably higher false alarm and confusion rates.
 
-Next, we allowed the electronic voices segmented by human annotaters, and the LENA^®^ system's  TVN speaker categories to be included in the evaluation (rather than mapping them all to silence), such that the human categories considered were CHI, FEM, MAL, OCH, overlap, and electronic; and the LENA^®^ categories considered were CHN, FAN, MAN,  CXN, OLN, and TVN. the LENA^®^ system's  false alarm, miss, and confusion rate medians were  `r medians[medians$type=="pysil",2]`%, `r medians[medians$type=="pysil",3]`%, and `r medians[medians$type=="pysil",4]`% respectively, for a total median diarization error rate of `r medians[medians$type=="pysil",5]`%. Again, the miss rate drops slightly as we allow one more class to be considered speech, but this does not make up for the higher false alarm and confusion rate, likely  because TVN is not defined similarly to the electronic speech segmented by ACLEW annotators. 
-=======
 For simplicity's sake, for the subsequent re-analyses using different mappings from talkers to categories as bulleted above, we focus on only *medians* over all clips, capturing performance across all samples without being overly sensitive to outliers. In the second-best performing case, electronic voices in the human annotation are still mapped onto Other but Overlap is not, so that the human categories considered were CHI, FEM, MAL, OCH, and overlap; and the LENA^®^ categories considered were CHN, FAN, MAN, CXN, and OLN (with all "far" classes and TVN mapped onto Other). In this setting, LENA^®^'s false alarm, miss, and confusion rate medians were  `r medians[medians$type=="pynotv",2]`%, `r medians[medians$type=="pynotv",3]`%, and `r medians[medians$type=="pynotv",4]`% respectively, for a total median diarization error rate of `r medians[medians$type=="pynotv",5]`%. Although the miss rate is reduced when OLN is considered speech, overall performance degraded because OLN was not picking out the same regions as the overlapping speech found in the human annotations, leading to considerably higher false alarm and confusion rates.
 
 Next, we allowed the electronic voices segmented by human annotaters, and LENA^®^'s TVN speaker categories to be included in the evaluation (rather than mapping them all to Other), such that the human categories considered were CHI, FEM, MAL, OCH, overlap, and electronic; and the LENA^®^ categories considered were CHN, FAN, MAN,  CXN, OLN, and TVN. LENA^®^'s false alarm, miss, and confusion rate medians were  `r medians[medians$type=="pysil",2]`%, `r medians[medians$type=="pysil",3]`%, and `r medians[medians$type=="pysil",4]`% respectively, for a total median diarization error rate of `r medians[medians$type=="pysil",5]`%. Again, the miss rate drops slightly as we allow one more class to be considered speech, but this does not make up for the higher false alarm and confusion rate, likely  because TVN is not defined similarly to the electronic speech segmented by ACLEW annotators. 
->>>>>>> c961be37b7f1aacdb697de7c952f1e7de64bb221
+
 
 Finally, we included the maximum possible number of categories. The human categories considered were still CHI, FEM, MAL, OCH, overlap, and electronic, alongside the fuller range of LENA^®^ categories: CHN, FAN, MAN, CXN, OLN, TVN, CHF, FAF, MAF, CXF, OLF, and TVF. the LENA^®^ system's  false alarm, miss, and confusion rate medians were  `r medians[medians$type=="pyfar",2]`%, `r medians[medians$type=="pyfar",3]`%, and `r medians[medians$type=="pyfar",4]`% respectively, for a total median diarization error rate of `r medians[medians$type=="pyfar",5]`%. Thus, performance degrades considerable when all the "far" classes are treated as speech, leading to huge false alarm rates and increased confusion rates. 
 
@@ -618,13 +626,27 @@ colnames(spreadsheet_tsi) = c("child","age")
 age_id = rbind(spreadsheet, spreadsheet_tsi)
 py=merge(py,age_id,by.x="child",by.y="child",all.x=T) #one row is lost... **ATTENTION BUG HERE**
 
+mydv=c("false.alarm..","missed.detection..","confusion..")
+
 mymodels<- list()
 myANOVAs<- list()
-for(dv in c("false.alarm..","missed.detection..","confusion..")){
+anovatab=matrix(nrow=4,ncol=3)
+colnames(anovatab)<-mydv
+for(dv in mydv){
     #print(dv)
     mymodels[[dv]]<-lmer(py[,dv]~cor*age+(1|child),data=py)
-  myANOVAs[[dv]]<-ANOVA(mymodels[[dv]],type="III")
+  myANOVAs[[dv]]<-Anova(mymodels[[dv]],type="III")
+  mycols=cbind(round(myANOVAs[[dv]]$Chisq,2),round(myANOVAs[[dv]]$Df),round(myANOVAs[[dv]]["Pr(>Chisq)"],2))
+  anovatab[,dv]<-paste0(mycols[,1]," (",mycols[,2],")",ifelse(mycols[,3]<.05," *",""))
 }
+rownames(anovatab)<-rownames(mycols)
+
+```
+
+```{r anovatab}
+colnames(anovatab)<-c("FA","M","C")
+rownames(anovatab)<-c("Intercept","Corpus","Age","Corpus*Age")
+apa_table(anovatab,caption="Results of Type III ANOVAs on false alarms (FA), misses (M), and confusions (C): Chi-square (degrees of freedom), followed by * if the relevant factor is significant (p<.05).")
 
 ```
 
@@ -660,7 +682,7 @@ merge(cvtc,age_id,by="child")->cvtc
 
 mymodel<-lmer(CVC_gold~CVC_n*age*cor + (1|child), data=cvtc)
 #summary(mymodel)
-#ANOVA(mymodel,type="III")
+#Anova(mymodel,type="III")
 
 #there is a 3-way interaction between age, corpus, and the predictive value of the LENA^®^ system's  counts with respect to the gold counts
 # to investigate this we fit the same reg within corpus
@@ -670,7 +692,7 @@ myANOVAs<- list()
 for(thiscor in levels(cvtc$cor)){
   #print(thiscor)
  mymodels[[thiscor]]<-lmer(CVC_gold~CVC_n*age + (1|child), data=cvtc,subset=c(cor==thiscor))
- myANOVAs[[thiscor]]<-ANOVA(mymodels[[thiscor]],type="III")
+ myANOVAs[[thiscor]]<-Anova(mymodels[[thiscor]],type="III")
 }
 ```
 
@@ -681,7 +703,7 @@ For CVC, we fit a mixed model where CVC according to the human was predicted fro
 
 mymodel<-lmer(CTC_gold~CTC_n*age*cor + (1|child), data=cvtc)
 #summary(mymodel)
-#ANOVA(mymodel,type="III")
+#Anova(mymodel,type="III")
 
 ```
 
@@ -692,7 +714,7 @@ For CTC, we fit a mixed model where CTC according to the human was predicted fro
 
 mymodel<-lmer(gold~LENA*age*cor + (1|child), data=awc)
 #summary(mymodel)
-#ANOVA(mymodel,type="III")
+#Anova(mymodel,type="III")
 
 #there is a 3-way interaction between age, corpus, and the predictive value of the LENA^®^ system's  counts with respect to the gold counts
 # to investigate this we fit the same reg within corpus
@@ -702,7 +724,7 @@ myANOVAs<- list()
 for(thiscor in levels(awc$cor)){
   #print(thiscor)
  mymodels[[thiscor]]<-lmer(gold~LENA*age + (1|child), data=awc,subset=c(cor==thiscor))
- myANOVAs[[thiscor]]<-ANOVA(mymodels[[thiscor]],type="III")
+ myANOVAs[[thiscor]]<-Anova(mymodels[[thiscor]],type="III")
 }
 
 ```
@@ -712,11 +734,9 @@ Finally, for AWC (which was only analyzable for the four ACLEW corpora), we fit 
 
 ## Discussion
 
-<<<<<<< HEAD
-The aim of the present study was to assess LENA^®^ accuracy across key outcome measures: speaker classification accuracy, adult word counts, child vocalization counts, and conversational turn counts.  We did this using an approach that sought to avoid inflating accuracy estimates in several ways. Methodologically, we used random or periodic sampling to select portions of the files for manual annotation, and our human annotators did not see the LENA^®^ segmentation. Analytically, we considered both speech and non-speech classes (including electronic sounds and silence). This permitted a systematic, extensive, and independent evaluation of key automated metrics provided by LENA^®^. We also tested generalizability by analyzing the performance of the LENA^®^ system across five different corpora: three based on the same population, language, dialect, and age group that LENA^®^ was established for, and trained on (North American English); one that allowed us to test how accurately it captured a different dialect of English (UK English); and one that tested its performance in a totally different recording situation (a rural setting with large families and many children present, speaking a linguistically unrelated language, and where the key children were, on average, somewhat older). We begin but recapping our key results.
-=======
+
 The aim of the present study was to assess LENA^®^ accuracy across key outcome measures: speaker classification accuracy, adult word counts, child vocalization counts, and conversational turn counts.  We did this using an approach that sought to avoid inflating accuracy estimates in several ways. Methodologically, we used random or periodic sampling to select portions of the files for manual annotation, and our human annotators did not see the LENA^®^ segmentation. Analytically, we considered both speech and non-speech classes (including electronic sounds and silence/Other). This permitted a systematic, extensive, and independent evaluation of LENA^®^'s key automated metrics. We also tested generalizability by analyzing LENA^®^'s performance across five different corpora: three based on the same population, language, dialect, and age group that LENA^®^ was established for, and trained on (North American English); one that allowed us to test how accurately it captured a different dialect of English (UK English); and one that tested its performance in a totally different recording situation (a rural setting with large families and many children present, speaking a linguistically unrelated language, and where the key children were, on average, somewhat older). We begin but recapping our key results.
->>>>>>> c961be37b7f1aacdb697de7c952f1e7de64bb221
+
 
 Our first set of analyses tested overall accuracy, using established speech and talker segmentation metrics (false alarm rate, miss rate, confusion rate, and the composite diarization error rate), and evaluated the pattern of errors in more detail, by assessing how LENA^®^ and human annotators agreed (precision and recall).  The median diarization error rate was relatively high (`r round(median(py$diarization.error.rate..,na.rm=T))`%), mainly due to a high miss rate (missing or excluding speech that was there; `r round(median(py$missed.detection..,na.rm=T))`%). The false alarm rate (identifying non-speech/silence as speech; `r round(median(py$false.alarm..,na.rm=T))`%) and confusion rate (identifying voice type; `r round(median(py$confusion..,na.rm=T))`%) were low. 
 
@@ -757,9 +777,11 @@ Thus, it is important for further work to help establish the systematicity in th
 
 ### How to test the reliability of the automated output provided by LENA^®^
 
-We are overall hopeful that the reliability metrics we provide here will be relevant for researchers working with different populations. We hope the current paper inspires others to evaluate and report all aspects of the system, rather than a subset of metrics. Similarly extensive evaluations of LENA^®^ in other corpora would bolster the validation literature, and be useful for the whole research community.  In fact, it would be useful if researchers systematically test the reliability of LENA^®^ counts in their own samples, especially if they are collecting data from families living in different environments from those assessed here. Next, we provide some guidelines for how to go about this. Note that this requires downloading the audio (.wav) file generated by LENA^®^ as well as the concomitant LENA^®^ output file. 
+We are overall hopeful that the reliability metrics we provide here will be relevant for researchers working with different populations. We hope the current paper inspires others to evaluate and report all aspects of the system, rather than a subset of metrics. Similarly extensive evaluations of LENA^®^ in other corpora would bolster the validation literature, and be useful for the whole research community.  In fact, it would be useful if researchers systematically test the reliability of LENA^®^ counts in their own samples, especially if they are collecting data from families living in different environments from those assessed here. Next, we provide some guidelines for how to go about this. Note that this requires downloading the audio (.wav) file generated by LENA^®^ as well as the corresponding LENA^®^ output file. 
 
 First, we recommend a literature search, to determine whether a similar sample has been studied in the past for which there exists reliability data [see for example,  @Cristia for a systematic review]. If no studies exist, draw 10 x 2 minutes randomly from 10 children. This is about 3h20min of data, which takes roughly 60h to annotate, in our experience. We recommend training annotators using the ACLEW Annotation Scheme <https://osf.io/b2jep/>, which has an online test annotators can go through to ensure reliability. Once the manual annotations are complete, the LENA^®^ annotations can be extracted and compared against the human annotation using the free DiViMe software [divime.readthedocs.io, @le2018aclew]. This will allow researchers to extract the classification accuracy measures used here (false alarm rate, miss rate, confusion rate and the derived diarization error rate), as well as CVC, CTC, and AWC comparing LENA^®^ and human annotations. We note this DiViMe pipeline is only possible 'off the shelf' for manual annotations made using the ACLEW Annotation Scheme, though in principle, it is adaptable to other schemata by adept programmers.
+
+One issue that may arise is whether data should be sampled differently to, for example, make sure every class is represented the same amount of time and/or a minimum of time. Our understanding is that class imbalance and data scarceness is an important issue for training, and directly affects algorithm accuracy [CITE MARVIN PLS]. However, it does not pose the same kind of problem for evaluation. That is, if there are no samples of a given category, then accuracy cannot be evaluated; if there are only a few, then it is possible that these are special in some way and accuracy estimates may not generalize well to others. Thus, it would indeed be desirable to have enough samples of a given label to reduce the impact of each individual instance, in case they are outliers. That said, almost any strategy that attempts to boost the frequency of specific categories risks increasing the issue of non-generalizability. For instance, if one were to over-sample regions tagged by LENA^®^ as MAN in the hopes of having more male samples, one may only be capturing certain types of male speech or acoustic properties. To take this example further, notice that male speech is our smallest category, representing 1% of the data. Since we sampled randomly or periodically, this represents the prevalence of male speech and the samples that are included are unlikely to be acoustically biased.
 
 Separately, researchers should reflect about the accuracy needed for their question of interest. For instance, suppose we have an evaluation of an intervention where we expect treatment children to hear 20% more speech than controls, or an individual differences study where we expect that the lower fifth of the children hear 20% less speech than the top fifth. If the intended measure used to compare groups has an error rate larger than the effect predicted (such as the the CTC error rate we find here), a different algorithm or outcome metric would be wise.
 
