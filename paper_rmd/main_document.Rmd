@@ -446,12 +446,23 @@ Finally, as with precision, the "far" categories show worse performance than the
 ### Child Vocalization Counts (CVC) accuracy 
 
 ```{r cvc,echo=F}
+allpearsons=matrix(nrow=3,ncol=4)
+rownames(allpearsons)<-c("CVC","CTC","AWC")
+colnames(allpearsons)<-c("N clips","r all","N","r")
+
+aller=matrix(nrow=3,ncol=4)
+rownames(aller)<-c("CVC","CTC","AWC")
+colnames(aller)<-c("AER","min","max","RER","min1","max1","RAER","min2","max2")
+
 read.table(paste0(thisdir,"/cvtc.txt"),header=T)->cvtc
-
-
 
 cor.cvc.all= cor.test(cvtc$CVC_n,cvtc$CVC_gold)
 cor.cvc.noZeros= cor.test(cvtc$CVC_n[cvtc$CVC_n>0 & cvtc$CVC_gold>0],cvtc$CVC_gold[cvtc$CVC_n>0 & cvtc$CVC_gold>0])
+
+allpearsons["CVC","N clips"]<-round(cor.cvc.all$parameter)
+allpearsons["CVC","r all"]<-round(cor.cvc.all$estimate,3)
+allpearsons["CVC","N"]<-round(cor.cvc.noZeros$parameter)
+allpearsons["CVC","r"]<-round(cor.cvc.noZeros$estimate,3)
 
 ```
 
@@ -488,6 +499,13 @@ arer=abs(no_human_zeros$CVC_n-no_human_zeros$CVC_gold)/no_human_zeros$CVC_gold*1
 aer_cvc <-(cvtc$CVC_n-cvtc$CVC_gold)
 aer_nozeros_cvc <-(cvtc$CVC_n[cvtc$CVC_n>0 & cvtc$CVC_gold > 0]-cvtc$CVC_gold[cvtc$CVC_n>0 & cvtc$CVC_gold > 0])
 
+
+colnames(aller)<-c("AER","min","max","RER","min1","max1","RAER","min2","max2")
+aller["CVC",]<-cbind((aer),
+                     ,
+                     )
+
+
 ```
 
 
@@ -520,6 +538,12 @@ abline(lm(CTC_gold~CTC_n,data=cvtc,subset=c(cvtc$CTC_n>0 & cvtc$CTC_gold>0)),lty
 
 cor.ctc.all=cor.test(cvtc$CTC_n,cvtc$CTC_gold)
 cor.ctc.noZeros=cor.test(cvtc$CTC_n[cvtc$CTC_n>0 & cvtc$CTC_gold>0],cvtc$CTC_gold[cvtc$CTC_n>0 & cvtc$CTC_gold>0])
+
+
+allpearsons["CTC","N clips"]<-round(cor.ctc.all$parameter)
+allpearsons["CTC","r all"]<-round(cor.ctc.all$estimate,3)
+allpearsons["CTC","N"]<-round(cor.ctc.noZeros$parameter)
+allpearsons["CTC","r"]<-round(cor.ctc.noZeros$estimate,3)
 
 # ER against human
 aer=(cvtc$CTC_n-cvtc$CTC_gold)
@@ -563,6 +587,12 @@ merge(awc,age_id,by="child")->awc
 cor.awc.all= cor.test(awc$gold,awc$LENA)
 cor.awc.noZeros= cor.test(awc$gold[awc$gold>0 & awc$LENA>0],awc$LENA[awc$gold>0 & awc$LENA>0])
 
+
+allpearsons["AWC","N clips"]<-round(cor.awc.all$parameter)
+allpearsons["AWC","r all"]<-round(cor.awc.all$estimate,3)
+allpearsons["AWC","N"]<-round(cor.awc.noZeros$parameter)
+allpearsons["AWC","r"]<-round(cor.awc.noZeros$estimate,3)
+
 # ER against human
 aer=(awc$LENA-awc$gold)
 aer_no_zeros=(awc$LENA[awc$LENA>0 & awc$gold > 0]-awc$gold[awc$LENA>0 & awc$gold > 0])
@@ -575,6 +605,13 @@ arer=abs(no_human_zeros$LENA-no_human_zeros$gold)/no_human_zeros$gold*100
 aer_awc <-(awc$LENA-awc$gold)
 aer_nozeros_awc <-(awc$LENA[awc$LENA>0 & awc$gold > 0]-awc$gold[awc$LENA>0 & awc$gold > 0])
 ```
+
+
+```{r tabrs, echo=F}
+
+apa_table(allpearsons,caption="For each measure (CVC, CTC, AWC), N all stands for the total number of clips considered in the general correlation analysis and resulting Pearson r coefficient; N stands for the number of non-null clips (i.e., having some vocalizations, turns, and adult words respectively) as well as Pearson r in the analyses restricted to the non-null clips. ")
+```
+
 
 ```{r awc-fig, ig.pos = "T!", fig.width=3.5, fig.height=3.5, fig.cap="Adult Word Counts according to LENA (x axis) and humans (y axis). Each point represents the AWC totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA^®^ said there were no adult words."}
 
