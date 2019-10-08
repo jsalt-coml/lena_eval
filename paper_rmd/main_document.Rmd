@@ -226,13 +226,15 @@ kable(cor_tsi, "latex", caption = "Correspondances between LENA and our human an
 
 However, our overlap category is not defined identically to the LENA^®^ overlap category. For LENA^®^, overlap between any two categories is labeled OLN -- i.e., Noise + TV would be counted towards overlap as would FAN+FAN; whereas for us, only overlap between two talker categories (e.g., key child and female adult, noise was not coded) counts as overlap. Similarly, the TVN LENA^®^ class is not equivalent to the electronic speech tag in the ACLEW coding, because the former also includes music, singing, crowd noise and any other sound coming from a TV or another electronic source, whereas the latter only includes speech from an electronic source. Therefore, additional analyses map these classes onto "Other" post hoc, so as to not penalize confusions involving them.
 
-#### Agreement
-
-When two or more annotators provide data on the same classification, one can calculate agreement. We report on Cohen's kappa as a measure of the extent to which LENA^®^ and human annotators coincide in their labeling.
 
 #### Precision and recall
 
 This evaluation looks in more detail at the pattern of errors, by assessing how LENA^®^ and human annotators agreed and disagreed. In both precision and recall, the numerator is the intersection between a LENA^®^ tag and a human tag (e.g., the number of frames that LENA^®^ classified as CHN and the annotator classified as Key child). The denominator differs: To calculate precision, we divide that number by the total number of frames attributed to a category by LENA^®^, whereas for recall, we divide by the total number of frames attributed to a category by the human annotator.
+
+#### Agreement
+
+When two or more annotators provide data on the same classification, one can calculate agreement. We report on Cohen's kappa as a measure of the extent to which LENA^®^ and human annotators coincide in their labeling.
+
 
 ### CVC and CTC evaluation
 
@@ -273,6 +275,9 @@ sod=sod[rownames(sod)[rowSums(sod)>0],]
 all=sod[rownames(all)[rowSums(all)>0],]
 
 sumref=rowSums(all)
+
+
+
 
 ```
 
@@ -352,7 +357,8 @@ We thought it most informative to report on several of these options, albeit bri
  read.csv("../LENA_eval_201906/diaer_LENA_sil.csv")->pysil
  read.csv("../LENA_eval_201906/diaer_LENA_far.csv")->pyfar
  read.csv("../LENA_eval_201906/diaer_gold_no_ele_LENA_sil_no_tv_report.csv")->pynotv
-
+pytot=py[,colnames(pysil)]
+pytot$type="pytot"
  pysil$type<-"pysil"
 pyfar$type<-"pyfar"
 pynotv$type<-"pynotv"
@@ -364,7 +370,7 @@ clean<-function(py){
   py
 }
 
-allpy= rbind(pysil,pyfar,pynotv)
+allpy= rbind(pytot,pysil,pyfar,pynotv)
 
 clean(allpy)->allpy 
 
@@ -373,23 +379,27 @@ medians=aggregate(allpy[,c("false.alarm..","missed.detection..","confusion..")],
 colnames(medians)[1]<-c("type")
 medians[2:4]<-round(medians[2:4])
 medians$der=rowSums(medians[2:4])
+medians=medians[c(4,2,3,1),]
+rownames(medians)<-c("Speakers","+ Overlap","+ Electronic","+ Far")
+
+```
+
+```{r tabalts, echo=F}
+
+colnames(medians)<-c("FAR","MR","CR","DER")
+
+apa_table(medians,caption="False Alarm Rate (FAR), Miss Rate (MR), Confusion Rate, and total Diarization Error Rate (DER, sum of the medians of the other three categories), as a function of which categories are considered. Speakers indicates that only speaker categories are considers (all others are mapped onto Other); + Overlap that overlap in both human and LENA annotation were also scored; + Electronic that also electronic was scored; + Far that all far LENA categories were also scored.")
 ```
 
 
-For simplicity's sake, for the subsequent re-analyses using different mappings from talkers to categories as bulleted above, we focus on only *medians* over all clips, capturing performance across all samples without being overly sensitive to outliers. In the second-best performing case, electronic voices in the human annotation are still mapped onto Other but Overlap is not, so that the human categories considered were CHI, FEM, MAL, OCH, and overlap; and the LENA^®^ categories considered were CHN, FAN, MAN, CXN, and OLN (with all "far" classes and TVN mapped onto Other). In this setting, LENA^®^'s false alarm, miss, and confusion rate medians were  `r medians[medians$type=="pynotv",2]`%, `r medians[medians$type=="pynotv",3]`%, and `r medians[medians$type=="pynotv",4]`% respectively, for a total median diarization error rate of `r medians[medians$type=="pynotv",5]`%. Although the miss rate is reduced when OLN is considered speech, overall performance degraded because OLN was not picking out the same regions as the overlapping speech found in the human annotations, leading to considerably higher false alarm and confusion rates.
+For simplicity's sake, for the subsequent re-analyses using different mappings from talkers to categories as bulleted above, we focus on only *medians* over all clips, capturing performance across all samples without being overly sensitive to outliers. In the second-best performing case, electronic voices in the human annotation are still mapped onto Other but Overlap is not, so that the human categories considered were CHI, FEM, MAL, OCH, and overlap; and the LENA^®^ categories considered were CHN, FAN, MAN, CXN, and OLN (with all "far" classes and TVN mapped onto Other). In this setting, although the miss rate is reduced when OLN is considered speech, overall performance degraded because OLN was not picking out the same regions as the overlapping speech found in the human annotations, leading to considerably higher false alarm and confusion rates.
 
-Next, we allowed the electronic voices segmented by human annotaters, and LENA^®^'s TVN speaker categories to be included in the evaluation (rather than mapping them all to Other), such that the human categories considered were CHI, FEM, MAL, OCH, overlap, and electronic; and the LENA^®^ categories considered were CHN, FAN, MAN,  CXN, OLN, and TVN. LENA^®^'s false alarm, miss, and confusion rate medians were  `r medians[medians$type=="pysil",2]`%, `r medians[medians$type=="pysil",3]`%, and `r medians[medians$type=="pysil",4]`% respectively, for a total median diarization error rate of `r medians[medians$type=="pysil",5]`%. Again, the miss rate drops slightly as we allow one more class to be considered speech, but this does not make up for the higher false alarm and confusion rate, likely  because TVN is not defined similarly to the electronic speech segmented by ACLEW annotators. 
+Next, we allowed the electronic voices segmented by human annotaters, and LENA^®^'s TVN speaker categories to be included in the evaluation (rather than mapping them all to Other), such that the human categories considered were CHI, FEM, MAL, OCH, overlap, and electronic; and the LENA^®^ categories considered were CHN, FAN, MAN,  CXN, OLN, and TVN. Again, the miss rate drops slightly as we allow one more class to be considered speech, but this does not make up for the higher false alarm and confusion rate, likely  because TVN is not defined similarly to the electronic speech segmented by ACLEW annotators. 
 
 
-Finally, we included the maximum possible number of categories. The human categories considered were still CHI, FEM, MAL, OCH, overlap, and electronic, alongside the fuller range of LENA^®^ categories: CHN, FAN, MAN, CXN, OLN, TVN, CHF, FAF, MAF, CXF, OLF, and TVF. the LENA^®^ system's  false alarm, miss, and confusion rate medians were  `r medians[medians$type=="pyfar",2]`%, `r medians[medians$type=="pyfar",3]`%, and `r medians[medians$type=="pyfar",4]`% respectively, for a total median diarization error rate of `r medians[medians$type=="pyfar",5]`%. Thus, performance degrades considerable when all the "far" classes are treated as speech, leading to huge false alarm rates and increased confusion rates. 
+Finally, we included the maximum possible number of categories. The human categories considered were still CHI, FEM, MAL, OCH, overlap, and electronic, alongside the fuller range of LENA^®^ categories: CHN, FAN, MAN, CXN, OLN, TVN, CHF, FAF, MAF, CXF, OLF, and TVF. Performance degrades considerable when all the "far" classes are treated as speech, leading to huge false alarm rates and increased confusion rates. 
 
-### LENA^®^ classification accuracy: Agreement using Cohen's kappa STOPPED HERE
 
-Given results above suggesting that our coding of electronic may not have coincided with LENA^®^'s, and that "far" categories are inaccurate, in this analysis we only consider the following labels for LENA^®^: (all others are collapsed into an Other category); and the following labels for human annotators: (all others are collapsed into an Other category).
-
-```{r kappa}
-
-```
 
 
 ### LENA^®^ classification accuracy: Precision and recall 
@@ -401,6 +411,9 @@ We therefore turn to precision and recall. Looking at precision of speech catego
 This subsection shows confusion matrices, containing information on precision and recall, for each key category. For this analysis, we collapsed over all human annotations that contained overlap between two speakers into a category called "overlap". Please remember that this category is not defined the same way as the LENA^®^ overlap category. For LENA^®^, overlap between any two categories falls within overlap -- i.e., CHN+TV would be counted towards overlap; whereas for us, only overlap between two talker categories (e.g., key child and female adult) counts as overlap.
 
 ```{r ggprec-fig, fig.cap="Precision: Confusion matrix between LENA (x axis) and human annotations (y axis). In each cell, the top number indicates the percentage of all frames in that LENA category (column) that are labeled as a given class by the human (row); cells in a given column add up to 100%. The number below indicates number of frames in that intersection of LENA and human classes."}
+
+#rename human SIL as Other only for this graph, otherwise it'll break formulas elsewhere
+rownames(all)[7]<-"Other"
 
 prop_cat=data.frame(apply(all,2,dodiv)*100) #generates precision because columns
 #colSums(prop_cat)
@@ -416,7 +429,11 @@ ggplot(data = stall, mapping = aes(y = stall$human, x=stall$LENA)) +
   geom_text(aes(label = stall$n), vjust = 1,size=2) + 
   scale_fill_gradient(low = "white", high = "red", name = "Proportion") +
   xlab("LENA(TM)") + ylab("Human")
+
+rownames(all)[7]<-"SIL"
+
 ```
+
 
 #### LENA^®^ classification accuracy: Precision
 We start by explaining how to interpret one cell in Figure 2: the darkest cell in column 1. This is the cross of the human category (i.e. row) FEM and the LENA^®^ category (i.e. column) FAN; when LENA^®^ tagged a given frame as FAN, this corresponded to a frame tagged as being a female adult by the human `r round(stall$pr[stall$LENA=="FAN" & stall$human=="FEM"])`% of the time. This category, as mentioned above, was the most common speaker category in the audio, so that over `r floor(stall$n[stall$LENA=="FAN" & stall$human=="FEM"]/1000)`k frames (representing `r round(stall$n[stall$LENA=="FAN" & stall$human=="FEM"]/sum(stall$n[stall$LENA=="FAN"])*100)`% of the frames tagged as FAN by LENA^®^) were tagged as a female adult by both the human and LENA^®^. The remaining `r round(sum(stall$n[stall$LENA=="FAN" & stall$human!="FEM"]/sum(stall$n[stall$LENA=="FAN"])*100))`% of frames that LENA^®^ tagged as FAN were actually other categories according to our human coders: `r round(stall$pr[stall$LENA=="FAN" & stall$human=="SIL"])`% were Other (meaning no speakers were talking), `r round(sum(stall$pr[stall$LENA=="FAN" & stall$human=="OVL"]))`% were in regions of overlap between speakers or between a speaker and an electronic voice, and `r round(sum(stall$pr[stall$LENA=="FAN" & !(stall$human=="SIL" | stall$human=="FEM" | stall$human=="OVL")]))`% were confusions with other speaker tags. Inspection of the rest of the confusion matrix shows that, other than Other, this is the LENA^®^ tag with the greatest precision. 
@@ -431,6 +448,10 @@ These precision analyses shed light on the extent to which we can trust the LENA
 
 ```{r ggrec-fig, fig.cap="Recall: Confusion matrix between LENA (x axis) and human annotations (y axis). In each cell, the top number indicates the percentage of all frames that a human labeled as a given class (row) which were recovered in a given LENA category (column); cells in a given row add up to 100%. The number below indicates number of frames in that intersection of LENA and human classes."}
 
+#rename human SIL as Other only for this graph, otherwise it'll break formulas elsewhere
+rownames(all)[7]<-"Other"
+
+
 prop_cat=data.frame(t(apply(all,1,dodiv)*100)) #generates recall because rows
 rec=stall
 rec$pr=stack(prop_cat)$values
@@ -441,6 +462,8 @@ ggplot(data = rec, mapping = aes(y = rec$human, x=rec$LENA)) +
   geom_text(aes(label = rec$n), vjust = 1,size=2) + 
   scale_fill_gradient(low = "white", high = "green", name = "Proportion") +
   xlab("LENA(TM)") + ylab("Human")
+
+rownames(all)[7]<-"SIL"
 ```
 
 #### LENA^®^ classification accuracy: Recall 
@@ -453,6 +476,29 @@ Many researchers also use the LENA^®^ as a first pass to capture female adult s
 For the remaining two "near" speaker labels (MAN, CXN), recall averaged `r round(mean(rec$pr[(rec$LENA=="MAN" & rec$human=="MAL")|(rec$LENA=="CXN" & rec$human=="CXN")]))`%, meaning that less than a quarter of male adult and other child speech is being captured by LENA^®^. In fact, most of these speakers' contributions are being tagged by the LENA^®^ as OLN (mean across MAN and CXN `r round(mean(rec$pr[(rec$LENA=="OLN" & rec$human=="MAL")|(rec$LENA=="OLN" & rec$human=="CXN")]))`%) or TV (mean across MAN and CXN is `r round(mean(rec$pr[(rec$LENA=="TVN" & rec$human=="MAL")|(rec$LENA=="SIL" & rec$human=="CXN")]))`%), although the remaining sizable proportion of misses is actually distributed across many categories. 
 
 Finally, as with precision, the "far" categories show worse performance than the "near" ones. It was always the case that a higher percentage of frames is captured by the near rather than the far labels. For instance, out of all frames attributed to the key child by the human annotator, `r round(rec$pr[(rec$LENA=="CHN" & rec$human=="CHI")])`% were picked up by the LENA^®^ CHN label versus `r round(rec$pr[(rec$LENA=="CHF" & rec$human=="CHI")])`% by the LENA^®^ CHF label. This result provides further support that when sampling LENA^®^ daylong files using the LENA^®^ software, users likely need not take the "far" categories into account.
+
+
+### LENA^®^ classification accuracy: Agreement using Cohen's kappa
+
+
+```{r kappa}
+
+
+#generate version with collapsed data
+colapall=all
+colapall$Other=all$FAF+all$CHF+all$CXF+all$MAF+all$OLN+all$OLF+all$TVN+all$TVF+all$SIL
+colapall["SIL",]<-colapall["SIL",]+colapall["OVL",]+colapall["ELE",]
+colapall[c("FEM","CHI","OCH","MAL","SIL"),c("FAN","CHN","CXN","MAN","Other")]->colapall
+rownames(colapall)[5]<-"Other"
+
+library(psych)
+cohen.kappa(colapall)->ck
+
+```
+
+Given results above suggesting that our coding of electronic may not have coincided with LENA^®^'s, and that "far" categories are inaccurate, in this analysis we only consider the following labels for LENA^®^: (all others are collapsed into an Other category); and the following labels for human annotators: (all others are collapsed into an Other category). This analysis revealed a Cohen Kappa estimated at K(`r ck$n.obs`) = `r ck$kappa` (confidence interval `r ck$kappa-ck$var.kappa*2`-`r ck$kappa+ck$var.kappa*2`), weighted Kappa estimated at K(`r ck$n.obs`) = `r ck$weighted.kappa` (confidence interval `r ck$weighted.kappa-ck$var.weighted*2`-`r ck$weighted.kappa+ck$var.weighted*2`).
+
+
 
 ### Child Vocalization Counts (CVC) accuracy 
 
