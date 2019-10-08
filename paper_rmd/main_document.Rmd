@@ -226,7 +226,9 @@ kable(cor_tsi, "latex", caption = "Correspondances between LENA and our human an
 
 However, our overlap category is not defined identically to the LENA^®^ overlap category. For LENA^®^, overlap between any two categories is labeled OLN -- i.e., Noise + TV would be counted towards overlap as would FAN+FAN; whereas for us, only overlap between two talker categories (e.g., key child and female adult, noise was not coded) counts as overlap. Similarly, the TVN LENA^®^ class is not equivalent to the electronic speech tag in the ACLEW coding, because the former also includes music, singing, crowd noise and any other sound coming from a TV or another electronic source, whereas the latter only includes speech from an electronic source. Therefore, additional analyses map these classes onto "Other" post hoc, so as to not penalize confusions involving them.
 
+#### Agreement
 
+When two or more annotators provide data on the same classification, one can calculate agreement. We report on Cohen's kappa as a measure of the extent to which LENA^®^ and human annotators coincide in their labeling.
 
 #### Precision and recall
 
@@ -236,7 +238,7 @@ This evaluation looks in more detail at the pattern of errors, by assessing how 
 
 From the human annotation, each vocalization by the key child counted towards the total Child Vocalization Count (CVC) for a given clip. For the Conversational Turn Count (CTC), a sequence of key child and any adult (or vice versa) within 5 seconds counted towards the clip total CTC. The Pearson correlation across LENA^®^ and human estimations was calculated.
 
-Users may also wish to interpret the absolute number of vocalizations or turns found by LENA^®^. Therefore, it is important to also bear in mind absolute error rates, relative error rates, and relative absolute error rates. Despite the similarity in their names, these three metrics provide different information. The *absolute error rate* tells us, given a LENA^®^ estimate, how close the actual number may be. It is calculated as NL-NH, where  NL is the number according to LENA^®^ and NH is the number according to humans. By averaging across clips, we then get an idea of the bias towards overestimation (if this number is positive) or underestimation (if this difference is negative). 
+Users may also wish to interpret the absolute number of vocalizations or turns found by LENA^®^. Therefore, it is important to also bear in mind absolute error rates, relative error rates, and relative absolute error rates. Despite the similarity in their names, these three metrics provide different information. The *absolute error rate* tells us, given a LENA^®^ estimate, how close the actual number may be. It is calculated as NL-NH, where  NL is the number according to LENA^®^ and NH is the number according to humans; this is done separately for each clip. By then averaging across clips, we then get an idea of the bias towards overestimation (if this number is positive) or underestimation (if this difference is negative). 
 
 The *relative error rate* puts this bias in relation to the actual number of vocalizations tagged by the human coder: (NL-NH)/NL. For instance, imagine that we find that LENA^®^ errs by 10 vocalizations on average according to the average absolute error rate; this means that, on average across short clips like the ones used here, the numbers by LENA^®^ would be off by 10 vocalizations. By using the relative error rate, we can check whether this seemingly small difference is indeed small relative to the actual number found. I.e, an error of 10 vocalizations would be less problematic if there were 100 vocalizations on average (LENA^®^ would be just 10% off) than if there were 10 (LENA^®^ would be doubling the number of vocalizations). As with the absolute error rate, the sign of this difference indicates whether LENA^®^ tends to over- or under-estimate these counts.
 
@@ -381,6 +383,15 @@ Next, we allowed the electronic voices segmented by human annotaters, and LENA^�
 
 Finally, we included the maximum possible number of categories. The human categories considered were still CHI, FEM, MAL, OCH, overlap, and electronic, alongside the fuller range of LENA^®^ categories: CHN, FAN, MAN, CXN, OLN, TVN, CHF, FAF, MAF, CXF, OLF, and TVF. the LENA^®^ system's  false alarm, miss, and confusion rate medians were  `r medians[medians$type=="pyfar",2]`%, `r medians[medians$type=="pyfar",3]`%, and `r medians[medians$type=="pyfar",4]`% respectively, for a total median diarization error rate of `r medians[medians$type=="pyfar",5]`%. Thus, performance degrades considerable when all the "far" classes are treated as speech, leading to huge false alarm rates and increased confusion rates. 
 
+### LENA^®^ classification accuracy: Agreement using Cohen's kappa STOPPED HERE
+
+Given results above suggesting that our coding of electronic may not have coincided with LENA^®^'s, and that "far" categories are inaccurate, in this analysis we only consider the following labels for LENA^®^: (all others are collapsed into an Other category); and the following labels for human annotators: (all others are collapsed into an Other category).
+
+```{r kappa}
+
+```
+
+
 ### LENA^®^ classification accuracy: Precision and recall 
 
 By now, we have established that the best performance (when "far" labels such as CHF and OLF are mapped onto Other, as are TVN and OLN), the median diarization error rate is about `r round(median(py$diarization.error.rate..,na.rm=T))`%, due mainly to missing speech (`r round(median(py$missed.detection..,na.rm=T))`%), with false alarms (`r round(median(py$false.alarm..,na.rm=T))`%) and confusion between talker categories (`r round(median(py$confusion..,na.rm=T))`%) constituting a relatively small proportion of errors. These metrics may be insufficient for our readers for two reasons. First, these metrics give more importance to correctly classifying segments as speech versus non-speech (false alarms + misses) than confusing talkers (confusion). Second, many LENA^®^ adopters use the system not to make decisions on the sections labeled as non-speech, but rather on sections labeled as speech, and particularly those labeled adults and key child. The metrics above do not give more importance to adults and the key child, and they do not give us insight on the patterns of error made by the system. 
@@ -450,9 +461,9 @@ allpearsons=matrix(nrow=3,ncol=4)
 rownames(allpearsons)<-c("CVC","CTC","AWC")
 colnames(allpearsons)<-c("N clips","r all","N","r")
 
-aller=matrix(nrow=3,ncol=4)
+aller=matrix(nrow=3,ncol=12)
 rownames(aller)<-c("CVC","CTC","AWC")
-colnames(aller)<-c("AER","min","max","RER","min1","max1","RAER","min2","max2")
+colnames(aller)<-c("AER","min","max","AER-0","min","max","RER","min1","max1","ARER","min2","max2")
 
 read.table(paste0(thisdir,"/cvtc.txt"),header=T)->cvtc
 
@@ -500,9 +511,10 @@ aer_cvc <-(cvtc$CVC_n-cvtc$CVC_gold)
 aer_nozeros_cvc <-(cvtc$CVC_n[cvtc$CVC_n>0 & cvtc$CVC_gold > 0]-cvtc$CVC_gold[cvtc$CVC_n>0 & cvtc$CVC_gold > 0])
 
 
-colnames(aller)<-c("AER","min","max","RER","min1","max1","RAER","min2","max2")
-aller["CVC",]<-cbind((aer),
-                     ,
+aller["CVC",]<-cbind(mean(aer),min(aer),max(aer),
+                     mean(aer_no_zeros),min(aer_no_zeros),max(aer_no_zeros),
+                     mean(rer),min(rer),max(rer),
+                     mean(arer),min(arer),max(arer)
                      )
 
 
@@ -557,6 +569,12 @@ arer=abs(no_human_zeros$CTC_n-no_human_zeros$CTC_gold)/no_human_zeros$CTC_gold*1
 aer_ctc <-(cvtc$CTC_n-cvtc$CTC_gold)
 aer_nozeros_ctc <-(cvtc$CTC_n[cvtc$CTC_n>0 & cvtc$CTC_gold > 0]-cvtc$CTC_gold[cvtc$CTC_n>0 & cvtc$CTC_gold > 0])
 
+aller["CTC",]<-cbind(mean(aer),min(aer),max(aer),
+                     mean(aer_no_zeros),min(aer_no_zeros),max(aer_no_zeros),
+                     mean(rer),min(rer),max(rer),
+                     mean(arer),min(arer),max(arer)
+                     )
+
 ```
 
 Again, we only considered "near" speaker categories in the turn count, and applied the same rule the LENA^®^ does, where a turn can be from the key child to an adult or vice versa, and should happen within 5 seconds to be counted. The association between clip-level LENA^®^ and human CTC was weaker than that found for CVC (Figure 5):  the Pearson correlation between the two was r = `r round(cor.ctc.all$estimate,3)` (p = `r signif(cor.ctc.all$p.value,3)`) when all clips were taken into account, and r = `r round(cor.ctc.noZeros$estimate,3)` (p = `r signif(cor.ctc.noZeros$p.value,3)`)  when only clips with some child speech (i.e., excluding `r sum(cvtc$CTC_n>0 & cvtc$CTC_gold>0)` clips with 0 counts in both LENA^®^ and human annotations) were considered.  
@@ -604,6 +622,13 @@ arer=abs(no_human_zeros$LENA-no_human_zeros$gold)/no_human_zeros$gold*100
 
 aer_awc <-(awc$LENA-awc$gold)
 aer_nozeros_awc <-(awc$LENA[awc$LENA>0 & awc$gold > 0]-awc$gold[awc$LENA>0 & awc$gold > 0])
+
+aller["AWC",]<-cbind(mean(aer),min(aer),max(aer),
+                     mean(aer_no_zeros),min(aer_no_zeros),max(aer_no_zeros),
+                     mean(rer),min(rer),max(rer),
+                     mean(arer),min(arer),max(arer)
+                     )
+
 ```
 
 
@@ -612,6 +637,11 @@ aer_nozeros_awc <-(awc$LENA[awc$LENA>0 & awc$gold > 0]-awc$gold[awc$LENA>0 & awc
 apa_table(allpearsons,caption="For each measure (CVC, CTC, AWC), N all stands for the total number of clips considered in the general correlation analysis and resulting Pearson r coefficient; N stands for the number of non-null clips (i.e., having some vocalizations, turns, and adult words respectively) as well as Pearson r in the analyses restricted to the non-null clips. ")
 ```
 
+
+```{r tabrers, echo=F}
+
+apa_table(aller,caption="For each measure (CVC, CTC, AWC), AER is the absolute error rate, AER-0 the same excluding clips with counts of zero according to either the human or the system, RER is the relative error rate and ARER the absolute relative error rate (the latter two exclude clips where the human count is zero). ")
+```
 
 ```{r awc-fig, ig.pos = "T!", fig.width=3.5, fig.height=3.5, fig.cap="Adult Word Counts according to LENA (x axis) and humans (y axis). Each point represents the AWC totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA^®^ said there were no adult words."}
 
