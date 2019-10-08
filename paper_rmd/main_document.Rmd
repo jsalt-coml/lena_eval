@@ -419,12 +419,12 @@ prop_cat=data.frame(apply(all,2,dodiv)*100) #generates precision because columns
 #colSums(prop_cat)
 stack(all)->stall
 colnames(stall)<-c("n","LENA")
-stall$human=rownames(all)
+stall$human=factor(rownames(all))
 stall$pr=stack(prop_cat)$values
 
   
 ggplot(data = stall, mapping = aes(y = stall$human, x=stall$LENA)) + 
-  geom_tile(aes(fill= rescale(stall$pr)), colour = "white") +
+ # geom_tile(aes(fill= rescale(stall$pr)), colour = "white") + ## there is a bug here now, not sure why
   geom_text(aes(label = paste(round(stall$pr),"%")), vjust = -1,size=2) + 
   geom_text(aes(label = stall$n), vjust = 1,size=2) + 
   scale_fill_gradient(low = "white", high = "red", name = "Proportion") +
@@ -491,9 +491,9 @@ colapall["SIL",]<-colapall["SIL",]+colapall["OVL",]+colapall["ELE",]
 colapall[c("FEM","CHI","OCH","MAL","SIL"),c("FAN","CHN","CXN","MAN","Other")]->colapall
 rownames(colapall)[5]<-"Other"
 
-library(psych)
+library(psych) # INTRODUCES A BUG!!!
 cohen.kappa(colapall)->ck
-
+detach(psych)
 ```
 
 Given results above suggesting that our coding of electronic may not have coincided with LENA^®^'s, and that "far" categories are inaccurate, in this analysis we only consider the following labels for LENA^®^: (all others are collapsed into an Other category); and the following labels for human annotators: (all others are collapsed into an Other category). This analysis revealed a Cohen Kappa estimated at K(`r ck$n.obs`) = `r ck$kappa` (confidence interval `r ck$kappa-ck$var.kappa*2`-`r ck$kappa+ck$var.kappa*2`), weighted Kappa estimated at K(`r ck$n.obs`) = `r ck$weighted.kappa` (confidence interval `r ck$weighted.kappa-ck$var.weighted*2`-`r ck$weighted.kappa+ck$var.weighted*2`).
