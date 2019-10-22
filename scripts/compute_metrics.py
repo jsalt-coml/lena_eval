@@ -210,6 +210,12 @@ def main():
 
     metrics = run_metrics(references_f, hypothesis_f, metrics, args.visualization)
 
+    output_dir = os.path.join(args.reference,
+                              (os.path.basename(args.reference) + '_' + os.path.basename(args.hypothesis))
+                              .replace('mapped_', ''))
+    if not os.path.isdir(output_dir):
+        os.mkdir(output_dir)
+
     # Display a report for each metrics
     for name, m in metrics.items():
         print("\n%s report" % name)
@@ -222,9 +228,9 @@ def main():
                 colnames[i] = colnames[i] +' %'
         rep.columns = colnames
         if args.prefix != "":
-            dest_output = os.path.join(args.reference, name+'_'+args.prefix+"_report.csv")
+            dest_output = os.path.join(output_dir, name+'_'+args.prefix+"_report.csv")
         else:
-            dest_output = os.path.join(args.reference, name + "_report.csv")
+            dest_output = os.path.join(output_dir, name + "_report.csv")
         rep.to_csv(dest_output, float_format="%.2f")
 
 
