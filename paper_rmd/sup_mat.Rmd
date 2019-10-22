@@ -1,0 +1,399 @@
+---
+title: "Supplementary Materials to: A thorough evaluation of the Language Environment Analysis (LENA) system"
+shorttitle        : "LENA evaluation"
+
+author: 
+  - name          : "Alejandrina Cristia"
+    affiliation   : "1"
+    corresponding : true    # Define only one corresponding author
+    address       : "29, rue d’Ulm, 75005 Paris, France"
+    email         : "alecristia@gmail.com"
+  - name: Marvin Lavechin
+    affiliation: "1"
+  - name: Camila Scaff
+    affiliation: "1"
+  - name: Melanie Soderstrom
+    affiliation: "2"
+  - name: Caroline Rowland
+    affiliation: "3"
+  - name: Okko Räsänen
+    affiliation: "4,5"
+  - name: John Bunce
+    affiliation: "2,"
+  - name: Elika Bergelson
+    affiliation: "6"
+
+affiliation:
+  - id            : "1"
+    institution   : "Laboratoire de Sciences Cognitives et de Psycholinguistique, Département d’études cognitives, ENS, EHESS, CNRS, PSL University"
+  - id: "2"
+    institution: "Department of Psychology, University of Manitoba, Canada"
+  - id: "3"
+    institution: "Max Planck Institute for Psycholinguistics, Netherlands"
+  - id: "4"
+    institution: "Unit of Computing Sciences, Tampere University, Finland"
+  - id: "5"
+    institution: "Department of Signal Processing and Acoustics, Aalto University, Finland"
+  - id: "6"
+    institution: "Psychology & Neuroscience, Duke University, Durham, North Carolina, USA"
+
+
+
+abstract: >    
+    This document provides the full results of analyses carried out in the main manuscript as well as other useful analyses.
+
+
+
+bibliography      : ["lena_eval.bib"]
+
+figsintext        : yes
+figurelist        : no
+tablelist         : no
+footnotelist      : no
+lineno            : no
+
+lang              : "english"
+class             : "man"
+
+classoption: table    
+header-includes:
+  - \usepackage{array}
+  - \usepackage{float}
+
+output            : papaja::apa6_pdf
+
+---
+
+
+```{r setup, include=TRUE,echo=F,warning=FALSE}
+
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, cache = FALSE, fig.pos = "T")
+options(kableExtra.latex.load_packages = FALSE)
+require("papaja")
+thisdir=c("../LENA_eval_201906/")
+library(lme4)
+library(sm)
+library(scales)
+library(ggpubr)
+library(ggplot2)
+library(car)
+library(dplyr)
+library(kableExtra)
+
+dodiv=function(x) x/sum(x, na.rm=T)
+
+```
+
+
+
+```{r read-cm,echo=F}
+
+
+ber=read.table(paste0(thisdir,"BER","_cm.txt"),header=T)
+row=read.table(paste0(thisdir,"ROW","_cm.txt"),header=T)
+sod=read.table(paste0(thisdir,"SOD","_cm.txt"),header=T)
+war=read.table(paste0(thisdir,"WAR","_cm.txt"),header=T)
+all=read.table(paste0(thisdir,"all","_cm.txt"),header=T)
+
+
+#remove empty rows
+ber=ber[rownames(ber)[rowSums(ber)>0],]
+row=row[rownames(row)[rowSums(row)>0],]
+war=war[rownames(war)[rowSums(war)>0],]
+sod=sod[rownames(sod)[rowSums(sod)>0],]
+all=sod[rownames(all)[rowSums(all)>0],]
+
+sumref=rowSums(all)
+
+```
+
+```{r DIAER,echo=F}
+read.csv(paste0(thisdir,"/diaer_gold_no_ele_no_ovl_lena_sil_no_tv_no_oln_report.csv"))->py
+#dim(py) #873 clips
+#summary(py)
+
+#294 FA, MI, confusion are NA because no speech at all in the clip
+pytot=subset(py,item=="TOTAL")
+#other fixes and addtions
+py=subset(py,item!="TOTAL")
+py$false.alarm..[py$total==0 & py$false.alarm!=0]<-100
+py$false.alarm..[py$total==0 & py$false.alarm==0]<-0
+py$missed.detection..[py$total==0 ]<-0
+py$missed.detection..[py$missed.detection==0 ]<-0
+py$cor=substr(py$item,1,3)
+py$cor[grep("[0-9]",py$cor)]<-"tsi"
+py$cor=factor(py$cor)
+
+py$child=substr(py$item,1,8)
+py$child[py$cor=="tsi"]=substr(py$item[py$cor=="tsi"],1,3)
+
+# add in age info
+spreadsheet = read.csv(paste0(thisdir,"/ACLEW_list_of_corpora.csv"), header=TRUE, sep = ",")
+spreadsheet$child=paste0(spreadsheet$labname,"_",ifelse(nchar(spreadsheet$aclew_id)==3,paste0("0",spreadsheet$aclew_id),spreadsheet$aclew_id))
+spreadsheet = spreadsheet[,c("child","age_mo_round")]
+colnames(spreadsheet) = c("child","age")
+spreadsheet_tsi = read.csv(paste0(thisdir,"/anon_metadata.csv"), header=TRUE, sep = ",")
+spreadsheet_tsi = spreadsheet_tsi[c("id","age_mo")]
+colnames(spreadsheet_tsi) = c("child","age")
+age_id = rbind(spreadsheet, spreadsheet_tsi)
+py=merge(py,age_id,by.x="child",by.y="child",all.x=T)
+```
+
+## LENA^®^ classification accuracy: False alarms, misses, confusion 
+
+No additional results.
+
+
+```{r cf-dm,echo=F}
+
+ read.csv("../LENA_eval_201906/diaer_LENA_sil.csv")->pysil
+ read.csv("../LENA_eval_201906/diaer_LENA_far.csv")->pyfar
+ read.csv("../LENA_eval_201906/diaer_gold_no_ele_LENA_sil_no_tv_report.csv")->pynotv
+
+ pysil$type<-"pysil"
+pyfar$type<-"pyfar"
+pynotv$type<-"pynotv"
+
+clean<-function(py){
+  py[py$item!="Total",]->py
+  py$cor=substr(py$item,1,1)
+  py$cor[py$cor=="C"] ="T"
+  py
+}
+
+allpy= rbind(pysil,pyfar,pynotv)
+
+clean(allpy)->allpy 
+
+medians=aggregate(allpy[,c("false.alarm..","missed.detection..","confusion..")],by=list(allpy$type),median,na.rm=T)
+
+colnames(medians)[1]<-c("type")
+medians[2:4]<-round(medians[2:4])
+medians$der=rowSums(medians[2:4])
+```
+
+
+## LENA^®^ classification accuracy: Precision and recall 
+
+No additional results.
+
+### LENA^®^ classification accuracy: Precision
+
+No additional results.
+
+
+### LENA^®^ classification accuracy: Recall 
+No additional results.
+
+
+## Derived metrics
+
+### Child Vocalization Counts (CVC) accuracy 
+
+```{r cvc,echo=F}
+read.table(paste0(thisdir,"/cvtc.txt"),header=T)->cvtc
+
+
+
+cor.cvc.all= cor.test(cvtc$CVC_n,cvtc$CVC_gold)
+cor.cvc.noZeros= cor.test(cvtc$CVC_n[cvtc$CVC_n>0 & cvtc$CVC_gold>0],cvtc$CVC_gold[cvtc$CVC_n>0 & cvtc$CVC_gold>0])
+
+```
+
+No additional results.
+
+
+### Conversational Turn Counts (CTC) accuracy 
+
+No additional results.
+
+### Adult Word Counts accuracy 
+
+```{r awc, echo=F}
+read.table("../LENA_AWC_rel_v1_June.txt")->awc
+colnames(awc)<-c("filename","gold","LENA")
+gsub("LUC","ROW",awc$filename)->awc$filename
+
+awc$cor=substr(awc$filename,1,3)
+awc$cor[grep("[0-9]",awc$cor)]<-"tsi"
+awc$cor=factor(awc$cor)
+
+awc$child=substr(awc$filename,1,8)
+awc$child[awc$cor=="tsi"]=substr(awc$X[awc$cor=="tsi"],1,3)
+
+
+merge(awc,age_id,by="child")->awc
+
+
+cor.awc.all= cor.test(awc$gold,awc$LENA)
+cor.awc.noZeros= cor.test(awc$gold[awc$gold>0 & awc$LENA>0],awc$LENA[awc$gold>0 & awc$LENA>0])
+
+# ER against human
+aer=(awc$LENA-awc$gold)
+aer_no_zeros=(awc$LENA[awc$LENA>0 & awc$gold > 0]-awc$gold[awc$LENA>0 & awc$gold > 0])
+
+no_human_zeros=subset(awc,gold>0)
+rer=(no_human_zeros$LENA-no_human_zeros$gold)/no_human_zeros$gold*100
+
+arer=abs(no_human_zeros$LENA-no_human_zeros$gold)/no_human_zeros$gold*100
+
+aer_awc <-(awc$LENA-awc$gold)
+aer_nozeros_awc <-(awc$LENA[awc$LENA>0 & awc$gold > 0]-awc$gold[awc$LENA>0 & awc$gold > 0])
+```
+
+```{r awc-fig, ig.pos = "T!", fig.width=3.5, fig.height=3.5, fig.cap="Adult Word Counts according to LENA (x axis) and humans (y axis). Each point represents the AWC totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA^®^ said there were no adult words."}
+
+plot(gold~LENA,data=awc,pch=20,main="AWC",col=alpha("orange",.2),xlab="LENA AWC",ylab="Human AWC")
+abline(lm(gold~LENA,data=awc))
+abline(lm(gold~LENA,data=awc,subset=c(awc$gold>0 & awc$LENA>0)),lty=2)
+```
+
+No additional results.
+
+
+
+## Effects of age and differences across corpora 
+
+We report on full model results.
+
+### Diarization error rate
+
+```{r lmer-dm, echo=F}
+read.csv(paste0(thisdir,"/diaer_gold_no_ele_no_ovl_lena_sil_no_tv_no_oln_report.csv"))->py
+
+#other fixes and addtions
+py=subset(py,item!="TOTAL")
+py$cor=substr(py$item,1,3)
+py$cor[grep("[0-9]",py$cor)]<-"tsi"
+py$cor=factor(py$cor)
+
+py$child=substr(py$item,1,8)
+py$child[py$cor=="tsi"]=substr(py$item[py$cor=="tsi"],1,3)
+
+py$false.alarm..[py$total==0 & py$false.alarm!=0]<-100
+py$false.alarm..[py$total==0 & py$false.alarm==0]<-0
+
+py$missed.detection..[py$total==0 ]<-0
+py$missed.detection..[py$missed.detection==0 ]<-0
+
+# add in age info
+spreadsheet = read.csv(paste0(thisdir,"/ACLEW_list_of_corpora.csv"), header=TRUE, sep = ",")
+spreadsheet$child=paste0(spreadsheet$labname,"_",ifelse(nchar(spreadsheet$aclew_id)==3,paste0("0",spreadsheet$aclew_id),spreadsheet$aclew_id))
+spreadsheet = spreadsheet[,c("child","age_mo_round")]
+colnames(spreadsheet) = c("child","age")
+spreadsheet_tsi = read.csv(paste0(thisdir,"/anon_metadata.csv"), header=TRUE, sep = ",")
+spreadsheet_tsi = spreadsheet_tsi[c("id","age_mo")]
+colnames(spreadsheet_tsi) = c("child","age")
+age_id = rbind(spreadsheet, spreadsheet_tsi)
+py=merge(py,age_id,by.x="child",by.y="child",all.x=T) #one row is lost... **ATTENTION BUG HERE**
+
+mydv=c("false.alarm..","missed.detection..","confusion..")
+
+mymodels<- list()
+myANOVAs<- list()
+anovatab=matrix(nrow=4,ncol=3)
+colnames(anovatab)<-mydv
+for(dv in mydv){
+    print(paste("The following model corresponds to",dv))
+    mymodels[[dv]]<-lmer(py[,dv]~cor*age+(1|child),data=py)
+  myANOVAs[[dv]]<-Anova(mymodels[[dv]],type="III")
+  print(summary(mymodels[[dv]]))
+  print(myANOVAs[[dv]])
+  mycols=cbind(round(myANOVAs[[dv]]$Chisq,2),round(myANOVAs[[dv]]$Df),round(myANOVAs[[dv]]["Pr(>Chisq)"],2))
+  anovatab[,dv]<-paste0(mycols[,1]," (",mycols[,2],")",ifelse(mycols[,3]<.05," *",""))
+}
+rownames(anovatab)<-rownames(mycols)
+
+```
+
+### CVC
+
+```{r cvc-age, echo=F}
+read.table(paste0(thisdir,"/cvtc.txt"),header=T)->cvtc
+
+cvtc$cor=substr(cvtc$filename,1,3)
+cvtc$cor[substr(cvtc$filename,1,1)=="C"]<-"tsi"
+cvtc$cor=factor(cvtc$cor)
+
+cvtc$child=substr(cvtc$filename,1,8)
+cvtc$child[cvtc$cor=="tsi"]<-substr(cvtc$filename[cvtc$cor=="tsi"],1,3)
+
+merge(cvtc,age_id,by="child")->cvtc
+
+mymodel<-lmer(CVC_gold~CVC_n*age*cor + (1|child), data=cvtc)
+summary(mymodel)
+Anova(mymodel,type="III")
+
+```
+
+
+There is a 3-way interaction between age, corpus, and the predictive value of the LENA^®^ system's  counts with respect to the gold counts. To investigate this we fit the same regression within each corpus.
+
+
+```{r 3way,echo=F}
+
+
+mymodels<- list()
+myANOVAs<- list()
+for(thiscor in levels(cvtc$cor)){
+    print(paste("The following model corresponds to",thiscor))
+ mymodels[[thiscor]]<-lmer(CVC_gold~CVC_n*age + (1|child), data=cvtc,subset=c(cor==thiscor))
+ myANOVAs[[thiscor]]<-Anova(mymodels[[thiscor]],type="III")
+  print(summary(mymodels[[thiscor]]))
+  print(myANOVAs[[thiscor]])
+}
+
+```
+
+
+### CTC
+
+```{r ctc-age, echo=F}
+
+mymodel<-lmer(CTC_gold~CTC_n*age*cor + (1|child), data=cvtc)
+summary(mymodel)
+Anova(mymodel,type="III")
+
+```
+
+
+### AWC
+
+```{r awc-age, echo=F}
+
+mymodel<-lmer(gold~LENA*age*cor + (1|child), data=awc)
+summary(mymodel)
+Anova(mymodel,type="III")
+
+```
+
+
+There is a 3-way interaction between age, corpus, and the predictive value of the LENA^®^ system's  counts with respect to the gold counts. To investigate this we fit the same regression within each corpus.
+
+
+```{r 3way,echo=F}
+
+
+
+mymodels<- list()
+myANOVAs<- list()
+for(thiscor in levels(awc$cor)){
+  print(paste("the model coming up corresponds to",thiscor))
+ mymodels[[thiscor]]<-lmer(gold~LENA*age + (1|child), data=awc,subset=c(cor==thiscor))
+ myANOVAs[[thiscor]]<-Anova(mymodels[[thiscor]],type="III")
+ print(mymodels[[thiscor]])
+ print(myANOVAs[[thiscor]])
+}
+
+```
+
+
+
+\newpage
+
+
+
+# References
+
+\setlength{\parindent}{-0.5in}
+\setlength{\leftskip}{0.5in}
