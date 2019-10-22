@@ -4,8 +4,43 @@ import numpy as np
 
 # Must arrive in [SIL, CHI, FEM, MAL]
 gold_dict = {
-    'C1': 'CHI',
-    'C2': 'CHI',
+    'C1': 'OCH',
+    'C2': 'OCH',
+    'CHI': 'CHI',
+    'CHI*': 'CHI',
+    'EE1': 'ELE',
+    'FA1': 'FEM',
+    'FA2': 'FEM',
+    'FA3': 'FEM',
+    'FA4': 'FEM',
+    'FA5': 'FEM',
+    'FA6': 'FEM',
+    'FA7': 'FEM',
+    'FA8': 'FEM',
+    'FAE': 'ELE',
+    'FC1': 'OCH',
+    'MA1': 'MAL',
+    'MA2': 'MAL',
+    'MA3': 'MAL',
+    'MA4': 'MAL',
+    'MA5': 'MAL',
+    'MAE': 'ELE',
+    'MC1': 'OCH',
+    'MC2': 'OCH',
+    'MC3': 'OCH',
+    'MI1': 'OCH', # not sure for this one
+    'MOT*': 'FEM',
+    'UC1': 'OCH',
+    'UC2': 'OCH',
+    'UC3': 'OCH',
+    'UC4': 'OCH',
+    'UC5': 'OCH',
+    'UC6': 'OCH'
+}
+
+gold_dict_no_ele = {
+    'C1': 'OCH',
+    'C2': 'OCH',
     'CHI': 'CHI',
     'CHI*': 'CHI',
     'EE1': 'SIL',
@@ -18,55 +53,123 @@ gold_dict = {
     'FA7': 'FEM',
     'FA8': 'FEM',
     'FAE': 'SIL',
-    'FC1': 'CHI',
+    'FC1': 'OCH',
     'MA1': 'MAL',
     'MA2': 'MAL',
     'MA3': 'MAL',
     'MA4': 'MAL',
     'MA5': 'MAL',
     'MAE': 'SIL',
-    'MC1': 'CHI',
-    'MC2': 'CHI',
-    'MC3': 'CHI',
-    'MI1': 'FEM', # not sure for this one
+    'MC1': 'OCH',
+    'MC2': 'OCH',
+    'MC3': 'OCH',
+    'MI1': 'OCH', # not sure for this one
     'MOT*': 'FEM',
-    'UC1': 'CHI',
-    'UC2': 'CHI',
-    'UC3': 'CHI',
-    'UC4': 'CHI',
-    'UC5': 'CHI',
-    'UC6': 'CHI'
+    'UC1': 'OCH',
+    'UC2': 'OCH',
+    'UC3': 'OCH',
+    'UC4': 'OCH',
+    'UC5': 'OCH',
+    'UC6': 'OCH'
 }
 
-# Must arrive in [SIL, CHI, FEM, MAL, OVL]
-lena_dict = {
+#
+lena_dict_far = {
+    'CHF': 'CHF',
+    'CHN': 'CHN',
+    'CXF': 'CXF',
+    'CXN': 'CXN',
+    'FAF': 'FAF',
+    'FAN': 'FAN',
+    'MAF': 'MAF',
+    'MAN': 'MAN',
+    'NOF': 'SIL',
+    'NON': 'SIL',
+    'OLF': 'OLF',
+    'OLN': 'OLN',
+    'SIL': 'SIL',
+    'TVN': 'TVN',
+    'TVF': 'TVF'
+}
+
+#all the far categories  go to nonspeech
+lena_dict_sil = {
     'CHF': 'SIL',
-    'CHN': 'CHI',
+    'CHN': 'CHN',
     'CXF': 'SIL',
-    'CXN': 'CHI',
+    'CXN': 'CXN',
     'FAF': 'SIL',
-    'FAN': 'FEM',
+    'FAN': 'FAN',
     'MAF': 'SIL',
-    'MAN': 'MAL',
+    'MAN': 'MAN',
     'NOF': 'SIL',
     'NON': 'SIL',
     'OLF': 'SIL',
-    'OLN': 'OVL',
+    'OLN': 'OLN',
     'SIL': 'SIL',
-    'TVF': 'SIL',
+    'TVN': 'TVN',
+    'TVF': 'SIL'
+}
+
+#all the far categories  go to nonspeech
+lena_dict_sil_no_tv = {
+    'CHF': 'SIL',
+    'CHN': 'CHN',
+    'CXF': 'SIL',
+    'CXN': 'CXN',
+    'FAF': 'SIL',
+    'FAN': 'FAN',
+    'MAF': 'SIL',
+    'MAN': 'MAN',
+    'NOF': 'SIL',
+    'NON': 'SIL',
+    'OLF': 'SIL',
+    'OLN': 'OLN',
+    'SIL': 'SIL',
     'TVN': 'SIL',
+    'TVF': 'SIL'
+}
+
+lena_dict_sil_no_tv_no_oln = {
+    'CHF': 'SIL',
+    'CHN': 'CHN',
+    'CXF': 'SIL',
+    'CXN': 'CXN',
+    'FAF': 'SIL',
+    'FAN': 'FAN',
+    'MAF': 'SIL',
+    'MAN': 'MAN',
+    'NOF': 'SIL',
+    'NON': 'SIL',
+    'OLF': 'SIL',
+    'OLN': 'SIL',
+    'SIL': 'SIL',
+    'TVN': 'SIL',
+    'TVF': 'SIL'
 }
 
 
 def map_rttm(rttm, overlap, dict):
-    if dict == "lena":
-        dict = lena_dict
+
+    # Output name
+    output = os.path.join(os.path.dirname(rttm),
+                          "mapped_%s" % dict,
+                          os.path.basename(rttm))
+
+    if dict == "lena_far":
+        dict = lena_dict_far
+    elif dict == "lena_sil":
+        dict = lena_dict_sil
+    elif dict == "lena_sil_no_tv":
+        dict = lena_dict_sil_no_tv
+    elif dict == "lena_sil_no_tv_no_oln":
+        dict = lena_dict_sil_no_tv_no_oln
     elif dict == "gold":
         dict = gold_dict
+    elif dict == "gold_no_ele":
+        dict = gold_dict_no_ele
 
-    output = os.path.join(os.path.dirname(rttm),
-                          "mapped",
-                          os.path.basename(rttm))
+
 
     data = []
     # Version without overlap
@@ -149,9 +252,9 @@ def main():
                                                  "called mapped")
     parser.add_argument('-p', '--path', type=str, required=True,
                         help="Path to the folder containing .rttm files")
-    parser.add_argument('-m', '--map', type=str, required=True, choices=["lena", "gold"],
+    parser.add_argument('-m', '--map', type=str, required=True, choices=["lena_sil","lena_far", "lena_sil_no_tv", "lena_sil_no_tv_no_oln", "gold", "gold_no_ele"],
                         help="Indicates if this is lena files that needs to be mapped or gold files."
-                             "Must be in [lena,gold]")
+                             "Must be in [lena_sil,lena_far, lena_sil_no_tv,lena_sil_no_tv_no_oln,gold,gold_no_ele]")
     parser.add_argument('-o', '--overlap', action="store_true",
                         help="Indicates if we need to map overlapping speech to the label \"OVL\"")
     args = parser.parse_args()
@@ -165,7 +268,7 @@ def main():
         raise ValueError("No rttm files have been found in %s" % folder_path)
 
     # Create output dir
-    output_folder = os.path.join(folder_path, "mapped")
+    output_folder = os.path.join(folder_path, "mapped_%s" % dict)
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
         print("Directory", output_folder, " created ")

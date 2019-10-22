@@ -69,7 +69,6 @@ def rttm_to_annotation(input_rttm, collapse_to_speech=False):
                 anno[Segment(t_beg, t_beg + t_dur)] = spkr
     return anno
 
-
 def run_metrics(references_f, hypothesis_f, metrics, visualization=False):
     if len(references_f) != len(hypothesis_f):
         raise ValueError("The number of reference files and hypothesis files must match ! (%d != %d)"
@@ -223,12 +222,11 @@ def main():
                 colnames[i] = colnames[i] +' %'
         rep.columns = colnames
         if args.prefix != "":
-            dest_output = os.path.join(args.reference, name + '_' + args.prefix + "_report.csv")
+            dest_output = os.path.join(args.reference, name+'_'+args.prefix+"_report.csv")
         else:
-            dest_output = os.path.join(args.reference, name+"_report.csv")
-        rep.to_csv(dest_output, float_format='%.2f')
+            dest_output = os.path.join(args.reference, name + "_report.csv")
+        rep.to_csv(dest_output, float_format="%.2f")
 
 
 if __name__ == '__main__':
     main()
-

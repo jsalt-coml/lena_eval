@@ -61,28 +61,34 @@ pip install pyannote-metrics
 
 Let us get down to business !
 
-1) Map the labels. Both sets of labels will be mapped to [SIL, CHI, FEM, MAL, OVL] by default.
-Mapping can be modified directly in **scripts/labels_mapper.py**.
+1) Map the labels :
 
 ```bash
-python scripts/labels_mapper.py -p data/lena/ -m lena
-python scripts/labels_mapper.py -p data/gold/ -m gold -o
+python scripts/labels_mapper.py -p data/lena/ -m lena_sil
+python scripts/labels_mapper.py -p gold/ -m gold_no_ele -o
 ```
-This will create a **mapped** sub-folder in the **lena** and **gold** folders.
+
+This will create :
+- a **mapped_lena_sil** sub-folder in the **lena** folder
+- a **mapped_gold_no_ele** in the gold folder.
+
+The parameter **-m** describes the desired mapping :
+- Mapping choices for the lena files are **[lena_far, lena_sil, lena_sil_no_tv,lena_sil_no_tv_no_oln]**.
+- Mapping choices for the gold files are **[gold, gold_no_ele]**.
 
 2) Compute the metrics :
 
 ```bash
-python scripts/compute_metrics.py -ref data/gold/mapped/ -hyp data/lena/mapped/ -t diarization -m diaer coverage homogeneity completeness purity
+python scripts/compute_metrics.py -ref data/gold/mapped_gold_no_ele/ -hyp data/lena/mapped_lena_sil/ -t diarization -m diaer coverage homogeneity completeness purity
 ```
 
 This will list all pairs that have been found between the human-made and the lena-made files (150 pairs).
-It will also generated *.csv files containing the evaluations in the *data/gold/mapped* folder.
+It will also generated *.csv files containing the evaluations in the *data/gold/mapped_gold_no_ele* folder.
 Let's repatriate these files :
 
 ```bash
 mkdir evaluations
-mv data/gold/mapped/*.csv evaluations
+mv data/gold/mapped_gold_no_ele/*.csv evaluations
 ```
 
 If we display the 2 first lines of one of these files by typing :
@@ -108,10 +114,13 @@ tail -1 evaluations/diaer_report.csv
 and should get :
 
 ```bash
-TOTAL,96.86,22477.62,10707.98,47.64,10001.95,44.50,5368.88,23.89,6400.75,28.48
+TOTAL,121.23,22477.62,10859.93,48.31,15633.00,69.55,4167.47,18.54,7450.23,33.15
 ```
 
 This line contains the metrics aggregated across all of the files, and therefore describes general performances of the LENA model.
+
+## Computing confusion matrices
+
 
 ##### Alex notes :
 TODO
