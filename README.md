@@ -42,8 +42,8 @@ WAR : 150 / 150 / 150
 
 ## Creating the conda environment
 
-Make sure that [pip](https://pypi.org/project/pip/) and [conda](https://docs.conda.io/en/latest/) are installed.
-Now, we can create the [conda](https://docs.conda.io/en/latest/) environment containing all the necessary python packages.
+Make sure that [pip](https://pypi.org/project/pip/), [conda](https://docs.conda.io/en/latest/) and [R](https://www.r-project.org/) are installed on your system.
+Once everything has been installed, we can create the [conda](https://docs.conda.io/en/latest/) environment containing all the necessary python packages.
 
 ```bash
 # Create environment
@@ -64,7 +64,7 @@ Let us get down to business !
 1) Map the labels :
 
 ```bash
-python scripts/labels_mapper.py -p data/lena/ -m lena_sil
+python scripts/labels_mapper.py -p data/lena/ -m lena_far
 python scripts/labels_mapper.py -p data/gold/ -m gold -o
 ```
 
@@ -81,7 +81,7 @@ If provided, the **-o** option is responsible for mapping to "OVL" moments where
 2) Compute the metrics :
 
 ```bash
-python scripts/compute_metrics.py -ref data/gold/mapped_gold -hyp data/lena/mapped_lena_sil -t diarization -m diaer coverage homogeneity completeness purity
+python scripts/compute_metrics.py -ref data/gold/mapped_gold -hyp data/lena/mapped_lena_far -t diarization -m diaer coverage homogeneity completeness purity
 ```
 
 This will list all pairs that have been found between the human-made and the lena-made files (150 pairs).
@@ -90,7 +90,7 @@ Let's repatriate these files :
 
 ```bash
 mkdir evaluations
-mv data/gold/mapped_gold/gold_lena_sil evaluations
+mv data/gold/mapped_gold/gold_lena_far evaluations
 ```
 
 If we display the 2 first lines of one of these files by typing :
@@ -103,7 +103,7 @@ we should get :
 
 ```bash
 item,diarization error rate %,total,correct,correct %,false alarm,false alarm %,missed detection,missed detection %,confusion,confusion %
-BER_0396_005220_005340.rttm,95.96,27.04,19.13,70.73,18.03,66.70,3.21,11.88,4.70,17.39
+BER_0396_005220_005340.rttm,134.26,27.04,19.13,70.73,28.39,104.99,2.73,10.08,5.19,19.18
 ```
 
 where the first line describes the header, and the second line contains metrics for the *BER_0396_005220_005340.rttm* file.
@@ -116,13 +116,36 @@ tail -1 evaluations/gold_lena_sil/diaer_report.csv
 and should get :
 
 ```bash
-TOTAL,113.70,24664.56,11369.63,46.10,14747.86,59.79,5469.27,22.17,7825.66,31.73
+TOTAL,140.71,24664.56,11962.99,48.50,22004.18,89.21,2278.74,9.24,10422.83,42.26
 ```
 
 This line contains the metrics aggregated across all of the files, and therefore describes general performances of the LENA model.
 
 ## Computing confusion matrices
 
+We start by generating frame-based *.rttm* files to transform our problem into a classification task.
+
+```bash
+python scripts/frame_cutter.py  --i data/lena/mapped_lena_far/ --o framed_lena_far
+python scripts/frame_cutter.py  --i data/gold/mapped_gold/ --o framed_gold
+```
+
+This will generate a **framed** sub-folder in both **lena** and **gold** folders containing the framed-based rttm. 
+
+Once it has been done, we can generate the confusion matrices by typing:
+
+```bash
+Rscript scripts/conf_mat.r data/lena/framed_lena_far data/gold/framed_gold
+```
+
+This step might take a bit of time, go get yourself a cup of coffee !
+Once it's done, the script will save the confusion matrices under **data/gold/framed_gold**
+
+Let's repatriate these files :
+
+```bash
+mv data/gold/framed_gold/*.txt evaluations/gold_lena_far
+```
 
 ##### Alex notes :
 TODO
