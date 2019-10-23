@@ -139,13 +139,32 @@ Rscript scripts/conf_mat.r data/lena/framed_lena_far data/gold/framed_gold
 ```
 
 This step might take a bit of time, go get yourself a cup of coffee !
-Once it's done, the script will save the confusion matrices under **data/gold/framed_gold**
+Once it's done, the script will save the confusion matrices under **data/gold/framed_gold**.
 
 Let's repatriate these files :
 
 ```bash
 mv data/gold/framed_gold/*.txt evaluations/gold_lena_far
 ```
+
+We can print the first 3 lines of one of these confusion matrices by typing : 
+
+```bash
+head -3 evaluations/gold_lena_far/SOD_cm.txt
+```
+
+This should return : 
+
+```bash
+"CHN" "FAN" "OLF" "OLN" "SIL" "CHF" "CXF" "CXN" "FAF" "MAF" "TVF" "TVN" "MAN"
+"CHI" 40830 2453 2626 23320 3324 266 982 18567 439 1250 1966 5125 147
+"FEM" 12841 75210 21495 74932 22831 225 3135 12364 10245 7545 8809 18640 7536
+```
+
+With the first line being the LENA labels. 
+The first row (without considering its first element) are the gold labels.
+And cell(i,j) = number of frames annotated as class_i but classified by the model as class_j 
+
 
 ##### Alex notes :
 TODO
