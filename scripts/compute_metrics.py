@@ -44,7 +44,8 @@ def find_1mn_highest_volubility(annotation):
             best_start = get_best_start(beginnings, durations, tot_duration)
             return best_start, best_start + 60
 
-def rttm_to_annotation(input_rttm, collapse_to_speech=False):
+
+def rttm_to_annotation(input_rttm, collapse_to_speech=False, class_to_keep=None):
     """
         Given a path to a rttm file, create the corresponding Annotation objects
         containing the triplets (t_beg, t_end, activity)
@@ -66,10 +67,16 @@ def rttm_to_annotation(input_rttm, collapse_to_speech=False):
                 t_beg, t_dur, spkr = float(row[3]), float(row[4]), row[7]
                 if row[7] == "":
                     raise ValueError("Speaker role is empty in %s" % os.path.basename(input_rttm))
-                anno[Segment(t_beg, t_beg + t_dur)] = spkr
+                if class_to_keep is not None and spkr == class_to_keep:
+                    # Keep only class of interest
+                    anno[Segment(t_beg, t_beg + t_dur)] = spkr
+                elif class_to_keep is None:
+                    # Keep all classes
+                    anno[Segment(t_beg, t_beg + t_dur)] = spkr
     return anno
 
-def run_metrics(references_f, hypothesis_f, metrics, visualization=False):
+
+def run_metrics(references_f, hypothesis_f, metrics, visualization=False, class_to_keep=None):
     if len(references_f) != len(hypothesis_f):
         raise ValueError("The number of reference files and hypothesis files must match ! (%d != %d)"
                          % (len(references_f), len(hypothesis_f)))
@@ -78,7 +85,7 @@ def run_metrics(references_f, hypothesis_f, metrics, visualization=False):
         if not os.path.exists(visualization_dir):
             os.makedirs(visualization_dir)
     for ref_f, hyp_f in zip(references_f, hypothesis_f):
-        ref, hyp = rttm_to_annotation(ref_f), rttm_to_annotation(hyp_f)
+        ref, hyp = rttm_to_annotation(ref_f, class_to_keep=class_to_keep), rttm_to_annotation(hyp_f, class_to_keep=class_to_keep)
         basename = os.path.basename(ref_f)
         # Set the uri as the basename for both reference and hypothesis
         ref.uri, hyp.uri = basename, basename
@@ -162,8 +169,11 @@ def main():
                         help="Metrics that need to be run.")
     parser.add_argument('--visualization', action='store_true')
     parser.add_argument('--identification', action='store_true')
+    parser.add_argument('--class_to_keep', default=None, choices=['OCH', 'CHI', 'ELE', 'FEM', 'MAL', 'OVL', 'SIL'],
+                        help="If not None, will only keep labels corresponding to the specified class.")
     args = parser.parse_args()
 
+    class_to_keep = args.class_to_keep
     if args.identification:
         args.task = "identification"
 
@@ -204,11 +214,11 @@ def main():
     # Get files and run the metrics
     references_f, hypothesis_f = get_couple_files(args.reference, args.hypothesis, args.prefix)
 
-    print("Pairs that have been found : ")
-    for ref, hyp in zip(references_f, hypothesis_f):
-        print("%s / %s "% (os.path.basename(ref), os.path.basename(hyp)))
+    # print("Pairs that have been found : ")
+    # for ref, hyp in zip(references_f, hypothesis_f):
+    #     print("%s / %s "% (os.path.basename(ref), os.path.basename(hyp)))
 
-    metrics = run_metrics(references_f, hypothesis_f, metrics, args.visualization)
+    metrics = run_metrics(references_f, hypothesis_f, metrics, args.visualization, class_to_keep)
 
     output_dir = os.path.join(args.reference,
                               (os.path.basename(args.reference) + '_' + os.path.basename(args.hypothesis))
@@ -218,9 +228,9 @@ def main():
 
     # Display a report for each metrics
     for name, m in metrics.items():
-        print("\n%s report" % name)
-        print(m)
-        rep = m.report(display=True)
+        #print("\n%s report" % name)
+        #print(m)
+        rep = m.report(display=False)
         colnames = list(rep.columns.get_level_values(0))
         percent_or_count = rep.columns.get_level_values(1)
         for i in range(0,len(percent_or_count)):
@@ -231,7 +241,13 @@ def main():
             dest_output = os.path.join(output_dir, name+'_'+args.prefix+"_report.csv")
         else:
             dest_output = os.path.join(output_dir, name + "_report.csv")
+
+        if class_to_keep is not None:
+            dest_output = os.path.join(os.path.dirname(dest_output),
+                                       ("only_%s_" % class_to_keep) +
+                                       os.path.basename(dest_output))
         rep.to_csv(dest_output, float_format="%.2f")
+    print("Done computing metrics between %s and %s." % (args.reference, args.hypothesis))
 
 
 if __name__ == '__main__':

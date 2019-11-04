@@ -9,16 +9,13 @@ if (length(args)!=2) {
   gold_folder = args[2]
 }
 
-lena_folder="data/lena/framed_lena_far/"
-gold_folder="data/gold/framed_gold/"
-
 # First, we start to list all the labels that appear in gold and lena files.
-print("Reading gold and lena labels ...")
+# print("Reading gold and lena labels ...")
 gold_levels=c()
 filenames = list.files(gold_folder, pattern = "*.rttm")
 for (filename in filenames){
   rttm_path = paste(gold_folder, filename, sep="/")
-  rttm = read.csv(rttm_path, header=FALSE, sep = " ")[c(4,5,8)]
+  rttm = read.csv(rttm_path, header=FALSE, sep = "\t")[c(4,5,8)]
   gold_levels = c(gold_levels, levels(unique(unlist(rttm[3]))))
   gold_levels = unique(gold_levels)
 }
@@ -27,19 +24,19 @@ lena_levels=c()
 filenames = list.files(lena_folder, pattern = "*.rttm")
 for (filename in filenames){
   rttm_path = paste(lena_folder, filename, sep="/")
-  rttm = read.csv(rttm_path, header=FALSE, sep = " ")[c(4,5,8)]
+  rttm = read.csv(rttm_path, header=FALSE, sep = "\t")[c(4,5,8)]
   lena_levels = c(lena_levels, levels(unique(unlist(rttm[3]))))
   lena_levels = unique(lena_levels)
 }
 
 # Sort the levels, so that the matrices will be easier to read
-gold_levels[order(nchar(gold_levels))]
-lena_levels[order(nchar(lena_levels))]
+gold_levels = gold_levels[order(nchar(gold_levels))]
+lena_levels = lena_levels[order(nchar(lena_levels))]
 
-print("Gold labels found :")
-print(gold_levels)
-print("Lena labels found :")
-print(lena_levels)
+#print("Gold labels found :")
+#print(gold_levels)
+#print("Lena labels found :")
+#print(lena_levels)
 
 corpora = c("BER", "ROW", "SOD","WAR","TSI")
 
@@ -68,11 +65,11 @@ for(corpus in corpora){
     gold_path = paste(gold_folder, filename, sep="/")
 
     # The LENA always exist
-    lena = read.csv(lena_path, header=FALSE, sep = " ")[c(4,5,8)]
+    lena = read.csv(lena_path, header=FALSE, sep = "\t")[c(4,5,8)]
     names(lena) <- c("onset", "duration", "label")
 
     if(file.exists(gold_path)){
-      gold = read.csv(gold_path, header=FALSE, sep = " ")[c(4,5,8)]
+      gold = read.csv(gold_path, header=FALSE, sep = "\t")[c(4,5,8)]
       names(gold) <- c("onset", "duration", "label")
     } else {
       gold = lena # we make a copy to have the same N of lines
@@ -97,12 +94,13 @@ for(corpus in corpora){
     confusion_corp = confusion_corp + confusion_file
 
   }
-  print(corpus)
-  print(confusion_corp)
+  #print(corpus)
+  #print(confusion_corp)
   write.table(confusion_corp,file=paste(gold_folder,paste0(corpus,"_cm.txt"), sep = "/"))
   confusion_all = confusion_all + confusion_corp
-  print(paste0("Nb frames : ", sum(rowSums(confusion_corp)))) # nb frames
+  #print(paste0("Nb frames : ", sum(rowSums(confusion_corp)))) # nb frames
 }
-print("All")
-print(confusion_all)
+#print("All")
+#print(confusion_all)
 write.table(confusion_all,file=paste(gold_folder, "all_cm.txt", sep="/"))
+print("Done computing confusion matrix.")

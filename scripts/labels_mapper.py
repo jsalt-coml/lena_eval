@@ -2,7 +2,7 @@ import argparse
 import os, glob
 import numpy as np
 
-# Must arrive in [SIL, CHI, FEM, MAL]
+# Mapping to [OCH, CHI, FEM, MAL, ELE]
 gold_dict = {
     'C1': 'OCH',
     'C2': 'OCH',
@@ -28,7 +28,7 @@ gold_dict = {
     'MC1': 'OCH',
     'MC2': 'OCH',
     'MC3': 'OCH',
-    'MI1': 'OCH', # not sure for this one
+    'MI1': 'OCH',
     'MOT*': 'FEM',
     'UC1': 'OCH',
     'UC2': 'OCH',
@@ -38,6 +38,7 @@ gold_dict = {
     'UC6': 'OCH'
 }
 
+# Map ELE to SIL
 gold_dict_no_ele = {
     'C1': 'OCH',
     'C2': 'OCH',
@@ -63,7 +64,7 @@ gold_dict_no_ele = {
     'MC1': 'OCH',
     'MC2': 'OCH',
     'MC3': 'OCH',
-    'MI1': 'OCH', # not sure for this one
+    'MI1': 'OCH',
     'MOT*': 'FEM',
     'UC1': 'OCH',
     'UC2': 'OCH',
@@ -73,27 +74,8 @@ gold_dict_no_ele = {
     'UC6': 'OCH'
 }
 
-#
-lena_dict_far = {
-    'CHF': 'CHF',
-    'CHN': 'CHN',
-    'CXF': 'CXF',
-    'CXN': 'CXN',
-    'FAF': 'FAF',
-    'FAN': 'FAN',
-    'MAF': 'MAF',
-    'MAN': 'MAN',
-    'NOF': 'SIL',
-    'NON': 'SIL',
-    'OLF': 'OLF',
-    'OLN': 'OLN',
-    'SIL': 'SIL',
-    'TVN': 'TVN',
-    'TVF': 'TVF'
-}
-
-#all the far categories  go to nonspeech
-lena_dict_sil = {
+# Keep near classes only
+lena_dict_near_only = {
     'CHF': 'SIL',
     'CHN': 'CHN',
     'CXF': 'SIL',
@@ -111,8 +93,8 @@ lena_dict_sil = {
     'TVF': 'SIL'
 }
 
-#all the far categories  go to nonspeech
-lena_dict_sil_no_tv = {
+# Near classes without TV
+lena_dict_near_only_no_tv = {
     'CHF': 'SIL',
     'CHN': 'CHN',
     'CXF': 'SIL',
@@ -130,7 +112,8 @@ lena_dict_sil_no_tv = {
     'TVF': 'SIL'
 }
 
-lena_dict_sil_no_tv_no_oln = {
+# Near classes without tv and overlap
+lena_dict_near_only_no_tv_no_oln = {
     'CHF': 'SIL',
     'CHN': 'CHN',
     'CXF': 'SIL',
@@ -148,28 +131,41 @@ lena_dict_sil_no_tv_no_oln = {
     'TVF': 'SIL'
 }
 
+# Used when gold and lena labels need to be the same
+lena_to_gold = {'SIL': 'SIL',
+                'NOF': 'SIL',
+                'NON': 'SIL',
+                'CHN': 'CHI',
+                'CHF': 'CHI',
+                'CXN': 'OCH',
+                'CXF': 'OCH',
+                'FAN': 'FEM',
+                'FAF': 'FEM',
+                'MAN': 'MAL',
+                'MAF': 'MAL',
+                'OLN': 'OVL',
+                'OLF': 'OVL',
+                'TVN': 'ELE',
+                'TVF': 'ELE'}
 
-def map_rttm(rttm, overlap, dict):
 
+def map_rttm(rttm, overlap, dict, same, output_folder):
     # Output name
-    output = os.path.join(os.path.dirname(rttm),
-                          "mapped_%s" % dict,
+    output = os.path.join(output_folder,
                           os.path.basename(rttm))
 
-    if dict == "lena_far":
-        dict = lena_dict_far
-    elif dict == "lena_sil":
-        dict = lena_dict_sil
+    if dict == "lena_sil":
+        dict = lena_dict_near_only
     elif dict == "lena_sil_no_tv":
-        dict = lena_dict_sil_no_tv
+        dict = lena_dict_near_only_no_tv
     elif dict == "lena_sil_no_tv_no_oln":
-        dict = lena_dict_sil_no_tv_no_oln
+        dict = lena_dict_near_only_no_tv_no_oln
     elif dict == "gold":
         dict = gold_dict
     elif dict == "gold_no_ele":
         dict = gold_dict_no_ele
-
-
+    else:
+        raise ValueError("Value of dict unknown, must be in [lena_sil, lena_sil_no_tv, lena_sil_no_tv_no_oln, gold, gold_no_ele")
 
     data = []
     # Version without overlap
@@ -179,11 +175,13 @@ def map_rttm(rttm, overlap, dict):
             if not overlap:
                 # Version without overlap
                 for line in fi:
-                    splitted = line.split(' ')
+                    splitted = line.split('\t')
                     onset, duration, speaker = float(splitted[3]), float(splitted[4]), splitted[7]
                     target_speaker = dict[speaker]
+                    if same:
+                        target_speaker = lena_to_gold[target_speaker]
                     if target_speaker != "SIL":
-                        fo.write("SPEAKER %s 1 %.4f %.4f <NA> <NA> %s <NA> <NA>\n"
+                        fo.write("SPEAKER\t%s\t1\t%.4f\t%.4f\t<NA>\t<NA>\t%s\t<NA>\t<NA>\n"
                                  % (basename, onset, duration, target_speaker))
                     data.append([onset, duration, target_speaker])
             else:
@@ -191,7 +189,7 @@ def map_rttm(rttm, overlap, dict):
                 prev_onset, prev_duration, prev_offset, prev_speaker = 0.0, 0.0, 0.0, "SIL"
 
                 for line in fi:
-                    splitted = line.split(' ')
+                    splitted = line.split('\t')
                     onset, duration, speaker = round(float(splitted[3]), 4), round(float(splitted[4]),4), \
                                                splitted[7]
                     offset = round(onset+duration, 4)
@@ -209,10 +207,10 @@ def map_rttm(rttm, overlap, dict):
                                 # |---------|
                                 #       |---------|
                                 if onset-prev_onset > 0:
-                                    fo.write("SPEAKER %s 1 %.4f %.4f <NA> <NA> %s <NA> <NA>\n"
+                                    fo.write("SPEAKER\t%s\t1\t%.4f\t%.4f\t<NA>\t<NA>\t%s\t<NA>\t<NA>\n"
                                              % (basename, prev_onset, onset-prev_onset, prev_speaker))
                                 if prev_offset - onset > 0:
-                                    fo.write("SPEAKER %s 1 %.4f %.4f <NA> <NA> %s <NA> <NA>\n"
+                                    fo.write("SPEAKER\t%s\t1\t%.4f\t%.4f\t<NA>\t<NA>\t%s\t<NA>\t<NA>\n"
                                              % (basename, onset, prev_offset - onset, "OVL"))
                                 duration = duration - (prev_offset - onset)
                                 onset = prev_onset + prev_duration
@@ -222,10 +220,10 @@ def map_rttm(rttm, overlap, dict):
                                 # |------------|
                                 #       |----|
                                 if onset-prev_onset > 0:
-                                    fo.write("SPEAKER %s 1 %.4f %.4f <NA> <NA> %s <NA> <NA>\n"
+                                    fo.write("SPEAKER\t%s\t1\t%.4f\t%.4f\t<NA>\t<NA>\t%s\t<NA>\t<NA>\n"
                                              % (basename, prev_onset, onset-prev_onset, prev_speaker))
                                 if duration > 0:
-                                    fo.write("SPEAKER %s 1 %.4f %.4f <NA> <NA> %s <NA> <NA>\n"
+                                    fo.write("SPEAKER\t%s\t1\t%.4f\t%.4f\t<NA>\t<NA>\t%s\t<NA>\t<NA>\n"
                                              % (basename, onset, duration, "OVL"))
                                 onset = offset
                                 duration = prev_offset - offset
@@ -233,7 +231,7 @@ def map_rttm(rttm, overlap, dict):
                                 target_speaker = prev_speaker
                         else:
                             if prev_duration > 0:
-                                fo.write("SPEAKER %s 1 %.4f %.4f <NA> <NA> %s <NA> <NA>\n" % (basename, prev_onset,
+                                fo.write("SPEAKER\t%s\t1\t%.4f\t%.4f\t<NA>\t<NA>\t%s\t<NA>\t<NA>\n" % (basename, prev_onset,
                                                                                           prev_duration, prev_speaker))
                     #print("%f : %f : %s" % (prev_onset, prev_offset, prev_speaker))
                     prev_onset = onset
@@ -243,7 +241,7 @@ def map_rttm(rttm, overlap, dict):
 
                 # Write last utterance
                 if prev_duration > 0 and prev_speaker != "SIL":
-                    fo.write("SPEAKER %s 1 %.4f %.4f <NA> <NA> %s <NA> <NA>\n" % (basename, prev_onset,
+                    fo.write("SPEAKER\t%s\t1\t%.4f\t%.4f\t<NA>\t<NA>\t%s\t<NA>\t<NA>\n" % (basename, prev_onset,
                                                                                     prev_duration, prev_speaker))
 
 
@@ -252,29 +250,43 @@ def main():
                                                  "called mapped")
     parser.add_argument('-p', '--path', type=str, required=True,
                         help="Path to the folder containing .rttm files")
-    parser.add_argument('-m', '--map', type=str, required=True, choices=["lena_sil","lena_far", "lena_sil_no_tv", "lena_sil_no_tv_no_oln", "gold", "gold_no_ele"],
+    parser.add_argument('-m', '--map', type=str, required=True, choices=["lena_sil", "lena_sil_no_tv", "lena_sil_no_tv_no_oln", "gold", "gold_no_ele"],
                         help="Indicates if this is lena files that needs to be mapped or gold files."
                              "Must be in [lena_sil,lena_far, lena_sil_no_tv,lena_sil_no_tv_no_oln,gold,gold_no_ele]")
     parser.add_argument('-o', '--overlap', action="store_true",
                         help="Indicates if we need to map overlapping speech to the label \"OVL\"")
+    parser.add_argument('-s', '--same', action="store_true",
+                        help="Indicates if we need to map lena labels so that they're the same than gold labels")
     args = parser.parse_args()
 
     folder_path = args.path
     overlap = args.overlap
     dict = args.map
+
+    same = False
+    if dict == "lena_sil" or dict == "lena_sil_no_tv" or dict == "lena_sil_no_tv_no_oln":
+        same = args.same
+
     rttm_files = glob.glob(os.path.join(folder_path, "*.rttm"))
 
     if len(rttm_files) == 0:
         raise ValueError("No rttm files have been found in %s" % folder_path)
 
     # Create output dir
+
     output_folder = os.path.join(folder_path, "mapped_%s" % dict)
+    if dict == "gold_no_ele" and not overlap:
+        output_folder += "_no_ovl"
+
+    if same:
+        output_folder += "_same"
+
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
         print("Directory", output_folder, " created ")
 
     for rttm in rttm_files:
-        map_rttm(rttm, overlap, dict)
+        map_rttm(rttm, overlap, dict, same, output_folder)
 
 
 if __name__ == '__main__':

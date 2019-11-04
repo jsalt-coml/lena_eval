@@ -1,46 +1,13 @@
 # LENA evaluation
 
+## Prerequisites
+
 First, you can clone (and move to) this repository by typing :
 
 ```bash
 git clone https://github.com/jsalt-coml/lena_eval.git
 cd lena_eval
 ```
-
-## Data downloading & sanity check
-
-For **oberon** users, data can be found under **/scratch1/projects/LENA_eval_Marvin/data**. Type the following command to download the **data** :
-
-```bash
-rsync -rzvvPL /scratch1/projects/LENA_eval_Marvin/data .
-```
-
-This folder contains three sub-folders called :
-- **rttm** containing the human-made annotations.
-- **lena** containing the lena-made annotations.
-- **wav** containing the audio files.
-Once the data have been downloaded, we can verify that everything went smoothly by checking the number of files :
-
-```bash
-CORPUS=("BER" "ROW" "SOD" "WAR" "C");
-for CORPORA in ${CORPUS[*]}; do 
-    NB_GOLDS=$(find data/gold/${CORPORA}*.rttm | wc -l);
-    NB_LENAS=$(find data/lena/${CORPORA}*.rttm | wc -l);
-    NB_AUDIOS=$(find data/wav/${CORPORA}*.wav | wc -l);
-    echo "$CORPORA : ${NB_GOLDS} / ${NB_LENAS} / ${NB_AUDIOS}";      
-done;
-```
-
-The output should EXACTLY be (under the format **CORPORA : NB_GOLDS/NB_LENAS/NB_AUDIOS** ) :
-
-```bash
-BER : 150 / 150 / 150
-ROW : 150 / 150 / 150
-SOD : 150 / 150 / 150
-WAR : 150 / 150 / 150
-```
-
-## Creating the conda environment
 
 Make sure that [pip](https://pypi.org/project/pip/), [conda](https://docs.conda.io/en/latest/) and [R](https://www.r-project.org/) are installed on your system.
 Once everything has been installed, we can create the [conda](https://docs.conda.io/en/latest/) environment containing all the necessary python packages.
@@ -57,119 +24,94 @@ conda activate lena-eval
 pip install pyannote-metrics
 ```
 
-## Computing performance metrics
-
-Let us get down to business !
-
-1) Map the labels :
+You must also verify that [R](https://www.r-project.org/) is installed and have the following packages : dplyr, magrittr, stringr, stringi.
+Once you installed everything, you can check that everything went well by launching :
 
 ```bash
-python scripts/labels_mapper.py -p data/lena/ -m lena_far
-python scripts/labels_mapper.py -p data/gold/ -m gold -o
+./scripts/0_check_config.sh
 ```
 
-This will create :
-- a **mapped_lena_sil** sub-folder in the **lena** folder
-- a **mapped_gold** in the gold folder.
+which will tell you either what's missing if something's missing or if everything's went as expected.
 
-The parameter **-m** describes the desired mapping :
-- Mapping choices for the lena files are **[lena_far, lena_sil, lena_sil_no_tv,lena_sil_no_tv_no_oln]**.
-- Mapping choices for the gold files are **[gold, gold_no_ele]**.
+## Get the data
 
-If provided, the **-o** option is responsible for mapping to "OVL" moments where two speakers are speaking at the same time (shouldn't be the case in LENA files).
-
-2) Compute the metrics :
+To download necessary data, you can launch :
 
 ```bash
-python scripts/compute_metrics.py -ref data/gold/mapped_gold -hyp data/lena/mapped_lena_far -t diarization -m diaer coverage homogeneity completeness purity
+./scripts/1_get_data.sh <habilis_username>
 ```
 
-This will list all pairs that have been found between the human-made and the lena-made files (150 pairs).
-It will also generate *.csv files containing the evaluations in the *data/gold/mapped_gold/gold_no_ele_lena_sil* folder.
-Let's repatriate these files :
+where <habilis_username> is the username of your habilis account. 
+The script will ask you to type your password.
+
+This will download ACLEW and Tsimane files. 
+We need both human-made annotations (gold) and lena-made annotations.
+Note that ACLEW gold files are automagically updated if the original annotation files are, themselves, updated.
+While other files are set in stone and should be re-downloaded to habilis whenever their annotation files undergo a substantial change. 
+
+## Run the evaluations
+
+You can run all the evaluations by typing :
 
 ```bash
-mkdir evaluations
-mv data/gold/mapped_gold/gold_lena_far evaluations
+./scripts/2_evaluate.sh
 ```
 
-If we display the 2 first lines of one of these files by typing :
+This will take a bit of time (but still less than 10 mn ! Go get yourself a cup of coffee...)
+
+## Understanding the results
+
+All the steps described above are generating something in the _**evaluations**_ folder.
+
+You can type : 
 
 ```bash
-head -2 evaluations/gold_lena_sil/diaer_report.csv
+tail -1 evaluations/gold_lena_sil_same/ider_report.csv
 ```
 
-we should get :
+and you should get :
 
 ```bash
-item,diarization error rate %,total,correct,correct %,false alarm,false alarm %,missed detection,missed detection %,confusion,confusion %
-BER_0396_005220_005340.rttm,134.26,27.04,19.13,70.73,28.39,104.99,2.73,10.08,5.19,19.18
+item,identification error rate %,total,correct,correct %,false alarm,false alarm %,missed detection,missed detection %,confusion,confusion %
+TOTAL,123.87,24664.27,8860.30,35.92,14748.43,59.80,5469.55,22.18,10334.42,41.90
 ```
 
-where the first line describes the header, and the second line contains metrics for the *BER_0396_005220_005340.rttm* file.
-One can display the last line by typing :
+Which gives you the **identification error rate** aggregated over all of the files for the classes [CHI, OCH, MAL, FEM, ELE, OVL].
+
+Or : 
 
 ```bash
-tail -1 evaluations/gold_lena_sil/diaer_report.csv
+tail -1 evaluations/gold_lena_sil_same/only_CHI_deter_report.csv
 ```
 
-and should get :
+gives you :
 
 ```bash
-TOTAL,140.71,24664.56,11962.99,48.50,22004.18,89.21,2278.74,9.24,10422.83,42.26
+TOTAL,82.90,5881.48,1912.53,32.52,2963.21,50.38
 ```
 
-This line contains the metrics aggregated across all of the files, and therefore describes general performances of the LENA model.
+which is the detection error rate aggregated over all of the files for the **CHI** class.
+The second folder indicates the mapping that has been used for running the evaluations :
 
-## Computing confusion matrices
+- gold_lena_sil_same for when the classes have been mapped to [CHI, OCH, MAL, FEM, ELE, OVL].
+- gold_no_ele_lena_sil_no_tv_same for when ELE has been mapped to SIL
+- gold_no_ele_no_ovl_lena_sil_no_tv_no_oln_same for when ELE and OVL have been mapped to SIL.
 
-We start by generating frame-based *.rttm* files to transform our problem into a classification task.
+You can also type :
 
 ```bash
-python scripts/frame_cutter.py  --i data/lena/mapped_lena_far/ --o framed_lena_far
-python scripts/frame_cutter.py  --i data/gold/mapped_gold/ --o framed_gold
+head -5 evaluations/all_cm.txt
 ```
 
-This will generate a **framed** sub-folder in both **lena** and **gold** folders containing the framed-based rttm. 
-
-Once it has been done, we can generate the confusion matrices by typing:
+that should return :
 
 ```bash
-Rscript scripts/conf_mat.r data/lena/framed_lena_far data/gold/framed_gold
+"CHN" "FAN" "OLN" "SIL" "CXN" "TVN" "MAN"
+"CHI" 292047 19167 115415 70443 67488 23664 1529
+"FEM" 29041 288019 250749 207098 38179 42612 36886
+"SIL" 102053 85137 652443 4888170 71942 521342 38700
+"OVL" 35929 49562 111186 24663 22517 14193 11967
 ```
 
-This step might take a bit of time, go get yourself a cup of coffee !
-Once it's done, the script will save the confusion matrices under **data/gold/framed_gold**.
-
-Let's repatriate these files :
-
-```bash
-mv data/gold/framed_gold/*.txt evaluations/gold_lena_far
-```
-
-We can print the first 3 lines of one of these confusion matrices by typing : 
-
-```bash
-head -3 evaluations/gold_lena_far/SOD_cm.txt
-```
-
-This should return : 
-
-```bash
-"CHN" "FAN" "OLF" "OLN" "SIL" "CHF" "CXF" "CXN" "FAF" "MAF" "TVF" "TVN" "MAN"
-"CHI" 40830 2453 2626 23320 3324 266 982 18567 439 1250 1966 5125 147
-"FEM" 12841 75210 21495 74932 22831 225 3135 12364 10245 7545 8809 18640 7536
-```
-
-With the first line being the LENA labels. 
-The first row (without considering its first element) are the gold labels.
-And cell(i,j) = number of frames annotated as class_i but classified by the model as class_j 
-
-
-##### Alex notes :
-TODO
-4. Pick up again from the beginning: how does one go from full rec to clip annotation for ACLEW, and for tsi?
-5. Replace tsi its with real ones
-6. Rerun whole
-7. Update results
-8. Talk with Okko, set up reproducible pipeline for AWC
+which is the confusion matrix over all of the files, obtained by considering "N" classes of LENA annotations files.
+Results are also available at the corpora scale - TSI, BER, ROW, WAR, SOD -.

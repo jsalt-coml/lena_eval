@@ -39,9 +39,7 @@ def cutter(path_to_rttm, frame_length, output_file, prefix):
             onset_s = None
 
             for line in rttm:
-                line = line.replace('\t', ' ')
-                line = re.sub('\s+', ' ', line).strip()
-                anno_fields = line.split(' ')
+                anno_fields = line.split('\t')
                 onset_s = float(anno_fields[3])
                 dur_s = float(anno_fields[4])
                 curr_activity = anno_fields[7]
@@ -102,13 +100,13 @@ def single_activity_cutter(basename, output, frame_length_s, dur_s, onset_s, cur
 
     for i in range(0, n_frames):
         onset_s = round(onset_s,2)
-        output.write("SPEAKER %s 1 %s %s <NA> <NA> %s <NA>\n" % \
+        output.write("SPEAKER\t%s\t1\t%s\t%s\t<NA>\t<NA>\t%s\t<NA>\n" % \
                      (basename, onset_s + frame_length_s * i,
                       str(frame_length_s), curr_activity))
 
     if (not np.isclose(onset_s + frame_length_s * n_frames, onset_s+dur_s+diff_s, rtol=1e-05, atol=1e-08, equal_nan=False)) and (onset_s + frame_length_s * n_frames < tot_dur_s):
        onset_s = round(onset_s,2)
-       output.write("SPEAKER %s 1 %s %s <NA> <NA> %s <NA>\n" % \
+       output.write("SPEAKER\t%s\t1\t%s\t%s\t<NA>\t<NA>\t%s\t<NA>\n" % \
                      (basename, onset_s + frame_length_s * n_frames,
                       str(frame_length_s), curr_activity))
 
@@ -142,7 +140,7 @@ def aggregate_overlap(path_to_rttm, output_file):
                     if onset_k != onset_j:
                         if len(frame_activity) >= 2 and 'SIL' in frame_activity:
                             frame_activity.remove("SIL")
-                        output.write("SPEAKER %s 1 %s %s <NA> <NA> %s <NA>\n" % \
+                        output.write("SPEAKER\t%s\t1\t%s\t%s\t<NA>\t<NA\t%s\t<NA>\n" % \
                                      (basename, onset_k, dur_k, '/'.join(frame_activity)))
                         break
                     else:   # onset_k == onset_j:
@@ -156,7 +154,7 @@ def aggregate_overlap(path_to_rttm, output_file):
             if len(frame_activity) >= 2 and 'SIL' in frame_activity:
                 frame_activity.remove("SIL")
             onset_k = round(onset_k,2)
-            output.write("SPEAKER %s 1 %s %s <NA> <NA> %s <NA>\n" % \
+            output.write("SPEAKER\t%s\t1\t%s\t%s\t<NA>\t<NA>\t%s\t<NA>\n" % \
                          (basename, onset_k, dur_k, '/'.join(frame_activity)))
 
 
@@ -189,7 +187,7 @@ def main():
         if len(rttm_files) == 0:
             raise ValueError("No rttm found in %s" % args.input)
         for rttm_path in rttm_files:
-            print("Processing %s" % rttm_path)
+            #print("Processing %s" % rttm_path)
 
             output_file = os.path.join(output, os.path.basename(rttm_path))
             cutter(rttm_path, args.length, output_file + '.tmp', args.prefix)
@@ -199,6 +197,8 @@ def main():
             if num_lines != 12000 and num_lines != 6000:
                 raise ValueError("We should get 12000 lines or 6000 lines but got %d lines instead" % num_lines)
             os.remove(output_file + '.tmp')
+    print("Done framarizing %s" % args.input)
+
 
 if __name__ == '__main__':
     main()
