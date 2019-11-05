@@ -94,3 +94,9 @@ python scripts/frame_cutter.py  --i data/gold/mapped_gold/ --o framed_gold
 Rscript scripts/conf_mat.r data/lena/framed_lena_sil data/gold/framed_gold
 mv data/gold/framed_gold/*.txt evaluations
 
+##################################
+#  4) Vocalizations             ##
+##################################
+
+
+
