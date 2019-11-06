@@ -86,6 +86,21 @@ dodiv=function(x) x/sum(x, na.rm=T)
 ```
 
 
+Marvin : How to use CTC/CVC files 
+```{r marvin1-fig, fig.cap="Key child vocalizations and turn-takings related statistics aggregated across all children"}
+
+all.stats = read.csv(paste0(thisdir,"../evaluations/key_child_voc_corpora_level.csv"), header=TRUE, sep = " ")
+kable(all.stats) %>% kable_styling(latex_options="scale_down")
+```
+```{r marvin2-fig, fig.cap="Key child vocalizations and turn-takings related statistics at the child level"}
+child.stats = read.csv(paste0(thisdir,"../evaluations/key_child_voc_child_level.csv"), header=TRUE, sep = " ")
+kable(head(child.stats)) %>% kable_styling(latex_options="scale_down")
+```
+
+```{r marvin3-fig, fig.cap="Number of conversational turn taking as a function of the age"}
+#rename human SIL as Other only for this graph, otherwise it'll break formulas elsewhere
+scatterplot(child.stats$CTC_count~child.stats$age_mo_round,main="Number of conversational turn taking as a function of the age")
+```
 While nearly all humans eventually become competent users of their language(s), documenting the experiential context of early acquisition is crucial for both theoretical and applied reasons. Regarding theory, there are many open questions about what kinds of experiences and interactions are necessary, sufficient, or optimal for supporting language development. Moreover, the ability to accurately and quickly assess an infant's state of development at a given point in time is of central importance for clinical purposes, both for children with known risks of language delays and disorders, and those who might not be identified based on risk factors. Reliable assessments are also crucial for measuring intervention efficacy. 
 
 One approach that has been making its way into the mainstream literature across basic and applied  research on language and cognition relies on day-long recordings gathered with a LENA^®^ audiorecorder [e.g., @Greenwood2011; @Oller; @Gilkerson2017; @VanDam2018], and further analyzed using automated, closed-source algorithms. As we summarize below, this approach has many advantages, which may explain its expanding popularity. While over a hundred papers over the past two decades have used the output automatically provided by LENA^®^, only a handful include validity estimates [e.g., @Weisleder2013a; @zimmerman2009; @d2019naturalistic], even fewer where validity estimation was the primary focus of the paper [e.g., @Busch2018; @Canault2016; @ganek2018concise; @bulgarelli2019; @Lehet2018]. As a result, few studies report sufficient details about validation accuracy for one or more metrics, limiting the interpretability of the results of a meta-analytic assessment [cf. @Cristia].
@@ -521,7 +536,7 @@ These precision analyses shed light on the extent to which we can trust the LENA
 ```{r ggrec-fig, fig.cap="Recall: Confusion matrix between LENA (x axis) and human annotations (y axis). In each cell, the top number indicates the percentage of all frames that a human labeled as a given class (row) which were recovered in a given LENA category (column); cells in a given row add up to 100%. The number below indicates number of frames in that intersection of LENA and human classes."}
 
 #rename human SIL as Other only for this graph, otherwise it'll break formulas elsewhere
-rownames(all)[7]<-"Other"
+rownames(all)[3]<-"Other"
 
 
 prop_cat=data.frame(t(apply(all,1,dodiv)*100)) #generates recall because rows
@@ -535,7 +550,7 @@ ggplot(data = rec, mapping = aes(y = rec$human, x=rec$LENA)) +
   scale_fill_gradient(low = "white", high = "green", name = "Proportion") +
   xlab("LENA(TM)") + ylab("Human")
 
-rownames(all)[7]<-"SIL"
+rownames(all)[3]<-"SIL"
 ```
 
 #### LENA^®^ classification accuracy: Recall 
@@ -558,8 +573,14 @@ Finally, as with precision, the "far" categories show worse performance than the
 
 #generate version with collapsed data
 colapall=all
-colapall$Other=all$FAF+all$CHF+all$CXF+all$MAF+all$OLN+all$OLF+all$TVN+all$TVF+all$SIL
-colapall["SIL",]<-colapall["SIL",]+colapall["OVL",]+colapall["ELE",]
+# Old version with FAR
+#colapall$Other=all$FAF+all$CHF+all$CXF+all$MAF+all$OLN+all$OLF+all$TVN+all$TVF+all$SIL
+# New version without FAR
+colapall$Other=all$OLN+all$TVN+all$SIL
+# Old version
+# colapall["SIL",]<-colapall["SIL",]+colapall["OVL",]+colapall["ELE",]
+# New version : we map all overlapping classes to SIL
+colapall["SIL",]<-colapall["SIL",]+colapall["OVL",]+colapall["ELE",]+colSums(all[which(grepl("/", rownames(all))),])
 colapall[c("FEM","CHI","OCH","MAL","SIL"),c("FAN","CHN","CXN","MAN","Other")]->colapall
 rownames(colapall)[5]<-"Other"
 
@@ -780,7 +801,7 @@ Together, these results suggest that the direction of errors for AWC is less sta
 The preceding sections include results that are wholesale, with all but AWC conducted over all corpora. However, it's possible that performance would be higher for the corpora collected in North America (BER, WAR, SOD) than those collected in other English-speaking countries (L05) or non-English speaking populations (TSI). Additionally, our age ranges are wide, and in the case of TSI children, some of the children are older than the oldest children in the LENA^®^ training set. To assess whether accuracy varies as a function of corpora and child age, we fit mixed models.
 
 ```{r lmer-dm, echo=F}
-read.csv(paste0(thisdir,"/diaer_gold_no_ele_no_ovl_lena_sil_no_tv_no_oln_report.csv"))->py
+read.csv(paste0(thisdir,"../evaluations/gold_no_ele_no_ovl_lena_sil_no_tv_no_oln_same/ider_report.csv"))->py
 
 #other fixes and addtions
 py=subset(py,item!="TOTAL")
@@ -829,7 +850,6 @@ rownames(anovatab)<-rownames(mycols)
 colnames(anovatab)<-c("FA","M","C")
 rownames(anovatab)<-c("Intercept","Corpus","Age","Corpus*Age")
 apa_table(anovatab,caption="Results of Type III ANOVAs on false alarms (FA), misses (M), and confusions (C): Chi-square (degrees of freedom), followed by * if the relevant factor is significant (p<.05).")
-
 ```
 
 
