@@ -24,7 +24,7 @@ conda activate lena-eval
 pip install pyannote-metrics
 ```
 
-You must also verify that [R](https://www.r-project.org/) is installed and have the following packages : dplyr, magrittr, stringr, stringi.
+You must also verify that [R](https://www.r-project.org/) is installed and have the following packages : dplyr, magrittr, stringr, stringi, and [rlena](https://github.com/HomeBankCode/rlena).
 Once you installed everything, you can check that everything went well by launching :
 
 ```bash
