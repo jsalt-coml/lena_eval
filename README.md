@@ -122,5 +122,23 @@ Results are also available at the corpora scale - TSI, BER, ROW, WAR, SOD -.
 You can type :
 
 ```bash
-head -5 evaluations/
+head -5 evaluations/evaluations/gold_key_child_voc_child_level.csv
 ```
+
+You should get :
+
+```bash
+"child_id" "age_mo_round" "CV_cum_dur" "CV_mean" "CV_count" "CNV_cum_dur" "CNV_mean" "CNV_count" "CTC_count"
+"BER_0396" 15 147.024 0.986738255033557 149 25.211 1.80078571428571 14 71
+"BER_1196" 9 189.982 0.922242718446602 206 2.942 2.942 1 31
+"BER_1618" 7 52.272 0.843096774193548 62 11.889 1.69842857142857 7 47
+"BER_1844" 10 76.787 1.37119642857143 56 57.291 3.8194 15 73
+```
+
+*CV* stands for canonical vocalizations.
+*CNV* stands non canonical voocalizations.
+For each of these vocalizations, you have its number, its cumulated duration, and its average duration.
+*CTC_count* correspond to the number of conversational turn-takings.
+
+Similar files exist across multiples scales, at the scale of the child, the file, or aggregated across all of the files.
+You'll also find similar files for the LENA system.
