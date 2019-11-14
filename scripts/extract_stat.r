@@ -34,7 +34,10 @@ read_its <- function(data_folder, gold_folder) {
       for(i in 1:length(onsets)) {
         onset = onsets[i]
         offset = offsets[i]
-        chunk = file_data[file_data$startTime > onset & file_data$startTime < offset, ]
+        chunk = file_data[file_data$endTime > onset & file_data$startTime < offset, ]
+        chunk[chunk$startTime < onset, "startTime"] = onset
+        chunk[chunk$endTime > offset, "offset"] = offset
+
         if(nrow(chunk) != 0) {
           chunk$onset = onset
           chunk$offset = offset

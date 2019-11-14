@@ -14,11 +14,11 @@ Once everything has been installed, we can create the [conda](https://docs.conda
 
 ```bash
 # Create environment
-conda create --name lena-eval python=3.6
+conda create --name lena_eval python=3.6
 
 # Activate the environment (this command should be run each time you open a new terminal !)
-# might be *source activate lena-eval* depending on how you set up conda
-conda activate lena-eval
+# might be *source activate lena_eval* depending on how you set up conda
+conda activate lena_eval
 
 # Install necessary packages
 pip install pyannote-metrics
@@ -46,8 +46,6 @@ The script will ask you to type your password.
 
 This will download ACLEW and Tsimane files. 
 We need both human-made annotations (gold) and lena-made annotations.
-Note that ACLEW gold files are automagically updated if the original annotation files are, themselves, updated.
-While other files are set in stone and should be re-downloaded to habilis whenever their annotation files undergo a substantial change. 
 
 ## Run the evaluations
 
@@ -57,11 +55,13 @@ You can run all the evaluations by typing :
 ./scripts/2_evaluate.sh
 ```
 
-This will take a bit of time (but still less than 10 mn ! Go get yourself a cup of coffee...)
+This will take a bit of time (but probably less than 10 mn ! Go get yourself a cup of coffee...)
 
 ## Understanding the results
 
 All the steps described above are generating something in the _**evaluations**_ folder.
+
+### Identification Error Rate 
 
 You can type : 
 
@@ -97,6 +97,7 @@ The second folder indicates the mapping that has been used for running the evalu
 - gold_no_ele_lena_sil_no_tv_same for when ELE has been mapped to SIL
 - gold_no_ele_no_ovl_lena_sil_no_tv_no_oln_same for when ELE and OVL have been mapped to SIL.
 
+### Confusion Matrices
 You can also type :
 
 ```bash
@@ -115,3 +116,11 @@ that should return :
 
 which is the confusion matrix over all of the files, obtained by considering "N" classes of LENA annotations files.
 Results are also available at the corpora scale - TSI, BER, ROW, WAR, SOD -.
+
+### Vocalization statistics
+
+You can type :
+
+```bash
+head -5 evaluations/
+```
