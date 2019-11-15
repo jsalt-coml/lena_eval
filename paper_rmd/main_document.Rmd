@@ -71,7 +71,7 @@ output            : papaja::apa6_pdf
 knitr::opts_chunk$set(warning = FALSE, message = FALSE, cache = FALSE, fig.pos = "T")
 options(kableExtra.latex.load_packages = FALSE)
 require("papaja")
-thisdir=c("../LENA_eval_201906/")
+thisdir=c("../evaluations/")
 library(lme4)
 library(sm)
 library(scales)
@@ -85,22 +85,6 @@ dodiv=function(x) x/sum(x, na.rm=T)
 
 ```
 
-
-Marvin : How to use CTC/CVC files 
-```{r marvin1-fig, fig.cap="Key child vocalizations and turn-takings related statistics aggregated across all children"}
-
-all.stats = read.csv(paste0(thisdir,"../evaluations/key_child_voc_corpora_level.csv"), header=TRUE, sep = " ")
-kable(all.stats) %>% kable_styling(latex_options="scale_down")
-```
-```{r marvin2-fig, fig.cap="Key child vocalizations and turn-takings related statistics at the child level"}
-child.stats = read.csv(paste0(thisdir,"../evaluations/key_child_voc_child_level.csv"), header=TRUE, sep = " ")
-kable(head(child.stats)) %>% kable_styling(latex_options="scale_down")
-```
-
-```{r marvin3-fig, fig.cap="Number of conversational turn taking as a function of the age"}
-#rename human SIL as Other only for this graph, otherwise it'll break formulas elsewhere
-scatterplot(child.stats$CTC_count~child.stats$age_mo_round,main="Number of conversational turn taking as a function of the age")
-```
 While nearly all humans eventually become competent users of their language(s), documenting the experiential context of early acquisition is crucial for both theoretical and applied reasons. Regarding theory, there are many open questions about what kinds of experiences and interactions are necessary, sufficient, or optimal for supporting language development. Moreover, the ability to accurately and quickly assess an infant's state of development at a given point in time is of central importance for clinical purposes, both for children with known risks of language delays and disorders, and those who might not be identified based on risk factors. Reliable assessments are also crucial for measuring intervention efficacy. 
 
 One approach that has been making its way into the mainstream literature across basic and applied  research on language and cognition relies on day-long recordings gathered with a LENA^®^ audiorecorder [e.g., @Greenwood2011; @Oller; @Gilkerson2017; @VanDam2018], and further analyzed using automated, closed-source algorithms. As we summarize below, this approach has many advantages, which may explain its expanding popularity. While over a hundred papers over the past two decades have used the output automatically provided by LENA^®^, only a handful include validity estimates [e.g., @Weisleder2013a; @zimmerman2009; @d2019naturalistic], even fewer where validity estimation was the primary focus of the paper [e.g., @Busch2018; @Canault2016; @ganek2018concise; @bulgarelli2019; @Lehet2018]. As a result, few studies report sufficient details about validation accuracy for one or more metrics, limiting the interpretability of the results of a meta-analytic assessment [cf. @Cristia].
@@ -182,7 +166,7 @@ kable(datasets_table, "latex", caption = "Key properties of the five corpora", b
 
 Despite these differences, all five corpora consists of long (4–16 hour) recordings collected as children wear a LENA^®^ recorder in a LENA^®^ vest throughout a normal day and/or night. For the four ACLEW corpora, out of the 106 recorded participants, daylong recordings from 10 infants from each corpus were chosen for manual annotation, selected to represent a diversity of ages (0–36 months) and socio-economic contexts. In the SOD corpus, sensitive information was found in one of the files, and thus one child needed to be excluded. The tenth day for this corpus was a second day by one of the 9 included children. From each daylong file, fifteen 2-minute non-overlapping audio (with a 5-minute context window) were randomly sampled from the entire daylong timeline for manual annotation. In total, this lead to 20 hours of audio, and 4.6 hours of annotated speech/vocalizations (collapsing across all speaker categories). 
 
-The TSI corpus consisted of 1 or 2 recordings from 12 children, out of the 25 children recorded from field work that year; the other 13 had been recorded using other devices (not the LENA^®^ hardware). From these  files, 1-minute segments were sampled in a periodic fashion. That is, for each recording, we skipped the first 33 minutes to allow the family to acclimate to the recorder, and then extracted 1 minute of audio (with a 5-minute context window) every 60 minutes, until the end of the recording was reached. This resulted in a total of 4.5 hours of audio, and 0.7 hours of speech (collapsing across all speaker categories).
+The TSI corpus consisted of 1 or 2 recordings from 13 children, out of the 25 children recorded from field work that year; the other 12 had been recorded using other devices (not the LENA^®^ hardware). From these  files, 1-minute segments were sampled in a periodic fashion. That is, for each recording, we skipped the first 33 minutes to allow the family to acclimate to the recorder, and then extracted 1 minute of audio (with a 5-minute context window) every 60 minutes, until the end of the recording was reached. This resulted in a total of 4.5 hours of audio, and 0.7 hours of speech (collapsing across all speaker categories).
 
 We chose to sample 1 or 2 minutes at a time (TSI, and ACLEW corpora, respectively) because conversations are likely to be bursty [@goh2008burstiness]. That is, it is likely the case that speech is not produced at a periodic rate (e.g., one phrase every 20 seconds), but rather it occurs in bursts (a conversation is followed by a long period of silence between the conversational partners, followed by another bout of conversation, perhaps with different interlocutors, followed by silence, and so on). In this context, imagine that you sample a 5-second stretch. If you find speech in that stretch, then it is likely you have by chance fallen on a conversation bout; if you do not find speech, then you have likely found a silence bout. If you were to extend that selection out to several minutes, then it is likely that you will simply add more material from the same type (i.e. conversation bout or silence bout). As a result, any sampling method that favors medium-sized stretches (5-15 minutes) will tend to end up with samples that are internally homogeneous (throughout the 5 minutes, there is a conversation, or there is silence throughout). If smaller clips are sampled out, this heterogeneity is still captured, but (keeping the total length of audio extracted fixed) the number of clips that can be extracted is larger, thus likely increasing the likelihood that results will generalize to a new section of the audio.
 
@@ -272,103 +256,12 @@ For the LENA^®^ Adult Word Counts, the regions sampled for manual annotation we
 ## Results
 
 ```{r read-cm,echo=F}
-
-# Old version of the code
-# ber=read.table(paste0(thisdir,"BER","_cm.txt"),header=T)
-# row=read.table(paste0(thisdir,"ROW","_cm.txt"),header=T)
-# sod=read.table(paste0(thisdir,"SOD","_cm.txt"),header=T)
-# war=read.table(paste0(thisdir,"WAR","_cm.txt"),header=T)
-# all=read.table(paste0(thisdir,"all","_cm.txt"),header=T)
-# 
-# 
-# #remove empty rows
-# ber=ber[rownames(ber)[rowSums(ber)>0],]
-# row=row[rownames(row)[rowSums(row)>0],]
-# war=war[rownames(war)[rowSums(war)>0],]
-# sod=sod[rownames(sod)[rowSums(sod)>0],]
-# all=sod[rownames(all)[rowSums(all)>0],]
-# 
-# sumref=rowSums(all)
-
-ber=read.table(paste0(thisdir,"../evaluations/BER","_cm.txt"),header=T)
-row=read.table(paste0(thisdir,"../evaluations/ROW","_cm.txt"),header=T)
-sod=read.table(paste0(thisdir,"../evaluations/SOD","_cm.txt"),header=T)
-war=read.table(paste0(thisdir,"../evaluations/WAR","_cm.txt"),header=T)
-all=read.table(paste0(thisdir,"../evaluations/all","_cm.txt"),header=T)
-
-
-#remove empty rows
-ber=ber[rownames(ber)[rowSums(ber)>0],]
-row=row[rownames(row)[rowSums(row)>0],]
-war=war[rownames(war)[rowSums(war)>0],]
-sod=sod[rownames(sod)[rowSums(sod)>0],]
-all=all[rownames(all)[rowSums(all)>0],]
-
-sumref=rowSums(all)
+source("readin_cm.R")
 ```
 
 ```{r DIAER,echo=F}
-# Old version based on identification error rate. We switched to identification error rate
-# read.csv(paste0(thisdir,"/diaer_gold_no_ele_no_ovl_lena_sil_no_tv_no_oln_report.csv"))->py
-# #dim(py) #873 clips
-# #summary(py)
-# 
-# #294 FA, MI, confusion are NA because no speech at all in the clip
-# pytot=subset(py,item=="TOTAL")
-# #other fixes and addtions
-# py=subset(py,item!="TOTAL")
-# py$false.alarm..[py$total==0 & py$false.alarm!=0]<-100
-# py$false.alarm..[py$total==0 & py$false.alarm==0]<-0
-# py$missed.detection..[py$total==0 ]<-0
-# py$missed.detection..[py$missed.detection==0 ]<-0
-# py$cor=substr(py$item,1,3)
-# py$cor[grep("[0-9]",py$cor)]<-"TSI"
-# py$cor=factor(py$cor)
-# 
-# py$child=substr(py$item,1,8)
-# py$child[py$cor=="TSI"]=substr(py$item[py$cor=="TSI"],1,3)
-# 
-# # add in age info
-# spreadsheet = read.csv(paste0(thisdir,"/ACLEW_list_of_corpora.csv"), header=TRUE, sep = ",")
-# spreadsheet$child=paste0(spreadsheet$labname,"_",ifelse(nchar(spreadsheet$aclew_id)==3,paste0("0",spreadsheet$aclew_id),spreadsheet$aclew_id))
-# spreadsheet = spreadsheet[,c("child","age_mo_round")]
-# colnames(spreadsheet) = c("child","age")
-# spreadsheet_tsi = read.csv(paste0(thisdir,"/anon_metadata.csv"), header=TRUE, sep = ",")
-# spreadsheet_tsi = spreadsheet_tsi[c("id","age_mo")]
-# colnames(spreadsheet_tsi) = c("child","age")
-# age_id = rbind(spreadsheet, spreadsheet_tsi)
-# py=merge(py,age_id,by.x="child",by.y="child",all.x=T)
 
-# [CHI,OCH,MAL,FEM]
-read.csv(paste0(thisdir,"../evaluations/gold_no_ele_no_ovl_lena_sil_no_tv_no_oln_same/ider_report.csv"))->py
-#dim(py) #873 clips
-#summary(py)
-
-#294 FA, MI, confusion are NA because no speech at all in the clip
-pytot=subset(py,item=="TOTAL")
-#other fixes and addtions
-py=subset(py,item!="TOTAL")
-py$false.alarm..[py$total==0 & py$false.alarm!=0]<-100
-py$false.alarm..[py$total==0 & py$false.alarm==0]<-0
-py$missed.detection..[py$total==0 ]<-0
-py$missed.detection..[py$missed.detection==0 ]<-0
-py$cor=substr(py$item,1,3)
-py$cor[grep("[0-9]",py$cor)]<-"TSI"
-py$cor=factor(py$cor)
-
-py$child=substr(py$item,1,8)
-py$child[py$cor=="TSI"]=substr(py$item[py$cor=="TSI"],1,3)
-
-# add in age info
-spreadsheet = read.csv(paste0(thisdir,"/ACLEW_list_of_corpora.csv"), header=TRUE, sep = ",")
-spreadsheet$child=paste0(spreadsheet$labname,"_",ifelse(nchar(spreadsheet$aclew_id)==3,paste0("0",spreadsheet$aclew_id),spreadsheet$aclew_id))
-spreadsheet = spreadsheet[,c("child","age_mo_round")]
-colnames(spreadsheet) = c("child","age")
-spreadsheet_tsi = read.csv(paste0(thisdir,"/anon_metadata.csv"), header=TRUE, sep = ",")
-spreadsheet_tsi = spreadsheet_tsi[c("id","age_mo")]
-colnames(spreadsheet_tsi) = c("child","age")
-age_id = rbind(spreadsheet, spreadsheet_tsi)
-py=merge(py,age_id,by.x="child",by.y="child",all.x=T)
+source("readin_ider.R")
 ```
 
 ```{r tabprops, echo=F}
@@ -386,7 +279,7 @@ tab[,3]=round(tab[,1]/100/60)
 colnames(tab)<-c("Frames","Percentage","Minutes")
 rownames(tab)<-c("CHI","FEM","MAL","OCH","OVL","ELE","Other")
 #k,f,m,oc,o,e,s
-apa_table(tab,caption="Number of frames, percentage of frames, and number of minutes attributed to each category by the human annotators. Please note percentages do not add up to 100 due to rounding.")
+apa_table(tab,caption="Number of frames, percentage of frames, and number of minutes attributed to each category by the human annotators. Please note percentages do not add up to 100 due to rounding.",digits=0)
 ```
 
 
@@ -463,10 +356,9 @@ clean(allpy)->allpy
 
 medians=aggregate(allpy[,c("false.alarm..","missed.detection..","confusion..")],by=list(allpy$type),median,na.rm=T)
 
-colnames(medians)[1]<-c("type")
 medians[2:4]<-round(medians[2:4])
 medians$ider=rowSums(medians[2:4])
-medians=medians[c(3,1,2),]
+medians=medians[c(3,1,2),-1]
 rownames(medians)<-c("Speakers","+ Overlap","+ Electronic")
 ```
 
@@ -478,7 +370,7 @@ rownames(medians)<-c("Speakers","+ Overlap","+ Electronic")
 
 colnames(medians)<-c("FAR","MR","CR","IDER")
 
-apa_table(medians,caption="False Alarm Rate (FAR), Miss Rate (MR), Confusion Rate, and total Identification Error Rate (IDER, sum of the medians of the other three categories), as a function of which categories are considered. Speakers indicates that only speaker categories are considers (all others are mapped onto SIL); + Overlap that overlap in both human and LENA annotation were also scored; + Electronic that also electronic was scored;")
+apa_table(medians,caption="False Alarm Rate (FAR), Miss Rate (MR), Confusion Rate, and total Identification Error Rate (IDER, sum of the medians of the other three categories), as a function of which categories are considered. Speakers indicates that only speaker categories are considers (all others are mapped onto SIL); + Overlap that overlap in both human and LENA annotation were also scored; + Electronic that also electronic was scored.",digits=0)
 ```
 
 
@@ -500,13 +392,13 @@ This subsection shows confusion matrices, containing information on precision an
 ```{r ggprec-fig, fig.cap="Precision: Confusion matrix between LENA (x axis) and human annotations (y axis). In each cell, the top number indicates the percentage of all frames in that LENA category (column) that are labeled as a given class by the human (row); cells in a given column add up to 100%. The number below indicates number of frames in that intersection of LENA and human classes."}
 
 #rename human SIL as Other only for this graph, otherwise it'll break formulas elsewhere
-rownames(all)[3]<-"Other"
+rownames(all)[rownames(all)=="SIL"]<-"Other"
 
 prop_cat=data.frame(apply(all,2,dodiv)*100) #generates precision because columns
 #colSums(prop_cat)
 stack(all)->stall
 colnames(stall)<-c("n","LENA")
-stall$human=factor(rownames(all))
+stall$human=factor(rownames(all),levels = rownames(all))
 stall$pr=stack(prop_cat)$values
 
 
@@ -517,7 +409,7 @@ ggplot(data = stall, mapping = aes(y = stall$human, x=stall$LENA)) +
   scale_fill_gradient(low = "white", high = "red", name = "Proportion") +
   xlab("LENA(TM)") + ylab("Human")
 
-rownames(all)[3]<-"SIL"
+rownames(all)[rownames(all)=="Other"]<-"SIL"
 
 ```
 
@@ -536,33 +428,32 @@ These precision analyses shed light on the extent to which we can trust the LENA
 ```{r ggrec-fig, fig.cap="Recall: Confusion matrix between LENA (x axis) and human annotations (y axis). In each cell, the top number indicates the percentage of all frames that a human labeled as a given class (row) which were recovered in a given LENA category (column); cells in a given row add up to 100%. The number below indicates number of frames in that intersection of LENA and human classes."}
 
 #rename human SIL as Other only for this graph, otherwise it'll break formulas elsewhere
-rownames(all)[3]<-"Other"
+rownames(all)[rownames(all)=="SIL"]<-"Other"
+
+prop_cat=data.frame(apply(all,1,dodiv)*100) #generates recall because rows
+stall$rec=stack(prop_cat)$values
 
 
-prop_cat=data.frame(t(apply(all,1,dodiv)*100)) #generates recall because rows
-rec=stall
-rec$pr=stack(prop_cat)$values
-  
-ggplot(data = rec, mapping = aes(y = rec$human, x=rec$LENA)) + 
-  geom_tile(aes(fill= rescale(rec$pr)), colour = "white") +
-  geom_text(aes(label = paste(round(rec$pr),"%")), vjust = -1,size=2) + 
-  geom_text(aes(label = rec$n), vjust = 1,size=2) + 
+ggplot(data = stall, mapping = aes(y = stall$human, x=stall$LENA)) + 
+  geom_tile(aes(fill= rescale(stall$rec)), colour = "white") +
+  geom_text(aes(label = paste(round(stall$rec),"%")), vjust = -1,size=2) + 
+  geom_text(aes(label = stall$n), vjust = 1,size=2) + 
   scale_fill_gradient(low = "white", high = "green", name = "Proportion") +
   xlab("LENA(TM)") + ylab("Human")
 
-rownames(all)[3]<-"SIL"
+rownames(all)[rownames(all)=="Other"]<-"SIL"
 ```
 
 #### LENA^®^ classification accuracy: Recall 
-Again, we start with an example to facilitate the interpretation of Figure 3. As seen at the intersectin of human CHI (row 1) and LENA^®^ CHN (column 3), the best performance for a talker category for recall is CHN: `r round(mean(rec$pr[rec$LENA=="CHN" & rec$human=="CHI"]))`% of the frames humans tagged as being uttered by the key child were captured by the LENA^®^ under the CHN tag. Among the remainder of what humans labeled as  the key child, `r round(mean(rec$pr[rec$LENA=="CXN" & rec$human=="CHI"]))`% was captured by the LENA^®^ system's  CXN category and `r round(mean(rec$pr[rec$LENA=="OLN" & rec$human=="CHI"]))`% by its OLN tag, with the rest spread across several categories. 
+Again, we start with an example to facilitate the interpretation of Figure 3. As seen at the intersectin of human CHI (row 1) and LENA^®^ CHN (column 3), the best performance for a talker category for recall is CHN: `r round(mean(stall$rec[stall$LENA=="CHN" & stall$human=="CHI"]))`% of the frames humans tagged as being uttered by the key child were captured by the LENA^®^ under the CHN tag. Among the remainder of what humans labeled as  the key child, `r round(mean(stall$rec[stall$LENA=="CXN" & stall$human=="CHI"]))`% was captured by the LENA^®^ system's  CXN category and `r round(mean(stall$rec[stall$LENA=="OLN" & stall$human=="CHI"]))`% by its OLN tag, with the rest spread across several categories. 
 
-This result suggests that an analysis pipeline that uses the LENA^®^ system to capture the key child's vocalizations by extracting only CHN regions will get nearly half of the key child's speech. If additional manual human vetting is occuring in the pipeline, researchers may find it fruitful to include segments labeled as CXN, since this category actually contains a further `r round(mean(rec$pr[rec$LENA=="CXN" & rec$human=="CHI"]))`% of the key child's speech. Moreover, as we saw above, over 33% of these LENA^®^ tags corresponds to the key child, which means that human coders re-coding these regions could filter out the 67% that do not.
+This result suggests that an analysis pipeline that uses the LENA^®^ system to capture the key child's vocalizations by extracting only CHN regions will get nearly half of the key child's speech. If additional manual human vetting is occuring in the pipeline, researchers may find it fruitful to include segments labeled as CXN, since this category actually contains a further `r round(mean(stall$rec[stall$LENA=="CXN" & stall$human=="CHI"]))`% of the key child's speech. Moreover, as we saw above, over 33% of these LENA^®^ tags corresponds to the key child, which means that human coders re-coding these regions could filter out the 67% that do not.
 	
-Many researchers also use the LENA^®^ as a first pass to capture female adult speech through the FAN label. Only `r round(mean(rec$pr[rec$LENA=="FAN" & rec$human=="FEM"]))`% of the female adult speech can be captured this way. Unlike the case of the key child, missed female speech is classified into many of the other categories, and thus there may not exist an easy solution (i.e., one would have to pull out all examples of many other categories to get at least half of the original female adult). However, if the goal is to capture as much of the female speech as possible, a reasonable solution would be to include OLN regions, since these capture a further `r round(mean(rec$pr[rec$LENA=="OLN" & rec$human=="FEM"]))`% of the original female adult speech and, out of the OLN tags, `r round(mean(stall$pr[stall$LENA=="OLN" & stall$human=="FEM"]))`% are indeed female adults (meaning that human annotators re-coding these regions need to filter out 3/4 clips, on average).
+Many researchers also use the LENA^®^ as a first pass to capture female adult speech through the FAN label. Only `r round(mean(stall$rec[stall$LENA=="FAN" & stall$human=="FEM"]))`% of the female adult speech can be captured this way. Unlike the case of the key child, missed female speech is classified into many of the other categories, and thus there may not exist an easy solution (i.e., one would have to pull out all examples of many other categories to get at least half of the original female adult). However, if the goal is to capture as much of the female speech as possible, a reasonable solution would be to include OLN regions, since these capture a further `r round(mean(stall$rec[stall$LENA=="OLN" & stall$human=="FEM"]))`% of the original female adult speech and, out of the OLN tags, `r round(mean(stall$pr[stall$LENA=="OLN" & stall$human=="FEM"]))`% are indeed female adults (meaning that human annotators re-coding these regions need to filter out 3/4 clips, on average).
 	
-For the remaining two "near" speaker labels (MAN, CXN), recall averaged `r round(mean(rec$pr[(rec$LENA=="MAN" & rec$human=="MAL")|(rec$LENA=="CXN" & rec$human=="CXN")]))`%, meaning that less than a quarter of male adult and other child speech is being captured by LENA^®^. In fact, most of these speakers' contributions are being tagged by the LENA^®^ as OLN (mean across MAN and CXN `r round(mean(rec$pr[(rec$LENA=="OLN" & rec$human=="MAL")|(rec$LENA=="OLN" & rec$human=="CXN")]))`%) or TV (mean across MAN and CXN is `r round(mean(rec$pr[(rec$LENA=="TVN" & rec$human=="MAL")|(rec$LENA=="SIL" & rec$human=="CXN")]))`%), although the remaining sizable proportion of misses is actually distributed across many categories. 
+For the remaining two "near" speaker labels (MAN, CXN), recall averaged `r round(mean(stall$rec[(stall$LENA=="MAN" & stall$human=="MAL")|(stall$LENA=="CXN" & stall$human=="CXN")]))`%, meaning that less than a quarter of male adult and other child speech is being captured by LENA^®^. In fact, most of these speakers' contributions are being tagged by the LENA^®^ as OLN (mean across MAN and CXN `r round(mean(stall$rec[(stall$LENA=="OLN" & stall$human=="MAL")|(stall$LENA=="OLN" & stall$human=="CXN")]))`%) or TV (mean across MAN and CXN is `r round(mean(stall$rec[(stall$LENA=="TVN" & stall$human=="MAL")|(stall$LENA=="SIL" & stall$human=="CXN")]))`%), although the remaining sizable proportion of misses is actually distributed across many categories. 
 
-Finally, as with precision, the "far" categories show worse performance than the "near" ones. It was always the case that a higher percentage of frames is captured by the near rather than the far labels. For instance, out of all frames attributed to the key child by the human annotator, `r round(rec$pr[(rec$LENA=="CHN" & rec$human=="CHI")])`% were picked up by the LENA^®^ CHN label versus `r round(rec$pr[(rec$LENA=="CHF" & rec$human=="CHI")])`% by the LENA^®^ CHF label. This result provides further support that when sampling LENA^®^ daylong files using the LENA^®^ software, users likely need not take the "far" categories into account.
+Finally, as with precision, the "far" categories show worse performance than the "near" ones. It was always the case that a higher percentage of frames is captured by the near rather than the far labels. For instance, out of all frames attributed to the key child by the human annotator, `r round(stall$rec[(stall$LENA=="CHN" & stall$human=="CHI")])`% were picked up by the LENA^®^ CHN label versus `r round(stall$rec[(stall$LENA=="CHF" & stall$human=="CHI")])`% by the LENA^®^ CHF label. This result provides further support that when sampling LENA^®^ daylong files using the LENA^®^ software, users likely need not take the "far" categories into account.
 
 
 #### LENA^®^ classification accuracy: Agreement using Cohen's kappa
@@ -573,14 +464,9 @@ Finally, as with precision, the "far" categories show worse performance than the
 
 #generate version with collapsed data
 colapall=all
-# Old version with FAR
-#colapall$Other=all$FAF+all$CHF+all$CXF+all$MAF+all$OLN+all$OLF+all$TVN+all$TVF+all$SIL
-# New version without FAR
 colapall$Other=all$OLN+all$TVN+all$SIL
-# Old version
-# colapall["SIL",]<-colapall["SIL",]+colapall["OVL",]+colapall["ELE",]
-# New version : we map all overlapping classes to SIL
-colapall["SIL",]<-colapall["SIL",]+colapall["OVL",]+colapall["ELE",]+colSums(all[which(grepl("/", rownames(all))),])
+colapall["SIL",]<-colapall["SIL",]+colapall["OVL",]+colapall["ELE",]
+#remove ovl and ele
 colapall[c("FEM","CHI","OCH","MAL","SIL"),c("FAN","CHN","CXN","MAN","Other")]->colapall
 rownames(colapall)[5]<-"Other"
 
@@ -589,7 +475,7 @@ cohen.kappa(colapall)->ck
 
 ```
 
-Given results above suggesting that our coding of electronic may not have coincided with LENA^®^'s, and that "far" categories are inaccurate, in this analysis we only consider the following labels for LENA^®^: (all others are collapsed into an Other category); and the following labels for human annotators: (all others are collapsed into an Other category). This analysis revealed a Cohen Kappa estimated at K(`r ck$n.obs`) = `r ck$kappa` (confidence interval `r ck$kappa-ck$var.kappa*2`-`r ck$kappa+ck$var.kappa*2`), weighted Kappa estimated at K(`r ck$n.obs`) = `r ck$weighted.kappa` (confidence interval `r ck$weighted.kappa-ck$var.weighted*2`-`r ck$weighted.kappa+ck$var.weighted*2`).
+Given results above suggesting that our coding of electronic may not have coincided with LENA^®^'s, and that "far" categories are inaccurate, in this analysis we only consider the following labels for LENA^®^: (all others are collapsed into an Other category); and the following labels for human annotators: (all others are collapsed into an Other category). This analysis revealed a Cohen Kappa estimated at K(`r ck$n.obs`) = `r ck$kappa`, weighted Kappa estimated at K(`r ck$n.obs`) = `r ck$weighted.kappa`.
 
 
 
@@ -600,14 +486,29 @@ allpearsons=matrix(nrow=3,ncol=4)
 rownames(allpearsons)<-c("CVC","CTC","AWC")
 colnames(allpearsons)<-c("N clips","r all","N","r")
 
-aller=matrix(nrow=3,ncol=12)
-rownames(aller)<-c("CVC","CTC","AWC")
-colnames(aller)<-c("AER","min","max","AER-0","min","max","RER","min1","max1","ARER","min2","max2")
 
-read.table(paste0(thisdir,"/cvtc.txt"),header=T)->cvtc
+read.table(paste0(thisdir,"/gold_key_child_voc_file_level.csv"),header=T,sep=" ")->gold
 
-cor.cvc.all= cor.test(cvtc$CVC_n,cvtc$CVC_gold)
-cor.cvc.noZeros= cor.test(cvtc$CVC_n[cvtc$CVC_n>0 & cvtc$CVC_gold>0],cvtc$CVC_gold[cvtc$CVC_n>0 & cvtc$CVC_gold>0])
+
+read.table(paste0(thisdir,"/lena_key_child_voc_file_level.csv"),header=T,sep=" ")->lena
+
+#some cleaning to get the filenames to match up
+gold$id=gold$filename
+gold$id=gsub("BER_","",gold$id)
+gold$id=gsub("WAR_","",gold$id)
+gold$id=gsub("ROW_","",gold$id)
+gold$id=gsub("SOD_","",gold$id)
+gold$id=gsub("_0","_",gold$id)
+lena$id=lena$filename
+lena$id=gsub("_ ","_0",lena$id)
+
+#join files by clip ID
+cvtc=merge(lena,gold,by="id", all=T)
+colnames(cvtc)<-gsub(".x","_lena",colnames(cvtc))
+colnames(cvtc)<-gsub(".y","_gold",colnames(cvtc))
+
+cor.cvc.all= cor.test(cvtc$CV_count_lena,cvtc$CV_count_gold)
+cor.cvc.noZeros= cor.test(cvtc$CV_count_lena[cvtc$CV_count_lena>0 & cvtc$CV_count_gold>0],cvtc$CV_count_gold[cvtc$CV_count_lena>0 & cvtc$CV_count_gold>0])
 
 allpearsons["CVC","N clips"]<-round(cor.cvc.all$parameter)
 allpearsons["CVC","r all"]<-round(cor.cvc.all$estimate,3)
@@ -620,11 +521,11 @@ allpearsons["CVC","r"]<-round(cor.cvc.noZeros$estimate,3)
 To calculate Child Vocalizaton Counts, given the inaccuracy of "far" LENA^®^ tags and our goal of following the LENA^®^ system procedure, we only counted vocalizations attributed to CHN and ignored those attributed to CHF. As shown in Figure 4, there is a strong association between clip-level counts estimated via the LENA^®^ system and those found in the human annotations: the Pearson correlation between the two was r = `r round(cor.cvc.all$estimate,3)` (p = `r signif(cor.cvc.all$p.value,3)`) when all clips were taken into account, and r = `r round(cor.cvc.noZeros$estimate,3)` (p = `r signif(cor.cvc.noZeros$p.value,3)`)  when only clips with some child speech (i.e., excluding clips with 0 counts in both LENA^®^ and human annotations) were considered. This suggests that the LENA^®^ system captures  differences in terms of number of child vocalizations across clips well.
 
 
-```{r cvc-fig, ig.pos = "T!", fig.width=3.5, fig.height=3.5, fig.cap="Child Vocalization Counts according to LENA (x axis) and humans (y axis). Each point represents the CVC totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA^®^ said zero child vocalizations."}
-
-plot(CVC_gold~CVC_n,data=cvtc,pch=20,col=alpha("black",.2),xlab="LENA CVC",ylab="Human CVC")
-abline(lm(CVC_gold~CVC_n,data=cvtc))
-abline(lm(CVC_gold~CVC_n,data=cvtc,subset=c(cvtc$CVC_n>0 & cvtc$CVC_gold>0)),lty=2)
+```{r cvc-fig, ig.pos = "T!", fig.width=3.5, fig.height=3.5, fig.cap="Child Vocalization Counts according to LENA (x axis) and humans (y axis). Each point represents the CVC totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA^®^ said zero child vocalizations. The x and y ranges have been adjusted to be equal regardless of the data distribution."}
+myrange=range(cvtc[,c("CV_count_gold","CV_count_lena")],na.rm=T)
+plot(CV_count_gold~CV_count_lena,data=cvtc,pch=20,col=alpha("black",.2),xlab="LENA CVC",ylab="Human CVC",xlim=myrange,ylim=myrange)
+abline(lm(CV_count_gold~CV_count_lena,data=cvtc))
+abline(lm(CV_count_gold~CV_count_lena,data=cvtc,subset=c(cvtc$CV_count_lena>0 & cvtc$CV_count_gold>0)),lty=2)
 
 ```
 
@@ -632,22 +533,27 @@ abline(lm(CVC_gold~CVC_n,data=cvtc,subset=c(cvtc$CVC_n>0 & cvtc$CVC_gold>0)),lty
  
 
 ```{r cvc-er, echo=F}
+
+aller=matrix(nrow=3,ncol=12)
+rownames(aller)<-c("CVC","CTC","AWC")
+colnames(aller)<-c("AER","min","max","AER-0","min","max","RER","min1","max1","ARER","min2","max2")
+
 # error rate
-aer=(cvtc$CVC_n-cvtc$CVC_gold)
+aer=(cvtc$CV_count_lena-cvtc$CV_count_gold)
 #summary(aer)
 
 
-aer_no_zeros=(cvtc$CVC_n[cvtc$CVC_n>0 & cvtc$CVC_gold > 0]-cvtc$CVC_gold[cvtc$CVC_n>0 & cvtc$CVC_gold > 0])
+aer_no_zeros=(cvtc$CV_count_lena[cvtc$CV_count_lena>0 & cvtc$CV_count_gold > 0]-cvtc$CV_count_gold[cvtc$CV_count_lena>0 & cvtc$CV_count_gold > 0])
 
-#sum(cvtc$CVC_gold>0)
-no_human_zeros=cvtc[ cvtc$CVC_gold>0,]
-rer=(no_human_zeros$CVC_n-no_human_zeros$CVC_gold)/no_human_zeros$CVC_gold*100
+#sum(cvtc$CV_count_gold>0)
+no_human_zeros=cvtc[ cvtc$CV_count_gold>0,]
+rer=(no_human_zeros$CV_count_lena-no_human_zeros$CV_count_gold)/no_human_zeros$CV_count_gold*100
 #summary(rer)
 
-arer=abs(no_human_zeros$CVC_n-no_human_zeros$CVC_gold)/no_human_zeros$CVC_gold*100
+arer=abs(no_human_zeros$CV_count_lena-no_human_zeros$CV_count_gold)/no_human_zeros$CV_count_gold*100
 
-aer_cvc <-(cvtc$CVC_n-cvtc$CVC_gold)
-aer_nozeros_cvc <-(cvtc$CVC_n[cvtc$CVC_n>0 & cvtc$CVC_gold > 0]-cvtc$CVC_gold[cvtc$CVC_n>0 & cvtc$CVC_gold > 0])
+aer_cvc <-(cvtc$CV_count_lena-cvtc$CV_count_gold)
+aer_nozeros_cvc <-(cvtc$CV_count_lena[cvtc$CV_count_lena>0 & cvtc$CV_count_gold > 0]-cvtc$CV_count_gold[cvtc$CV_count_lena>0 & cvtc$CV_count_gold > 0])
 
 
 aller["CVC",]<-cbind(mean(aer),min(aer),max(aer),
@@ -665,7 +571,7 @@ The *absolute error rate* ranged from `r min(aer)`% to `r max(aer)`%, with a mea
 <!-- eb: the ranges don't change -->
 the mean was `r mean(aer_no_zeros)`% and the median was `r median(aer_no_zeros)`%. 
 
-Next, we considered *relative error rates*, which require the number in the denominator to be non-null. For this analysis, therefore, we need to remove the `r sum(cvtc$CVC_gold==0)` clips in which the human annotator said there were no child vocalizations whatsoever. When we do this, the mean relative error rate ranged from `r min(rer)`% to `r max(rer)`%, with a mean of `r mean(rer)`% and a median of `r median(rer)`%. Finally, the *absolute relative error rate* ranged from `r min(arer)`% to `r max(arer)`%, with a mean of `r mean(arer)`% and a median of `r median(arer)`%. 
+Next, we considered *relative error rates*, which require the number in the denominator to be non-null. For this analysis, therefore, we need to remove the `r sum(cvtc$CV_count_gold==0)` clips in which the human annotator said there were no child vocalizations whatsoever. When we do this, the mean relative error rate ranged from `r min(rer)`% to `r max(rer)`%, with a mean of `r mean(rer)`% and a median of `r median(rer)`%. Finally, the *absolute relative error rate* ranged from `r min(arer)`% to `r max(arer)`%, with a mean of `r mean(arer)`% and a median of `r median(arer)`%. 
 
 Together, these data suggest that LENA tends to underestimate vocalization counts, particularly when only clips with some speech are considered. This understimation is quite systematic and it appears to be around half of the actual counts.
 
@@ -674,20 +580,20 @@ Together, these data suggest that LENA tends to underestimate vocalization count
 ### Conversational Turn Counts (CTC) accuracy 
 
 
-```{r ctc-fig, ig.pos = "T!", fig.width=3.5, fig.height=3.5, fig.cap="Conversational Turn Counts according to LENA (x axis) and humans (y axis). Each point represents the CTC totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA^®^ said zero child-adult or adult-child turns"}
+```{r ctc-fig, ig.pos = "T!", fig.width=3.5, fig.height=3.5, fig.cap="Conversational Turn Counts according to LENA (x axis) and humans (y axis). Each point represents the CTC totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA^®^ said zero child-adult or adult-child turns. The x and y ranges have been adjusted to be equal regardless of the data distribution."}
 
 
-
-plot(CTC_gold~CTC_n,data=cvtc,pch=20,col=alpha("blue",.2),xlab="LENA CTC",ylab="Human CTC")
-abline(lm(CTC_gold~CTC_n,data=cvtc))
-abline(lm(CTC_gold~CTC_n,data=cvtc,subset=c(cvtc$CTC_n>0 & cvtc$CTC_gold>0)),lty=2)
+myrange=range(cvtc[,c("CTC_count_gold","CTC_count_lena")],na.rm = T)
+plot(CTC_count_gold~CTC_count_lena,data=cvtc,pch=20,col=alpha("blue",.2),xlab="LENA CTC",ylab="Human CTC",xlim=myrange,ylim=myrange)
+abline(lm(CTC_count_gold~CTC_count_lena,data=cvtc))
+abline(lm(CTC_count_gold~CTC_count_lena,data=cvtc,subset=c(cvtc$CTC_count_lena>0 & cvtc$CTC_count_gold>0)),lty=2)
 
 ```
 
 ```{r ctc-er, echo=F}
 
-cor.ctc.all=cor.test(cvtc$CTC_n,cvtc$CTC_gold)
-cor.ctc.noZeros=cor.test(cvtc$CTC_n[cvtc$CTC_n>0 & cvtc$CTC_gold>0],cvtc$CTC_gold[cvtc$CTC_n>0 & cvtc$CTC_gold>0])
+cor.ctc.all=cor.test(cvtc$CTC_count_lena,cvtc$CTC_count_gold)
+cor.ctc.noZeros=cor.test(cvtc$CTC_count_lena[cvtc$CTC_count_lena>0 & cvtc$CTC_count_gold>0],cvtc$CTC_count_gold[cvtc$CTC_count_lena>0 & cvtc$CTC_count_gold>0])
 
 
 allpearsons["CTC","N clips"]<-round(cor.ctc.all$parameter)
@@ -696,16 +602,16 @@ allpearsons["CTC","N"]<-round(cor.ctc.noZeros$parameter)
 allpearsons["CTC","r"]<-round(cor.ctc.noZeros$estimate,3)
 
 # ER against human
-aer=(cvtc$CTC_n-cvtc$CTC_gold)
-aer_no_zeros=(cvtc$CTC_n[cvtc$CTC_n>0 & cvtc$CTC_gold > 0]-cvtc$CTC_gold[cvtc$CTC_n>0 & cvtc$CTC_gold > 0])
+aer=(cvtc$CTC_count_lena-cvtc$CTC_count_gold)
+aer_no_zeros=(cvtc$CTC_count_lena[cvtc$CTC_count_lena>0 & cvtc$CTC_count_gold > 0]-cvtc$CTC_count_gold[cvtc$CTC_count_lena>0 & cvtc$CTC_count_gold > 0])
 
-no_human_zeros=cvtc[ cvtc$CTC_gold>0,]
-rer=(no_human_zeros$CTC_n-no_human_zeros$CTC_gold)/no_human_zeros$CTC_gold*100
+no_human_zeros=cvtc[ cvtc$CTC_count_gold>0,]
+rer=(no_human_zeros$CTC_count_lena-no_human_zeros$CTC_count_gold)/no_human_zeros$CTC_count_gold*100
 
-arer=abs(no_human_zeros$CTC_n-no_human_zeros$CTC_gold)/no_human_zeros$CTC_gold*100
+arer=abs(no_human_zeros$CTC_count_lena-no_human_zeros$CTC_count_gold)/no_human_zeros$CTC_count_gold*100
 
-aer_ctc <-(cvtc$CTC_n-cvtc$CTC_gold)
-aer_nozeros_ctc <-(cvtc$CTC_n[cvtc$CTC_n>0 & cvtc$CTC_gold > 0]-cvtc$CTC_gold[cvtc$CTC_n>0 & cvtc$CTC_gold > 0])
+aer_ctc <-(cvtc$CTC_count_lena-cvtc$CTC_count_gold)
+aer_nozeros_ctc <-(cvtc$CTC_count_lena[cvtc$CTC_count_lena>0 & cvtc$CTC_count_gold > 0]-cvtc$CTC_count_gold[cvtc$CTC_count_lena>0 & cvtc$CTC_count_gold > 0])
 
 aller["CTC",]<-cbind(mean(aer),min(aer),max(aer),
                      mean(aer_no_zeros),min(aer_no_zeros),max(aer_no_zeros),
@@ -715,10 +621,10 @@ aller["CTC",]<-cbind(mean(aer),min(aer),max(aer),
 
 ```
 
-Again, we only considered "near" speaker categories in the turn count, and applied the same rule the LENA^®^ does, where a turn can be from the key child to an adult or vice versa, and should happen within 5 seconds to be counted. The association between clip-level LENA^®^ and human CTC was weaker than that found for CVC (Figure 5):  the Pearson correlation between the two was r = `r round(cor.ctc.all$estimate,3)` (p = `r signif(cor.ctc.all$p.value,3)`) when all clips were taken into account, and r = `r round(cor.ctc.noZeros$estimate,3)` (p = `r signif(cor.ctc.noZeros$p.value,3)`)  when only clips with some child speech (i.e., excluding `r sum(cvtc$CTC_n>0 & cvtc$CTC_gold>0)` clips with 0 counts in both LENA^®^ and human annotations) were considered.  
+Again, we only considered "near" speaker categories in the turn count, and applied the same rule the LENA^®^ does, where a turn can be from the key child to an adult or vice versa, and should happen within 5 seconds to be counted. The association between clip-level LENA^®^ and human CTC was weaker than that found for CVC (Figure 5):  the Pearson correlation between the two was r = `r round(cor.ctc.all$estimate,3)` (p = `r signif(cor.ctc.all$p.value,3)`) when all clips were taken into account, and r = `r round(cor.ctc.noZeros$estimate,3)` (p = `r signif(cor.ctc.noZeros$p.value,3)`)  when only clips with some child speech (i.e., excluding `r sum(cvtc$CTC_count_lena>0 & cvtc$CTC_count_gold>0)` clips with 0 counts in both LENA^®^ and human annotations) were considered.  
 
 The *absolute error rate* ranged from `r min(aer)`% to `r max(aer)`%, with a mean of `r mean(aer)`% and a median of `r median(aer)`%. Excluding clips where both human and LENA^®^ counts were zero,
-the mean was `r mean(aer_no_zeros)`% and the median was `r median(aer_no_zeros)`%. Again, *relative error rates* require non-null denominators, and we thus removed the `r sum(cvtc$CTC_gold==0)` clips in which the human annotator said there were no child-adult or adult-child turns at all. The mean relative error rate ranged from `r min(rer)`% to `r max(rer)`%, with a mean of `r mean(rer)`% and a median of `r median(rer)`%. Finally, the *absolute relative error* rate ranged from `r min(arer)`% to `r max(arer)`%, with a mean of `r mean(arer)`% and a median of `r median(arer)`%. For CTCs, as for CVCs, the LENA^®^ seems to be underestimating counts rather systematically, leading to counts that are on average `r mean(rer)`% smaller than what they actually are.
+the mean was `r mean(aer_no_zeros)`% and the median was `r median(aer_no_zeros)`%. Again, *relative error rates* require non-null denominators, and we thus removed the `r sum(cvtc$CTC_count_gold==0)` clips in which the human annotator said there were no child-adult or adult-child turns at all. The mean relative error rate ranged from `r min(rer)`% to `r max(rer)`%, with a mean of `r mean(rer)`% and a median of `r median(rer)`%. Finally, the *absolute relative error* rate ranged from `r min(arer)`% to `r max(arer)`%, with a mean of `r mean(arer)`% and a median of `r median(arer)`%. For CTCs, as for CVCs, the LENA^®^ seems to be underestimating counts rather systematically, leading to counts that are on average `r mean(rer)`% smaller than what they actually are.
 
 
 ### Adult Word Counts accuracy 
@@ -771,18 +677,19 @@ aller["AWC",]<-cbind(mean(aer),min(aer),max(aer),
 
 ```{r tabrs, echo=F}
 
-apa_table(allpearsons,caption="For each measure (CVC, CTC, AWC), N all stands for the total number of clips considered in the general correlation analysis and resulting Pearson r coefficient; N stands for the number of non-null clips (i.e., having some vocalizations, turns, and adult words respectively) as well as Pearson r in the analyses restricted to the non-null clips. ")
+apa_table(allpearsons,caption="For each measure (CVC, CTC, AWC), N all stands for the total number of clips considered in the general correlation analysis and resulting Pearson r coefficient; N stands for the number of non-null clips (i.e., having some vocalizations, turns, and adult words respectively) as well as Pearson r in the analyses restricted to the non-null clips.",digits=c(0,2,0,2))
 ```
 
 
 ```{r tabrers, echo=F}
 
-apa_table(aller,caption="For each measure (CVC, CTC, AWC), AER is the absolute error rate, AER-0 the same excluding clips with counts of zero according to either the human or the system, RER is the relative error rate and ARER the absolute relative error rate (the latter two exclude clips where the human count is zero). ")
+apa_table(aller,caption="For each measure (CVC, CTC, AWC), AER is the absolute error rate, AER-0 the same excluding clips with counts of zero according to either the human or the system, RER is the relative error rate and ARER the absolute relative error rate (the latter two exclude clips where the human count is zero). ",digits=0)
 ```
 
-```{r awc-fig, ig.pos = "T!", fig.width=3.5, fig.height=3.5, fig.cap="Adult Word Counts according to LENA (x axis) and humans (y axis). Each point represents the AWC totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA^®^ said there were no adult words."}
+```{r awc-fig, ig.pos = "T!", fig.width=3.5, fig.height=3.5, fig.cap="Adult Word Counts according to LENA (x axis) and humans (y axis). Each point represents the AWC totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA^®^ said there were no adult words. The x and y ranges have been adjusted to be equal regardless of the data distribution."}
+myrange=range(awc[,c("gold","lena")],na.rm = T)
 
-plot(gold~LENA,data=awc,pch=20,main="AWC",col=alpha("orange",.2),xlab="LENA AWC",ylab="Human AWC")
+plot(gold~LENA,data=awc,pch=20,main="AWC",col=alpha("orange",.2),xlab="LENA AWC",ylab="Human AWC",xlim=myrange,ylim=myrange)
 abline(lm(gold~LENA,data=awc))
 abline(lm(gold~LENA,data=awc,subset=c(awc$gold>0 & awc$LENA>0)),lty=2)
 ```
@@ -801,7 +708,7 @@ Together, these results suggest that the direction of errors for AWC is less sta
 The preceding sections include results that are wholesale, with all but AWC conducted over all corpora. However, it's possible that performance would be higher for the corpora collected in North America (BER, WAR, SOD) than those collected in other English-speaking countries (L05) or non-English speaking populations (TSI). Additionally, our age ranges are wide, and in the case of TSI children, some of the children are older than the oldest children in the LENA^®^ training set. To assess whether accuracy varies as a function of corpora and child age, we fit mixed models.
 
 ```{r lmer-dm, echo=F}
-read.csv(paste0(thisdir,"../evaluations/gold_no_ele_no_ovl_lena_sil_no_tv_no_oln_same/ider_report.csv"))->py
+read.csv(paste0(thisdir,"gold_no_ele_no_ovl_lena_sil_no_tv_no_oln_same/ider_report.csv"))->py
 
 #other fixes and addtions
 py=subset(py,item!="TOTAL")
@@ -819,15 +726,15 @@ py$missed.detection..[py$total==0 ]<-0
 py$missed.detection..[py$missed.detection==0 ]<-0
 
 # add in age info
-spreadsheet = read.csv(paste0(thisdir,"/ACLEW_list_of_corpora.csv"), header=TRUE, sep = ",")
+spreadsheet = read.csv(paste0("../ACLEW_list_of_corpora.csv"), header=TRUE, sep = ",")
 spreadsheet$child=paste0(spreadsheet$labname,"_",ifelse(nchar(spreadsheet$aclew_id)==3,paste0("0",spreadsheet$aclew_id),spreadsheet$aclew_id))
 spreadsheet = spreadsheet[,c("child","age_mo_round")]
 colnames(spreadsheet) = c("child","age")
-spreadsheet_tsi = read.csv(paste0(thisdir,"/anon_metadata.csv"), header=TRUE, sep = ",")
+spreadsheet_tsi = read.csv(paste0(thisdir,"../anon_metadata.csv"), header=TRUE, sep = ",")
 spreadsheet_tsi = spreadsheet_tsi[c("id","age_mo")]
 colnames(spreadsheet_tsi) = c("child","age")
 age_id = rbind(spreadsheet, spreadsheet_tsi)
-py=merge(py,age_id,by.x="child",by.y="child",all.x=T) #one row is lost... **ATTENTION BUG HERE**
+py=merge(py,age_id,by.x="child",by.y="child") 
 
 mydv=c("false.alarm..","missed.detection..","confusion..")
 
@@ -882,18 +789,17 @@ We predicted false alarm, miss, and confusion rates in clips where there was som
 
 
 ```{r cvc-age, echo=F}
-read.table(paste0(thisdir,"/cvtc.txt"),header=T)->cvtc
-
-cvtc$cor=substr(cvtc$filename,1,3)
-cvtc$cor[substr(cvtc$filename,1,1)=="C"]<-"TSI"
+cvtc$cor=substr(cvtc$filename_gold,1,3)
+cvtc$cor[substr(cvtc$filename_gold,1,1)=="C"]<-"TSI"
 cvtc$cor=factor(cvtc$cor)
 
-cvtc$child=substr(cvtc$filename,1,8)
-cvtc$child[cvtc$cor=="TSI"]<-substr(cvtc$filename[cvtc$cor=="TSI"],1,3)
+cvtc$child=substr(cvtc$filename_gold,1,8)
+#cvtc$child[cvtc$cor=="TSI"]<-substr(cvtc$filename_gold[cvtc$cor=="TSI"],1,3) #this line gives an error because there are no TSI files
+#***** WARNING THIS NEEDS TO BE UNCOMMENTED !!!!! ******
 
 merge(cvtc,age_id,by="child")->cvtc
 
-mymodel<-lmer(CVC_gold~CVC_n*age*cor + (1|child), data=cvtc)
+mymodel<-lmer(CV_count_gold~CV_count_lena*age*cor + (1|child), data=cvtc)
 #summary(mymodel)
 #Anova(mymodel,type="III")
 
@@ -904,7 +810,7 @@ mymodels<- list()
 myANOVAs<- list()
 for(thiscor in levels(cvtc$cor)){
   #print(thiscor)
- mymodels[[thiscor]]<-lmer(CVC_gold~CVC_n*age + (1|child), data=cvtc,subset=c(cor==thiscor))
+ mymodels[[thiscor]]<-lmer(CV_count_gold~CV_count_lena*age + (1|child), data=cvtc,subset=c(cor==thiscor))
  myANOVAs[[thiscor]]<-Anova(mymodels[[thiscor]],type="III")
 }
 ```
@@ -916,7 +822,7 @@ For CVC, we fit a mixed model where CVC according to the human was predicted fro
 
 ```{r ctc-age, echo=F}
 
-mymodel<-lmer(CTC_gold~CTC_n*age*cor + (1|child), data=cvtc)
+mymodel<-lmer(CTC_count_gold~CTC_count_lena*age*cor + (1|child), data=cvtc)
 #summary(mymodel)
 #Anova(mymodel,type="III")
 
@@ -959,7 +865,7 @@ Our first set of analyses tested overall accuracy, using established speech and 
 
 However, this low overall confusion rate hides considerable errors affecting the interpretation of the output.  In terms of precision (to what extent do LENA^®^ tags contain what they say they contain), the system performed relatively well at identifying female voices (`r round(stall$pr[stall$LENA=="FAN" & stall$human=="FEM"])`% of frames tagged by LENA^®^ as FAN were coded as female adult by the human coders), and reasonably well at identifying the target child (`r round(stall$pr[stall$LENA=="CHN" & stall$human=="CHI"])`% of frames tagged by LENA^®^ as CHN were correct).  However, the system performed substantially worse with other talker types (e.g. `r round(stall$pr[stall$LENA=="MAN" & stall$human=="MAL"])`% and `r round(stall$pr[stall$LENA=="CXN" & stall$human=="OCH"])`% for MAN and CXN, respectively); that is, less than a tenth of the frames that LENA^®^ tagged as being speech spoken by these speakers actually correspond to them.  
 
-In terms of recall (how accurately LENA^®^ captured the human annotations), performance for the key child's vocalizations was relatively robust; close to half of the frames tagged by humans being key child speech were captured by LENA^®^ under the CHN tag. However, recall was poorer for other talkers: only `r round(rec$pr[rec$LENA=="FAN" & rec$human=="FEM"])`% of adult female near speech (FAN) and less than 20% of adult male and other child speech were correctly tagged by LENA^®^. 
+In terms of recall (how accurately LENA^®^ captured the human annotations), performance for the key child's vocalizations was relatively robust; close to half of the frames tagged by humans being key child speech were captured by LENA^®^ under the CHN tag. However, recall was poorer for other talkers: only `r round(stall$rec[stall$LENA=="FAN" & stall$human=="FEM"])`% of adult female near speech (FAN) and less than 20% of adult male and other child speech were correctly tagged by LENA^®^. 
 
 Our second set of analyses tested the accuracy of three of the aggregated counts automatically provided by LENA^®^, namely Child Vocalization Counts (CVC), Conversational Turn Counts (CTC) and Adult Word Counts (AWC).  We found high correlations between clip-level counts estimated via the LENA^®^ system and those from the human annotations for AWC and CVC, with weaker performance for CTC. 
 
@@ -973,7 +879,7 @@ More generally, a caveat is in order for all of these apparently null or unstabl
 
 That said, the current data lead us to conclude that there were very few systematic language, dialect, and age effects. This is a promising finding for future speech technology solutions, since it suggests that identification success may not require large quantities of highly specific training data. This is particularly important for the possibility of using LENA^®^ for languages unrelated to the (dialect of) English for which it was developed. That is, given the significant challenges in creating new datasets for training and testing speech technology, if it indeed turns out to be the case that automated speech processing (e.g. identification) for daylong recordings is relatively language- or dialect-agnostic in its accuracy, it may be possible to use existing American English corpora with high hopes of generalizability.\footnote{Please note, however, that since we were unable to compute AWC for Tsimane', we are only able to speak to generalizability across samples and dialects of English for that metric.}
 
-Summarily, LENA^®^ performs relatively well in terms of overall accuracy, but there are pockets in the system (e.g., identifying male adult voices, establishing absolute numbers of child-adult turns) where the results of the algorithms are quite unreliable. Thus, whether LENA^®^ results are 'good enough' for a given research, educational, or clinical study depends largely on the goals of each particular study.  For example, we can describe precision rates of `r round(stall$pr[rec$LENA=="FAN" & stall$human=="FEM"])`%  (i.e.`r round(stall$pr[rec$LENA=="FAN" & stall$human=="FEM"])`% of frames tagged by LENA^®^ as FAN were coded as female adult by human coders) and `r round(stall$pr[rec$LENA=="CHN" & stall$human=="CHI"])`% (i.e.`r round(stall$pr[rec$LENA=="CHN" & stall$human=="CHI"])`% of frames tagged as target child were also tagged as such by human coders) as being reasonably good. We do this partly because these rates are much higher than the system's  precision rates for other speakers (MAN `r round(stall$pr[rec$LENA=="MAN" & stall$human=="MAL"])`%, CXN `r round(stall$pr[rec$LENA=="CXN" & stall$human=="OCH"])`%) but also partly because our frame-based criteria is more stringent than many coding schemes previously applied.  That said, whether a *particular* accuracy rate can be considered sufficient will depend on the purpose of the study. As a result, we next provide  a set of recommendations to help researchers make this determination for their goals.
+Summarily, LENA^®^ performs relatively well in terms of overall accuracy, but there are pockets in the system (e.g., identifying male adult voices, establishing absolute numbers of child-adult turns) where the results of the algorithms are quite unreliable. Thus, whether LENA^®^ results are 'good enough' for a given research, educational, or clinical study depends largely on the goals of each particular study.  For example, we can describe precision rates of `r round(stall$pr[stall$LENA=="FAN" & stall$human=="FEM"])`%  (i.e.`r round(stall$pr[stall$LENA=="FAN" & stall$human=="FEM"])`% of frames tagged by LENA^®^ as FAN were coded as female adult by human coders) and `r round(stall$pr[stall$LENA=="CHN" & stall$human=="CHI"])`% (i.e.`r round(stall$pr[stall$LENA=="CHN" & stall$human=="CHI"])`% of frames tagged as target child were also tagged as such by human coders) as being reasonably good. We do this partly because these rates are much higher than the system's  precision rates for other speakers (MAN `r round(stall$pr[stall$LENA=="MAN" & stall$human=="MAL"])`%, CXN `r round(stall$pr[stall$LENA=="CXN" & stall$human=="OCH"])`%) but also partly because our frame-based criteria is more stringent than many coding schemes previously applied.  That said, whether a *particular* accuracy rate can be considered sufficient will depend on the purpose of the study. As a result, we next provide  a set of recommendations to help researchers make this determination for their goals.
 
 ### What research goals can one pursue given the performance of LENA^®^ segmentation and metrics?
 
@@ -983,7 +889,7 @@ Similarly, although the overall confusion rate (i.e. incorrectly identifying tal
 
 We, thus, recommend caution before undertaking any analyses that rely on the accuracy (precision and/or recall) of male adult and other children's speech. For example, if the goal is simply to calculate an overall adult word count (AWC), summing over male and female adult speakers, some confusion between MAN and FAN is likely not problematic. However, if the goal of the study is to compare the relative input from fathers and mothers, LENA^®^ tags are relatively unreliable and on our view, merit further manual vetting in most use cases. 
 
-As another example (detailed further in the 'Recall' results above), if the goal is to capture as many of the key child's vocalisations as possible, it might be worthwhile to pull out segments LENA^®^ labelled as non-target child, CXN, (of which `r stall$pr[rec$LENA=="CXN" & stall$human=="CHI"]`% was target child speech) as well, with human coders brought in to filter out non-target child speech. Indeed, we find that this kind of binary classification (key child or not) can be readily undertaken with little training by research assistants in our labs, and would substantially boost data quality and quantity for child vocalizations in this use case.
+As another example (detailed further in the 'Recall' results above), if the goal is to capture as many of the key child's vocalisations as possible, it might be worthwhile to pull out segments LENA^®^ labelled as non-target child, CXN, (of which `r stall$pr[stall$LENA=="CXN" & stall$human=="CHI"]`% was target child speech) as well, with human coders brought in to filter out non-target child speech. Indeed, we find that this kind of binary classification (key child or not) can be readily undertaken with little training by research assistants in our labs, and would substantially boost data quality and quantity for child vocalizations in this use case.
 
 Notably, while we recommend LENA^®^ users be cautious in their use of LENA^®^ identification and classification, especially for certain talker classes, our results for LENA^®^ count metrics suggest these derived counts may be accurate enough to serve well across a large variety of uses. To begin with, as far as it is possible to generalize from the limited range of samples tested here (children aged 2 to 58 months, learning North American English, UK English, or Tsimane') it seems that the system's performance does not vary a great deal across ages, dialects, language and home settings. Moreover, *correlations* between human and LENA^®^ clip-level counts were high to very high, suggesting that the software accurately captures differences in counts across clips (even when *error* rates were also high). These  correlations remained quite high even when clips with counts equal to zero were removed from consideration, suggesting that LENA^®^ captures gradience in vocalization counts. 
 
