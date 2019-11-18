@@ -310,6 +310,7 @@ gold_data <- read_rttm(gold_data_folder)
 # List all the files containing utterances without associated tier (no xds, vcm lex or mwu tier)
 only_CHI = gold_data[gold_data$mapped_speaker_type == "CHI",]
 contains.na = unique(only_CHI[is.na(only_CHI['utt_type']), "filename"])
+contains.na = contains.na[2:length(contains.na)]
 print("Files containing none of the 'xds', 'lex', 'vcm' or 'mwu' tier")
 print(as.character(contains.na))
 
@@ -335,7 +336,6 @@ file[is.na(file)] = 0
 all[is.na(all)] = 0
 
 # Remove SOD files that were annotated with lex tier
-contains.na = contains.na[2:length(contains.na)]
 file = file[! file$gold_filename %in% contains.na, ]
 child.contains.na = unique(sub("(.*_.*)_.*_.*", "\\1", contains.na, perl=TRUE))
 child = child[! child$gold_child_id %in% child.contains.na,]
