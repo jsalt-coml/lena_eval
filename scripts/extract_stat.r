@@ -56,8 +56,11 @@ read_its <- function(data_folder, gold_folder) {
   data <- data %>% filter(spkr == "CHN" | spkr == "MAN" | spkr == "FAN" | spkr == "CXN")
   # columns to paste together
   cols <- c('child_id', 'onset', 'offset')
+  data$onset = str_pad(data$onset, 6, pad = "0")
+  data$offset = str_pad(data$offset, 6, pad = "0")
   # create a new column `filename` with the three columns collapsed together
-  data$filename <- apply( data[ ,cols] , 1 , paste0 , collapse = "_" )
+  data$filename <- apply(data[ ,cols] , 1 , paste0 , collapse = "_" )
+  data$filename <- gsub(' ', '0', data$filename)
   ## Let's count turn-taking in the clearest way as possible
   next_starts = c(data[2:nrow(data), "startTime"], 10000)
   prev_ends = data[1:nrow(data), "endTime"]
@@ -93,7 +96,6 @@ read_rttm <- function(data_folder) {
   for(rttm in rttm.files){
     filepath = paste(data_folder, rttm, sep ="/")
     info = file.info(filepath)
-
     if (info['size'] != 0) {
       file_data = read.csv(file=filepath, header=FALSE, sep="\t")
       file_data = file_data %>% select(2, 4, 5, 6, 7, 8) %>% dplyr::rename(filename = V2,
@@ -105,6 +107,16 @@ read_rttm <- function(data_folder) {
 
       file_data <- data.frame(file_data)
       data <- rbind(data, file_data)
+    } else {
+      filename = str_remove(basename(filepath), ".rttm")
+
+      fake_row = data.frame(filename=filename,
+                           onset=0,
+                           duration=0,
+                           transcription="0.",
+                           utt_type=NA,
+                           speaker_type=NA)
+      data <- rbind(data, fake_row)
     }
   }
   # Data post-processing to clean up a bit the tiers.
@@ -166,8 +178,8 @@ get_stats_gold <- function(gold_data){
               CV_mean = mean(duration, na.rm=TRUE),
               CV_count = length(duration))
 
-  child_CNVC = gold_data %>%
-    filter(speaker_type == 'CHI', tier_type == 'vcm', tier_subtype == 'L' | tier_subtype == 'U' | tier_subtype == 'Y') %>%
+  child_CNVC = gold_data %>% 
+      filter(speaker_type == 'CHI', tier_type == 'vcm', tier_subtype == 'L' | tier_subtype == 'U' | tier_subtype == 'Y') %>%
     dplyr::group_by(child_id, age_mo_round) %>%
     dplyr::summarise(CNV_cum_dur = sum(duration, na.rm=TRUE),
               CNV_mean = mean(duration, na.rm=TRUE),
@@ -199,26 +211,31 @@ get_stats_gold <- function(gold_data){
     filter(speaker_type == 'CHI', tier_type == 'vcm', tier_subtype == 'C' | tier_subtype == 'N') %>%
     dplyr::summarise(CV_cum_dur = sum(duration, na.rm=TRUE),
               CV_mean = mean(duration, na.rm=TRUE),
-              CV_count = length(duration))
+              CV_count = length(duration),
+              short_CV_count = sum(duration < 0.6))
 
   all_CNVC = gold_data %>%
     filter(speaker_type == 'CHI', tier_type == 'vcm', tier_subtype == 'L' | tier_subtype == 'U' | tier_subtype == 'Y') %>%
     dplyr::summarise(CNV_cum_dur = sum(duration, na.rm=TRUE),
               CNV_mean = mean(duration, na.rm=TRUE),
-              CNV_count = length(duration))
+              CNV_count = length(duration),
+              short_CNV_count = sum(duration < 0.6))
   all_CTC = gold_data %>% dplyr::summarise(CTC_count = sum(turn_taking))
 
-  child_stats = merge(child_CVC, child_CNVC)
-  child_stats = merge(child_stats, child_CTC)
-  file_stats = merge(file_CVC, file_CNVC)
-  file_stats = merge(file_stats, file_CTC)
-  all_stats = merge(all_CVC, all_CNVC)
-  all_stats = merge(all_stats, all_CTC)
+  child_stats = merge(child_CVC, child_CNVC, all = TRUE)
+  child_stats = merge(child_stats, child_CTC, all = TRUE)
+  file_stats = merge(file_CVC, file_CNVC, all = TRUE)
+  file_stats = merge(file_stats, file_CTC, all = TRUE)
+  all_stats = merge(all_CVC, all_CNVC, all = TRUE)
+  all_stats = merge(all_stats, all_CTC, all = TRUE)
 
   stats <- list()
   stats$child = child_stats
   stats$file = file_stats
   stats$all = all_stats
+  stats$child[is.na(stats$child)] = 0
+  stats$file[is.na(stats$file)] = 0
+  stats$all[is.na(stats$all)] = 0
   return(stats)
 }
 
@@ -228,10 +245,10 @@ get_stats_its <- function(its_data){
   desc$aclew_id = str_pad(desc$aclew_id, 4, pad=0)
   desc["child_id"] = do.call(paste, c(desc[c("labname", "aclew_id")], sep="_"))
   desc = desc[c("child_id", "age_mo_round")]
-  desc$child_id = str_match(desc$child_id, "_(.*)")[,2]
+  #desc$child_id = str_match(desc$child_id, "_(.*)")[,2]
   its_data = merge(its_data, desc, dby="child_id")
 
-  # Child level statistics
+    # Child level statistics
   child_level = its_data %>% filter(spkr == "CHN") %>%
     dplyr::group_by(child_id, age_mo_round) %>%
     dplyr::summarise(CV_cum_dur = sum(childUttLen, na.rm = TRUE),
@@ -262,17 +279,22 @@ get_stats_its <- function(its_data){
               CV_count = sum(childUttLen > 0, na.rm = TRUE),
               CNV_cum_dur = sum(childCryVfxLen, na.rm = TRUE),
               CNV_mean = mean(childCryVfxLen, na.rm = TRUE),
-              CNV_count = sum(childCryVfxLen > 0, na.rm = TRUE))
+              CNV_count = sum(childCryVfxLen > 0, na.rm = TRUE),
+              short_CV_count = sum((childUttLen > 0 & childUttLen < 0.6), na.rm=TRUE),
+              short_CNV_count = sum((childCryVfxLen > 0 & childCryVfxLen < 0.6), na.rm=TRUE))
   all_CTC = its_data %>% dplyr::summarise(CTC_count = sum(turn_taking))
-  
-  child_stats = merge(child_level, child_CTC)
-  file_stats = merge(file_level, file_CTC)
-  all_stats = merge(all_level, all_CTC)
+
+  child_stats = merge(child_level, child_CTC, all=TRUE)
+  file_stats = merge(file_level, file_CTC, all=TRUE)
+  all_stats = merge(all_level, all_CTC, all=TRUE)
 
   stats <- list()
   stats$child = child_stats
   stats$file = file_stats
   stats$all = all_stats
+  stats$child[is.na(stats$child)] = 0
+  stats$file[is.na(stats$file)] = 0
+  stats$all[is.na(stats$all)] = 0
   return(stats)
 }
 
@@ -286,20 +308,48 @@ gold_data <- read_rttm(gold_data_folder)
 
 # Optional : Just log some info !
 # List all the files containing utterances without associated tier (no xds, vcm lex or mwu tier)
-contains.na = unique(gold_data[is.na(gold_data['utt_type']), "filename"])
+only_CHI = gold_data[gold_data$mapped_speaker_type == "CHI",]
+contains.na = unique(only_CHI[is.na(only_CHI['utt_type']), "filename"])
 print("Files containing none of the 'xds', 'lex', 'vcm' or 'mwu' tier")
 print(as.character(contains.na))
 
 # Compute CVC (vcm of type N and C) and CNVC (vcm of type L, U or Y) at multiple scales
 gold_stats <- get_stats_gold(gold_data)
-
 lena_stats <- get_stats_its(its_data)
 
-
 output_folder = paste(getwd(), "evaluations", sep = "/")
-write.table(gold_stats$child, file=paste(output_folder, "gold_key_child_voc_child_level.csv", sep="/"), row.names=FALSE)
-write.table(gold_stats$file, file=paste(output_folder, "gold_key_child_voc_file_level.csv", sep="/"), row.names=FALSE)
-write.table(gold_stats$all, file=paste(output_folder, "gold_key_child_voc_corpora_level.csv", sep="/"), row.names=FALSE)
-write.table(lena_stats$child, file=paste(output_folder, "lena_key_child_voc_child_level.csv", sep="/"), row.names=FALSE)
-write.table(lena_stats$file, file=paste(output_folder, "lena_key_child_voc_file_level.csv", sep="/"), row.names=FALSE)
-write.table(lena_stats$all, file=paste(output_folder, "lena_key_child_voc_corpora_level.csv", sep="/"), row.names=FALSE)
+
+# Cleaning a bit naming convention
+colnames(gold_stats$child) = paste("gold", colnames(gold_stats$child), sep = "_")
+colnames(lena_stats$child) = paste("lena", colnames(lena_stats$child), sep = "_")
+colnames(gold_stats$file) = paste("gold", colnames(gold_stats$file), sep = "_")
+colnames(lena_stats$file) = paste("lena", colnames(lena_stats$file), sep = "_")
+colnames(gold_stats$all) = paste("gold", colnames(gold_stats$all), sep = "_")
+colnames(lena_stats$all) = paste("lena", colnames(lena_stats$all), sep = "_")
+
+child = merge(gold_stats$child, lena_stats$child, all=TRUE, by.x="gold_child_id", by.y="lena_child_id")
+file = merge(gold_stats$file, lena_stats$file, all=TRUE, by.x="gold_filename", by.y="lena_filename")
+all = merge(gold_stats$all, lena_stats$all, all=TRUE)
+child[is.na(child)] = 0
+file[is.na(file)] = 0
+all[is.na(all)] = 0
+
+# Remove SOD files that were annotated with lex tier
+contains.na = contains.na[2:length(contains.na)]
+file = file[! file$gold_filename %in% contains.na, ]
+child.contains.na = unique(sub("(.*_.*)_.*_.*", "\\1", contains.na, perl=TRUE))
+child = child[! child$gold_child_id %in% child.contains.na,]
+
+# Remove useless columns
+child = subset(child, select = -c(lena_age_mo_round))
+colnames(child)[colnames(child) == "gold_child_id"] = "child_id"
+colnames(child)[colnames(child) == "gold_age_mo_round"] = "age_mo_round"
+
+file = subset(file, select = -c(lena_age_mo_round))
+colnames(file)[colnames(file) == "gold_filename"] = "filename"
+colnames(file)[colnames(file) == "gold_age_mo_round"] = "age_mo_round"
+
+
+write.table(child, file=paste(output_folder, "key_child_voc_child_level.csv", sep="/"), row.names=FALSE)
+write.table(file, file=paste(output_folder, "key_child_voc_file_level.csv", sep="/"), row.names=FALSE)
+write.table(all, file=paste(output_folder, "key_child_voc_corpora_level.csv", sep="/"), row.names=FALSE)

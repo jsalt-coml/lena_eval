@@ -176,23 +176,24 @@ def map_rttm(rttm, overlap, dict, same, output_folder):
                 # Version without overlap
                 for line in fi:
                     splitted = line.split('\t')
-                    onset, duration, speaker = float(splitted[3]), float(splitted[4]), splitted[7]
+                    onset, duration, sentence, sentence_type, speaker = float(splitted[3]), float(splitted[4]), splitted[5], splitted[6], splitted[7]
                     target_speaker = dict[speaker]
                     if same:
                         target_speaker = lena_to_gold[target_speaker]
                     if target_speaker != "SIL":
-                        fo.write("SPEAKER\t%s\t1\t%.4f\t%.4f\t<NA>\t<NA>\t%s\t<NA>\t<NA>\n"
-                                 % (basename, onset, duration, target_speaker))
+                        fo.write("SPEAKER\t%s\t1\t%.2f\t%.2f\t%s\t%s\t%s\t<NA>\t<NA>\n"
+                                 % (basename, onset, duration, sentence, sentence_type, target_speaker))
                     data.append([onset, duration, target_speaker])
             else:
                 # Version with overlap
                 prev_onset, prev_duration, prev_offset, prev_speaker = 0.0, 0.0, 0.0, "SIL"
+                prev_sentence, prev_sentence_type = "<NA>", "<NA>"
 
                 for line in fi:
                     splitted = line.split('\t')
-                    onset, duration, speaker = round(float(splitted[3]), 4), round(float(splitted[4]),4), \
-                                               splitted[7]
-                    offset = round(onset+duration, 4)
+                    onset, duration, sentence, sentence_type, speaker = round(float(splitted[3]), 2), round(float(splitted[4]),2), \
+                                               splitted[5], splitted[6], splitted[7]
+                    offset = round(onset+duration, 2)
                     target_speaker = dict[speaker]
 
                     if prev_onset > onset:
@@ -207,11 +208,11 @@ def map_rttm(rttm, overlap, dict, same, output_folder):
                                 # |---------|
                                 #       |---------|
                                 if onset-prev_onset > 0:
-                                    fo.write("SPEAKER\t%s\t1\t%.4f\t%.4f\t<NA>\t<NA>\t%s\t<NA>\t<NA>\n"
-                                             % (basename, prev_onset, onset-prev_onset, prev_speaker))
+                                    fo.write("SPEAKER\t%s\t1\t%.2f\t%.2f\t%s\t%s\t%s\t<NA>\t<NA>\n"
+                                             % (basename, prev_onset, onset-prev_onset, sentence, sentence_type, prev_speaker))
                                 if prev_offset - onset > 0:
-                                    fo.write("SPEAKER\t%s\t1\t%.4f\t%.4f\t<NA>\t<NA>\t%s\t<NA>\t<NA>\n"
-                                             % (basename, onset, prev_offset - onset, "OVL"))
+                                    fo.write("SPEAKER\t%s\t1\t%.2f\t%.2f\t%s\t%s\t%s\t<NA>\t<NA>\n"
+                                             % (basename, onset, prev_offset - onset, sentence, sentence_type, "OVL"))
                                 duration = duration - (prev_offset - onset)
                                 onset = prev_onset + prev_duration
                                 offset = onset + duration
@@ -220,29 +221,31 @@ def map_rttm(rttm, overlap, dict, same, output_folder):
                                 # |------------|
                                 #       |----|
                                 if onset-prev_onset > 0:
-                                    fo.write("SPEAKER\t%s\t1\t%.4f\t%.4f\t<NA>\t<NA>\t%s\t<NA>\t<NA>\n"
-                                             % (basename, prev_onset, onset-prev_onset, prev_speaker))
+                                    fo.write("SPEAKER\t%s\t1\t%.2f\t%.2f\t%s\t%s\t%s\t<NA>\t<NA>\n"
+                                             % (basename, prev_onset, onset-prev_onset, sentence, sentence_type, prev_speaker))
                                 if duration > 0:
-                                    fo.write("SPEAKER\t%s\t1\t%.4f\t%.4f\t<NA>\t<NA>\t%s\t<NA>\t<NA>\n"
-                                             % (basename, onset, duration, "OVL"))
+                                    fo.write("SPEAKER\t%s\t1\t%.2f\t%.2f\t%s\t%s\t%s\t<NA>\t<NA>\n"
+                                             % (basename, onset, duration, sentence, sentence_type, "OVL"))
                                 onset = offset
                                 duration = prev_offset - offset
                                 offset = prev_offset
                                 target_speaker = prev_speaker
                         else:
                             if prev_duration > 0:
-                                fo.write("SPEAKER\t%s\t1\t%.4f\t%.4f\t<NA>\t<NA>\t%s\t<NA>\t<NA>\n" % (basename, prev_onset,
-                                                                                          prev_duration, prev_speaker))
+                                fo.write("SPEAKER\t%s\t1\t%.2f\t%.2f\t%s\t%s\t%s\t<NA>\t<NA>\n" % (basename, prev_onset,
+                                                                                          prev_duration, prev_sentence, prev_sentence_type, prev_speaker))
                     #print("%f : %f : %s" % (prev_onset, prev_offset, prev_speaker))
                     prev_onset = onset
                     prev_duration = duration
                     prev_offset = offset
                     prev_speaker = target_speaker
+                    prev_sentence = sentence
+                    prev_sentence_type = prev_sentence_type
 
                 # Write last utterance
                 if prev_duration > 0 and prev_speaker != "SIL":
-                    fo.write("SPEAKER\t%s\t1\t%.4f\t%.4f\t<NA>\t<NA>\t%s\t<NA>\t<NA>\n" % (basename, prev_onset,
-                                                                                    prev_duration, prev_speaker))
+                    fo.write("SPEAKER\t%s\t1\t%.2f\t%.2f\t%s\t%s\t%s\t<NA>\t<NA>\n" % (basename, prev_onset,
+                                                                                    prev_duration, prev_sentence, prev_sentence_type, prev_speaker))
 
 
 def main():
