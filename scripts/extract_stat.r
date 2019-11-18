@@ -168,7 +168,7 @@ get_stats_gold <- function(gold_data){
   desc$aclew_id = str_pad(desc$aclew_id, 4, pad=0)
   desc["child_id"] = do.call(paste, c(desc[c("labname", "aclew_id")], sep="_"))
   desc = desc[c("child_id", "age_mo_round")]
-  gold_data = merge(gold_data, desc, dby="child_id")
+  gold_data = merge(gold_data, desc, dby="child_id", all=TRUE)
 
   # Child scale
   child_CVC = gold_data %>%
@@ -246,7 +246,7 @@ get_stats_its <- function(its_data){
   desc["child_id"] = do.call(paste, c(desc[c("labname", "aclew_id")], sep="_"))
   desc = desc[c("child_id", "age_mo_round")]
   #desc$child_id = str_match(desc$child_id, "_(.*)")[,2]
-  its_data = merge(its_data, desc, dby="child_id")
+  its_data = merge(its_data, desc, dby="child_id",all=TRUE)
 
     # Child level statistics
   child_level = its_data %>% filter(spkr == "CHN") %>%
@@ -314,6 +314,11 @@ contains.na = contains.na[2:length(contains.na)]
 print("Files containing none of the 'xds', 'lex', 'vcm' or 'mwu' tier")
 print(as.character(contains.na))
 
+# Remove SOD files that were annotated with lex tier
+child.contains.na = unique(sub("(.*_.*)_.*_.*", "\\1", contains.na, perl=TRUE))
+gold_data = gold_data[! gold_data$child_id %in% child.contains.na,]
+its_data = its_data[! its_data$child_id %in% child.contains.na,]
+
 # Compute CVC (vcm of type N and C) and CNVC (vcm of type L, U or Y) at multiple scales
 gold_stats <- get_stats_gold(gold_data)
 lena_stats <- get_stats_its(its_data)
@@ -335,10 +340,6 @@ child[is.na(child)] = 0
 file[is.na(file)] = 0
 all[is.na(all)] = 0
 
-# Remove SOD files that were annotated with lex tier
-file = file[! file$gold_filename %in% contains.na, ]
-child.contains.na = unique(sub("(.*_.*)_.*_.*", "\\1", contains.na, perl=TRUE))
-child = child[! child$gold_child_id %in% child.contains.na,]
 
 # Remove useless columns
 child = subset(child, select = -c(lena_age_mo_round))
