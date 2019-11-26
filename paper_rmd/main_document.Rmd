@@ -487,28 +487,11 @@ rownames(allpearsons)<-c("CVC","CTC","AWC")
 colnames(allpearsons)<-c("N clips","r all","N","r")
 
 
-read.table(paste0(thisdir,"/gold_key_child_voc_file_level.csv"),header=T,sep=" ")->gold
+read.table(paste0(thisdir,"/key_child_voc_file_level.csv"),header=T,sep=" ")->cvtc
 
 
-read.table(paste0(thisdir,"/lena_key_child_voc_file_level.csv"),header=T,sep=" ")->lena
-
-#some cleaning to get the filenames to match up
-gold$id=gold$filename
-gold$id=gsub("BER_","",gold$id)
-gold$id=gsub("WAR_","",gold$id)
-gold$id=gsub("ROW_","",gold$id)
-gold$id=gsub("SOD_","",gold$id)
-gold$id=gsub("_0","_",gold$id)
-lena$id=lena$filename
-lena$id=gsub("_ ","_0",lena$id)
-
-#join files by clip ID
-cvtc=merge(lena,gold,by="id", all=T)
-colnames(cvtc)<-gsub(".x","_lena",colnames(cvtc))
-colnames(cvtc)<-gsub(".y","_gold",colnames(cvtc))
-
-cor.cvc.all= cor.test(cvtc$CV_count_lena,cvtc$CV_count_gold)
-cor.cvc.noZeros= cor.test(cvtc$CV_count_lena[cvtc$CV_count_lena>0 & cvtc$CV_count_gold>0],cvtc$CV_count_gold[cvtc$CV_count_lena>0 & cvtc$CV_count_gold>0])
+cor.cvc.all= cor.test(cvtc$lena_CV_count,cvtc$gold_CV_count)
+cor.cvc.noZeros= cor.test(cvtc$lena_CV_count[cvtc$lena_CV_count>0 & cvtc$gold_CV_count>0],cvtc$gold_CV_count[cvtc$lena_CV_count>0 & cvtc$gold_CV_count>0])
 
 allpearsons["CVC","N clips"]<-round(cor.cvc.all$parameter)
 allpearsons["CVC","r all"]<-round(cor.cvc.all$estimate,3)
@@ -522,10 +505,10 @@ To calculate Child Vocalizaton Counts, given the inaccuracy of "far" LENA^®^ ta
 
 
 ```{r cvc-fig, ig.pos = "T!", fig.width=3.5, fig.height=3.5, fig.cap="Child Vocalization Counts according to LENA (x axis) and humans (y axis). Each point represents the CVC totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA^®^ said zero child vocalizations. The x and y ranges have been adjusted to be equal regardless of the data distribution."}
-myrange=range(cvtc[,c("CV_count_gold","CV_count_lena")],na.rm=T)
-plot(CV_count_gold~CV_count_lena,data=cvtc,pch=20,col=alpha("black",.2),xlab="LENA CVC",ylab="Human CVC",xlim=myrange,ylim=myrange)
-abline(lm(CV_count_gold~CV_count_lena,data=cvtc))
-abline(lm(CV_count_gold~CV_count_lena,data=cvtc,subset=c(cvtc$CV_count_lena>0 & cvtc$CV_count_gold>0)),lty=2)
+myrange=range(cvtc[,c("gold_CV_count","lena_CV_count")],na.rm=T)
+plot(gold_CV_count~lena_CV_count,data=cvtc,pch=20,col=alpha("black",.2),xlab="LENA CVC",ylab="Human CVC",xlim=myrange,ylim=myrange)
+abline(lm(gold_CV_count~lena_CV_count,data=cvtc))
+abline(lm(gold_CV_count~lena_CV_count,data=cvtc,subset=c(cvtc$lena_CV_count>0 & cvtc$gold_CV_count>0)),lty=2)
 
 ```
 
@@ -539,21 +522,21 @@ rownames(aller)<-c("CVC","CTC","AWC")
 colnames(aller)<-c("AER","min","max","AER-0","min","max","RER","min1","max1","ARER","min2","max2")
 
 # error rate
-aer=(cvtc$CV_count_lena-cvtc$CV_count_gold)
+aer=(cvtc$lena_CV_count-cvtc$gold_CV_count)
 #summary(aer)
 
 
-aer_no_zeros=(cvtc$CV_count_lena[cvtc$CV_count_lena>0 & cvtc$CV_count_gold > 0]-cvtc$CV_count_gold[cvtc$CV_count_lena>0 & cvtc$CV_count_gold > 0])
+aer_no_zeros=(cvtc$lena_CV_count[cvtc$lena_CV_count>0 & cvtc$gold_CV_count > 0]-cvtc$gold_CV_count[cvtc$lena_CV_count>0 & cvtc$gold_CV_count > 0])
 
-#sum(cvtc$CV_count_gold>0)
-no_human_zeros=cvtc[ cvtc$CV_count_gold>0,]
-rer=(no_human_zeros$CV_count_lena-no_human_zeros$CV_count_gold)/no_human_zeros$CV_count_gold*100
+#sum(cvtc$gold_CV_count>0)
+no_human_zeros=cvtc[ cvtc$gold_CV_count>0,]
+rer=(no_human_zeros$lena_CV_count-no_human_zeros$gold_CV_count)/no_human_zeros$gold_CV_count*100
 #summary(rer)
 
-arer=abs(no_human_zeros$CV_count_lena-no_human_zeros$CV_count_gold)/no_human_zeros$CV_count_gold*100
+arer=abs(no_human_zeros$lena_CV_count-no_human_zeros$gold_CV_count)/no_human_zeros$gold_CV_count*100
 
-aer_cvc <-(cvtc$CV_count_lena-cvtc$CV_count_gold)
-aer_nozeros_cvc <-(cvtc$CV_count_lena[cvtc$CV_count_lena>0 & cvtc$CV_count_gold > 0]-cvtc$CV_count_gold[cvtc$CV_count_lena>0 & cvtc$CV_count_gold > 0])
+aer_cvc <-(cvtc$lena_CV_count-cvtc$gold_CV_count)
+aer_nozeros_cvc <-(cvtc$lena_CV_count[cvtc$lena_CV_count>0 & cvtc$gold_CV_count > 0]-cvtc$gold_CV_count[cvtc$lena_CV_count>0 & cvtc$gold_CV_count > 0])
 
 
 aller["CVC",]<-cbind(mean(aer),min(aer),max(aer),
@@ -571,7 +554,7 @@ The *absolute error rate* ranged from `r min(aer)`% to `r max(aer)`%, with a mea
 <!-- eb: the ranges don't change -->
 the mean was `r mean(aer_no_zeros)`% and the median was `r median(aer_no_zeros)`%. 
 
-Next, we considered *relative error rates*, which require the number in the denominator to be non-null. For this analysis, therefore, we need to remove the `r sum(cvtc$CV_count_gold==0)` clips in which the human annotator said there were no child vocalizations whatsoever. When we do this, the mean relative error rate ranged from `r min(rer)`% to `r max(rer)`%, with a mean of `r mean(rer)`% and a median of `r median(rer)`%. Finally, the *absolute relative error rate* ranged from `r min(arer)`% to `r max(arer)`%, with a mean of `r mean(arer)`% and a median of `r median(arer)`%. 
+Next, we considered *relative error rates*, which require the number in the denominator to be non-null. For this analysis, therefore, we need to remove the `r sum(cvtc$gold_CV_count==0)` clips in which the human annotator said there were no child vocalizations whatsoever. When we do this, the mean relative error rate ranged from `r min(rer)`% to `r max(rer)`%, with a mean of `r mean(rer)`% and a median of `r median(rer)`%. Finally, the *absolute relative error rate* ranged from `r min(arer)`% to `r max(arer)`%, with a mean of `r mean(arer)`% and a median of `r median(arer)`%. 
 
 Together, these data suggest that LENA tends to underestimate vocalization counts, particularly when only clips with some speech are considered. This understimation is quite systematic and it appears to be around half of the actual counts.
 
@@ -583,17 +566,17 @@ Together, these data suggest that LENA tends to underestimate vocalization count
 ```{r ctc-fig, ig.pos = "T!", fig.width=3.5, fig.height=3.5, fig.cap="Conversational Turn Counts according to LENA (x axis) and humans (y axis). Each point represents the CTC totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA^®^ said zero child-adult or adult-child turns. The x and y ranges have been adjusted to be equal regardless of the data distribution."}
 
 
-myrange=range(cvtc[,c("CTC_count_gold","CTC_count_lena")],na.rm = T)
-plot(CTC_count_gold~CTC_count_lena,data=cvtc,pch=20,col=alpha("blue",.2),xlab="LENA CTC",ylab="Human CTC",xlim=myrange,ylim=myrange)
-abline(lm(CTC_count_gold~CTC_count_lena,data=cvtc))
-abline(lm(CTC_count_gold~CTC_count_lena,data=cvtc,subset=c(cvtc$CTC_count_lena>0 & cvtc$CTC_count_gold>0)),lty=2)
+myrange=range(cvtc[,c("gold_CTC_count","lena_CTC_count")],na.rm = T)
+plot(gold_CTC_count~lena_CTC_count,data=cvtc,pch=20,col=alpha("blue",.2),xlab="LENA CTC",ylab="Human CTC",xlim=myrange,ylim=myrange)
+abline(lm(gold_CTC_count~lena_CTC_count,data=cvtc))
+abline(lm(gold_CTC_count~lena_CTC_count,data=cvtc,subset=c(cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0)),lty=2)
 
 ```
 
 ```{r ctc-er, echo=F}
 
-cor.ctc.all=cor.test(cvtc$CTC_count_lena,cvtc$CTC_count_gold)
-cor.ctc.noZeros=cor.test(cvtc$CTC_count_lena[cvtc$CTC_count_lena>0 & cvtc$CTC_count_gold>0],cvtc$CTC_count_gold[cvtc$CTC_count_lena>0 & cvtc$CTC_count_gold>0])
+cor.ctc.all=cor.test(cvtc$lena_CTC_count,cvtc$gold_CTC_count)
+cor.ctc.noZeros=cor.test(cvtc$lena_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0],cvtc$gold_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0])
 
 
 allpearsons["CTC","N clips"]<-round(cor.ctc.all$parameter)
@@ -602,16 +585,16 @@ allpearsons["CTC","N"]<-round(cor.ctc.noZeros$parameter)
 allpearsons["CTC","r"]<-round(cor.ctc.noZeros$estimate,3)
 
 # ER against human
-aer=(cvtc$CTC_count_lena-cvtc$CTC_count_gold)
-aer_no_zeros=(cvtc$CTC_count_lena[cvtc$CTC_count_lena>0 & cvtc$CTC_count_gold > 0]-cvtc$CTC_count_gold[cvtc$CTC_count_lena>0 & cvtc$CTC_count_gold > 0])
+aer=(cvtc$lena_CTC_count-cvtc$gold_CTC_count)
+aer_no_zeros=(cvtc$lena_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count > 0]-cvtc$gold_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count > 0])
 
-no_human_zeros=cvtc[ cvtc$CTC_count_gold>0,]
-rer=(no_human_zeros$CTC_count_lena-no_human_zeros$CTC_count_gold)/no_human_zeros$CTC_count_gold*100
+no_human_zeros=cvtc[ cvtc$gold_CTC_count>0,]
+rer=(no_human_zeros$lena_CTC_count-no_human_zeros$gold_CTC_count)/no_human_zeros$gold_CTC_count*100
 
-arer=abs(no_human_zeros$CTC_count_lena-no_human_zeros$CTC_count_gold)/no_human_zeros$CTC_count_gold*100
+arer=abs(no_human_zeros$lena_CTC_count-no_human_zeros$gold_CTC_count)/no_human_zeros$gold_CTC_count*100
 
-aer_ctc <-(cvtc$CTC_count_lena-cvtc$CTC_count_gold)
-aer_nozeros_ctc <-(cvtc$CTC_count_lena[cvtc$CTC_count_lena>0 & cvtc$CTC_count_gold > 0]-cvtc$CTC_count_gold[cvtc$CTC_count_lena>0 & cvtc$CTC_count_gold > 0])
+aer_ctc <-(cvtc$lena_CTC_count-cvtc$gold_CTC_count)
+aer_nozeros_ctc <-(cvtc$lena_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count > 0]-cvtc$gold_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count > 0])
 
 aller["CTC",]<-cbind(mean(aer),min(aer),max(aer),
                      mean(aer_no_zeros),min(aer_no_zeros),max(aer_no_zeros),
@@ -621,10 +604,10 @@ aller["CTC",]<-cbind(mean(aer),min(aer),max(aer),
 
 ```
 
-Again, we only considered "near" speaker categories in the turn count, and applied the same rule the LENA^®^ does, where a turn can be from the key child to an adult or vice versa, and should happen within 5 seconds to be counted. The association between clip-level LENA^®^ and human CTC was weaker than that found for CVC (Figure 5):  the Pearson correlation between the two was r = `r round(cor.ctc.all$estimate,3)` (p = `r signif(cor.ctc.all$p.value,3)`) when all clips were taken into account, and r = `r round(cor.ctc.noZeros$estimate,3)` (p = `r signif(cor.ctc.noZeros$p.value,3)`)  when only clips with some child speech (i.e., excluding `r sum(cvtc$CTC_count_lena>0 & cvtc$CTC_count_gold>0)` clips with 0 counts in both LENA^®^ and human annotations) were considered.  
+Again, we only considered "near" speaker categories in the turn count, and applied the same rule the LENA^®^ does, where a turn can be from the key child to an adult or vice versa, and should happen within 5 seconds to be counted. The association between clip-level LENA^®^ and human CTC was weaker than that found for CVC (Figure 5):  the Pearson correlation between the two was r = `r round(cor.ctc.all$estimate,3)` (p = `r signif(cor.ctc.all$p.value,3)`) when all clips were taken into account, and r = `r round(cor.ctc.noZeros$estimate,3)` (p = `r signif(cor.ctc.noZeros$p.value,3)`)  when only clips with some child speech (i.e., excluding `r sum(cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0)` clips with 0 counts in both LENA^®^ and human annotations) were considered.  
 
 The *absolute error rate* ranged from `r min(aer)`% to `r max(aer)`%, with a mean of `r mean(aer)`% and a median of `r median(aer)`%. Excluding clips where both human and LENA^®^ counts were zero,
-the mean was `r mean(aer_no_zeros)`% and the median was `r median(aer_no_zeros)`%. Again, *relative error rates* require non-null denominators, and we thus removed the `r sum(cvtc$CTC_count_gold==0)` clips in which the human annotator said there were no child-adult or adult-child turns at all. The mean relative error rate ranged from `r min(rer)`% to `r max(rer)`%, with a mean of `r mean(rer)`% and a median of `r median(rer)`%. Finally, the *absolute relative error* rate ranged from `r min(arer)`% to `r max(arer)`%, with a mean of `r mean(arer)`% and a median of `r median(arer)`%. For CTCs, as for CVCs, the LENA^®^ seems to be underestimating counts rather systematically, leading to counts that are on average `r mean(rer)`% smaller than what they actually are.
+the mean was `r mean(aer_no_zeros)`% and the median was `r median(aer_no_zeros)`%. Again, *relative error rates* require non-null denominators, and we thus removed the `r sum(cvtc$gold_CTC_count==0)` clips in which the human annotator said there were no child-adult or adult-child turns at all. The mean relative error rate ranged from `r min(rer)`% to `r max(rer)`%, with a mean of `r mean(rer)`% and a median of `r median(rer)`%. Finally, the *absolute relative error* rate ranged from `r min(arer)`% to `r max(arer)`%, with a mean of `r mean(arer)`% and a median of `r median(arer)`%. For CTCs, as for CVCs, the LENA^®^ seems to be underestimating counts rather systematically, leading to counts that are on average `r mean(rer)`% smaller than what they actually are.
 
 
 ### Adult Word Counts accuracy 
@@ -687,7 +670,7 @@ apa_table(aller,caption="For each measure (CVC, CTC, AWC), AER is the absolute e
 ```
 
 ```{r awc-fig, ig.pos = "T!", fig.width=3.5, fig.height=3.5, fig.cap="Adult Word Counts according to LENA (x axis) and humans (y axis). Each point represents the AWC totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA^®^ said there were no adult words. The x and y ranges have been adjusted to be equal regardless of the data distribution."}
-myrange=range(awc[,c("gold","lena")],na.rm = T)
+myrange=range(awc[,c("gold","LENA")],na.rm = T)
 
 plot(gold~LENA,data=awc,pch=20,main="AWC",col=alpha("orange",.2),xlab="LENA AWC",ylab="Human AWC",xlim=myrange,ylim=myrange)
 abline(lm(gold~LENA,data=awc))
@@ -789,17 +772,21 @@ We predicted false alarm, miss, and confusion rates in clips where there was som
 
 
 ```{r cvc-age, echo=F}
-cvtc$cor=substr(cvtc$filename_gold,1,3)
-cvtc$cor[substr(cvtc$filename_gold,1,1)=="C"]<-"TSI"
+read.table(paste0(thisdir,"/key_child_voc_file_level.csv"),header=T,sep=" ")->cvtc
+cvtc$cor=substr(cvtc$filename,1,3)
+cvtc$cor[substr(cvtc$filename,1,1)=="C"]<-"TSI"
 cvtc$cor=factor(cvtc$cor)
 
-cvtc$child=substr(cvtc$filename_gold,1,8)
-#cvtc$child[cvtc$cor=="TSI"]<-substr(cvtc$filename_gold[cvtc$cor=="TSI"],1,3) #this line gives an error because there are no TSI files
-#***** WARNING THIS NEEDS TO BE UNCOMMENTED !!!!! ******
+cvtc$child=substr(cvtc$filename,1,8)
+cvtc$child[cvtc$cor=="TSI"]<-substr(cvtc$filename[cvtc$cor=="TSI"],1,3) 
+
+#REMOVE WHEN FILENAME=ZERO BUG IS FIXED 
+cvtc=subset(cvtc,filename!=0)
+cvtc$cor=factor(cvtc$cor)
 
 merge(cvtc,age_id,by="child")->cvtc
 
-mymodel<-lmer(CV_count_gold~CV_count_lena*age*cor + (1|child), data=cvtc)
+mymodel<-lmer(gold_CV_count~lena_CV_count*age*cor + (1|child), data=cvtc)
 #summary(mymodel)
 #Anova(mymodel,type="III")
 
@@ -808,9 +795,9 @@ mymodel<-lmer(CV_count_gold~CV_count_lena*age*cor + (1|child), data=cvtc)
 
 mymodels<- list()
 myANOVAs<- list()
-for(thiscor in levels(cvtc$cor)){
+for(thiscor in levels(cvtc$cor)[-4]){ #!!!! removing TSI -- REMOVE THIS -4 WHEN TSI ARE FIXED!!!
   #print(thiscor)
- mymodels[[thiscor]]<-lmer(CV_count_gold~CV_count_lena*age + (1|child), data=cvtc,subset=c(cor==thiscor))
+ mymodels[[thiscor]]<-lmer(gold_CV_count~lena_CV_count*age + (1|child), data=cvtc,subset=c(cor==thiscor))
  myANOVAs[[thiscor]]<-Anova(mymodels[[thiscor]],type="III")
 }
 ```
@@ -822,7 +809,7 @@ For CVC, we fit a mixed model where CVC according to the human was predicted fro
 
 ```{r ctc-age, echo=F}
 
-mymodel<-lmer(CTC_count_gold~CTC_count_lena*age*cor + (1|child), data=cvtc)
+mymodel<-lmer(gold_CTC_count~lena_CTC_count*age*cor + (1|child), data=cvtc)
 #summary(mymodel)
 #Anova(mymodel,type="III")
 
