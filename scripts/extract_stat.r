@@ -22,9 +22,10 @@ read_its <- function(data_folder, gold_folder) {
       child_id = str_replace(its, ".its", "")
       # List of associated rttm to know onset/offset of chunks
       associated.rttm <- rttm.files[grepl(paste0(child_id,'_'), rttm.files)]
+      print(its)
       # Read onsets/offsets of gold chunks
       if(startsWith(its, "C")){
-        onsets = as.integer(str_match(associated.rttm, ".*_.*_(.*?).rttm")[,2])
+        onsets = as.integer(str_match(associated.rttm, ".*_.*_(.*?)_.*.rttm")[,2])
         offsets = onsets+60
       } else {
         onsets = as.integer(str_match(associated.rttm, ".*_.*_(.*?)_.*.rttm")[,2])
@@ -85,7 +86,7 @@ read_its <- function(data_folder, gold_folder) {
 read_rttm <- function(data_folder) {
   all.files <- list.files(data_folder)
   # All rttm files excluding tsimane ones
-  rttm.files <- all.files[endsWith(all.files, '.rttm') & !startsWith(all.files, 'C') ]
+  rttm.files <- all.files[endsWith(all.files, '.rttm')]
   # Data structure where we'll store all the annotations
   data <- data.frame(filename = character(),
                      onset = double(),
@@ -96,6 +97,7 @@ read_rttm <- function(data_folder) {
   for(rttm in rttm.files){
     filepath = paste(data_folder, rttm, sep ="/")
     info = file.info(filepath)
+    filename = str_remove(basename(filepath), ".rttm")
     if (info['size'] != 0) {
       file_data = read.csv(file=filepath, header=FALSE, sep="\t")
       file_data = file_data %>% select(2, 4, 5, 6, 7, 8) %>% dplyr::rename(filename = V2,
@@ -104,12 +106,10 @@ read_rttm <- function(data_folder) {
                                        transcription = V6,
                                        utt_type = V7,
                                        speaker_type = V8)
-
+      file_data$filename = filename
       file_data <- data.frame(file_data)
       data <- rbind(data, file_data)
     } else {
-      filename = str_remove(basename(filepath), ".rttm")
-
       fake_row = data.frame(filename=filename,
                            onset=0,
                            duration=0,
@@ -128,6 +128,7 @@ read_rttm <- function(data_folder) {
   # And tier_subtype being a letter (N,C,L,Y...)
   data$tier_subtype = str_sub(data$utt_type,6,6)
   data$child_id = str_sub(data$filename,1,8)
+  data[substr(data$filename,1,1) == "C", "child_id"] = str_sub(data[substr(data$filename,1,1) == "C", "filename"], 1, 12)
   data$end_time <- data$onset + data$duration
   data[data==""]<-NA
 
@@ -158,64 +159,59 @@ read_rttm <- function(data_folder) {
   cond2 = (prev_spkr == 'MAL' | prev_spkr == 'FEM') & next_spkr == 'CHI'
   data$adult_chi_swipe = cond1 | cond2
   data$turn_taking = data$adult_chi_swipe & data$less_than_5
+  data[substr(data$filename,1,1) == "C", "tier_type"] = data[substr(data$filename,1,1) == "C", "utt_type"]
+  data[substr(data$filename,1,1) == "C", "tier_subtype"] = data[substr(data$filename,1,1) == "C", "utt_type"]
   data = data[,c(1,2,3,11,12,13,14,4,5,6,7,8,9,10)]
   return(data)
 }
 
 get_stats_gold <- function(gold_data){
-  # Add age column
-  desc = read.csv(file="data/ACLEW_list_of_corpora.csv", header=TRUE, sep=",")
-  desc$aclew_id = str_pad(desc$aclew_id, 4, pad=0)
-  desc["child_id"] = do.call(paste, c(desc[c("labname", "aclew_id")], sep="_"))
-  desc = desc[c("child_id", "age_mo_round")]
-  gold_data = merge(gold_data, desc, dby="child_id", all=TRUE)
-
   # Child scale
   child_CVC = gold_data %>%
-    filter(speaker_type == 'CHI', tier_type == 'vcm', tier_subtype == 'C' | tier_subtype == 'N') %>%
-    dplyr::group_by(child_id, age_mo_round) %>%
+    filter(speaker_type == 'CHI', tier_subtype == 'C' | tier_subtype == 'N') %>%
+    dplyr::group_by(child_id) %>%
     dplyr::summarise(CV_cum_dur = sum(duration, na.rm=TRUE),
               CV_mean = mean(duration, na.rm=TRUE),
               CV_count = length(duration))
 
   child_CNVC = gold_data %>% 
-      filter(speaker_type == 'CHI', tier_type == 'vcm', tier_subtype == 'L' | tier_subtype == 'U' | tier_subtype == 'Y') %>%
-    dplyr::group_by(child_id, age_mo_round) %>%
+      filter(speaker_type == 'CHI', tier_subtype == 'L' | tier_subtype == 'U' | tier_subtype == 'Y') %>%
+    dplyr::group_by(child_id) %>%
     dplyr::summarise(CNV_cum_dur = sum(duration, na.rm=TRUE),
               CNV_mean = mean(duration, na.rm=TRUE),
               CNV_count = length(duration))
 
-  child_CTC = gold_data %>% dplyr::group_by(child_id, age_mo_round) %>%
+  child_CTC = gold_data %>% dplyr::group_by(child_id) %>%
     dplyr::summarise(CTC_count = sum(turn_taking))
 
   # File scale
   file_CVC = gold_data %>%
-    filter(speaker_type == 'CHI', tier_type == 'vcm', tier_subtype == 'C' | tier_subtype == 'N') %>%
-    dplyr::group_by(filename, age_mo_round) %>%
+    filter(speaker_type == 'CHI', tier_subtype == 'C' | tier_subtype == 'N') %>%
+    dplyr::group_by(filename) %>%
     dplyr::summarise(CV_cum_dur = sum(duration, na.rm=TRUE),
               CV_mean = mean(duration, na.rm=TRUE),
               CV_count = length(duration))
 
   file_CNVC = gold_data %>%
-    filter(speaker_type == 'CHI', tier_type == 'vcm', tier_subtype == 'L' | tier_subtype == 'U' | tier_subtype == 'Y') %>%
-    dplyr::group_by(filename, age_mo_round) %>%
+    filter(speaker_type == 'CHI', tier_subtype == 'L' | tier_subtype == 'U' | tier_subtype == 'Y') %>%
+    dplyr::group_by(filename) %>%
     dplyr::summarise(CNV_cum_dur = sum(duration, na.rm=TRUE),
               CNV_mean = mean(duration, na.rm=TRUE),
               CNV_count = length(duration))
 
-  file_CTC = gold_data %>% dplyr::group_by(filename, age_mo_round) %>%
+  file_CTC = gold_data %>% dplyr::group_by(filename) %>%
     dplyr::summarise(CTC_count = sum(turn_taking))
 
   # Aggregated across child and files
   all_CVC = gold_data %>%
-    filter(speaker_type == 'CHI', tier_type == 'vcm', tier_subtype == 'C' | tier_subtype == 'N') %>%
+    filter(speaker_type == 'CHI', tier_subtype == 'C' | tier_subtype == 'N') %>%
     dplyr::summarise(CV_cum_dur = sum(duration, na.rm=TRUE),
               CV_mean = mean(duration, na.rm=TRUE),
               CV_count = length(duration),
               short_CV_count = sum(duration < 0.6))
 
   all_CNVC = gold_data %>%
-    filter(speaker_type == 'CHI', tier_type == 'vcm', tier_subtype == 'L' | tier_subtype == 'U' | tier_subtype == 'Y') %>%
+    filter(speaker_type == 'CHI', tier_subtype == 'L' | tier_subtype == 'U' | tier_subtype == 'Y') %>%
     dplyr::summarise(CNV_cum_dur = sum(duration, na.rm=TRUE),
               CNV_mean = mean(duration, na.rm=TRUE),
               CNV_count = length(duration),
@@ -240,36 +236,29 @@ get_stats_gold <- function(gold_data){
 }
 
 get_stats_its <- function(its_data){
-  # Add age column
-  desc = read.csv(file="data/ACLEW_list_of_corpora.csv", header=TRUE, sep=",")
-  desc$aclew_id = str_pad(desc$aclew_id, 4, pad=0)
-  desc["child_id"] = do.call(paste, c(desc[c("labname", "aclew_id")], sep="_"))
-  desc = desc[c("child_id", "age_mo_round")]
-  #desc$child_id = str_match(desc$child_id, "_(.*)")[,2]
-  its_data = merge(its_data, desc, dby="child_id",all=TRUE)
 
-    # Child level statistics
+  # Child level statistics
   child_level = its_data %>% filter(spkr == "CHN") %>%
-    dplyr::group_by(child_id, age_mo_round) %>%
+    dplyr::group_by(child_id) %>%
     dplyr::summarise(CV_cum_dur = sum(childUttLen, na.rm = TRUE),
               CV_mean = mean(childUttLen, na.rm = TRUE),
               CV_count = sum(childUttLen > 0, na.rm = TRUE),
               CNV_cum_dur = sum(childCryVfxLen, na.rm = TRUE),
               CNV_mean = mean(childCryVfxLen, na.rm = TRUE),
               CNV_count = sum(childCryVfxLen > 0, na.rm = TRUE))
-  child_CTC = its_data %>% dplyr::group_by(child_id, age_mo_round) %>%
+  child_CTC = its_data %>% dplyr::group_by(child_id) %>%
     dplyr::summarise(CTC_count = sum(turn_taking))
   
   # File level statistics
   file_level = its_data %>% filter(spkr == "CHN") %>%
-    dplyr::group_by(filename, age_mo_round) %>% 
+    dplyr::group_by(filename) %>% 
     dplyr::summarise(CV_cum_dur = sum(childUttLen, na.rm = TRUE),
               CV_mean = mean(childUttLen, na.rm = TRUE),
               CV_count = sum(childUttLen > 0, na.rm = TRUE),
               CNV_cum_dur = sum(childCryVfxLen, na.rm = TRUE),
               CNV_mean = mean(childCryVfxLen, na.rm = TRUE),
               CNV_count = sum(childCryVfxLen > 0, na.rm = TRUE))
-  file_CTC = its_data %>% dplyr::group_by(filename, age_mo_round) %>%
+  file_CTC = its_data %>% dplyr::group_by(filename) %>%
     dplyr::summarise(CTC_count = sum(turn_taking))
   
   # Aggregated across all
@@ -342,13 +331,9 @@ all[is.na(all)] = 0
 
 
 # Remove useless columns
-child = subset(child, select = -c(lena_age_mo_round))
 colnames(child)[colnames(child) == "gold_child_id"] = "child_id"
-colnames(child)[colnames(child) == "gold_age_mo_round"] = "age_mo_round"
 
-file = subset(file, select = -c(lena_age_mo_round))
 colnames(file)[colnames(file) == "gold_filename"] = "filename"
-colnames(file)[colnames(file) == "gold_age_mo_round"] = "age_mo_round"
 
 
 write.table(child, file=paste(output_folder, "key_child_voc_child_level.csv", sep="/"), row.names=FALSE)
