@@ -6,6 +6,7 @@ library(magrittr)
 library(stringr)
 library(stringi)
 library(rlena)
+library(tidyr)
 
 read_its <- function(data_folder, gold_folder) {
   all.files <- list.files(data_folder)
@@ -22,7 +23,6 @@ read_its <- function(data_folder, gold_folder) {
       child_id = str_replace(its, ".its", "")
       # List of associated rttm to know onset/offset of chunks
       associated.rttm <- rttm.files[grepl(paste0(child_id,'_'), rttm.files)]
-      print(its)
       # Read onsets/offsets of gold chunks
       if(startsWith(its, "C")){
         onsets = as.integer(str_match(associated.rttm, ".*_.*_(.*?)_.*.rttm")[,2])
@@ -62,24 +62,6 @@ read_its <- function(data_folder, gold_folder) {
   # create a new column `filename` with the three columns collapsed together
   data$filename <- apply(data[ ,cols] , 1 , paste0 , collapse = "_" )
   data$filename <- gsub(' ', '0', data$filename)
-  ## Let's count turn-taking in the clearest way as possible
-  next_starts = c(data[2:nrow(data), "startTime"], 10000)
-  prev_ends = data[1:nrow(data), "endTime"]
-  less_than_5 = (next_starts - prev_ends) < 5.0
-  less_than_5 = c(FALSE, less_than_5[1:length(less_than_5)-1])
-  data$less_than_5 = less_than_5
-  
-  change_files = c(data$filename,0) != c(0, data$filename)
-  change_files = change_files[1:length(change_files)-1]
-  data[change_files, "less_than_5"] = FALSE
-
-  
-  prev_spkr = data[1:nrow(data), "spkr"]
-  next_spkr = factor(append(as.character(data[2:nrow(data), "spkr"]), "UNKUNK"))
-  cond1 = prev_spkr == 'CHN' & (next_spkr == 'MAN' | next_spkr == 'FAN')
-  cond2 = (prev_spkr == 'MAN' | prev_spkr == 'FAN') & next_spkr == 'CHN'
-  data$adult_chi_swipe = cond1 | cond2
-  data$turn_taking = data$adult_chi_swipe & data$less_than_5
   return(data)
 }
 
@@ -154,9 +136,13 @@ read_rttm <- function(data_folder) {
   levels(data$mapped_speaker_type) <- gold_mapping.levels
 
   prev_spkr = data[1:nrow(data), "mapped_speaker_type"]
+  prev_subtype = data[1:nrow(data), "tier_subtype"]
   next_spkr = factor(append(as.character(data[2:nrow(data), "mapped_speaker_type"]), "UNKUNK"))
-  cond1 = prev_spkr == 'CHI' & (next_spkr == 'MAL' | next_spkr == 'FEM')
-  cond2 = (prev_spkr == 'MAL' | prev_spkr == 'FEM') & next_spkr == 'CHI'
+  next_subtype = factor(append(as.character(data[2:nrow(data), "tier_subtype"]), "UNKUNK"))
+  cond1 = (prev_subtype == "C" | prev_subtype == "N" ) & prev_spkr == 'CHI' &
+    (next_spkr == 'MAL' | next_spkr == 'FEM')
+  cond2 = (prev_spkr == 'MAL' | prev_spkr == 'FEM') & 
+    next_spkr == 'CHI' & (next_subtype == "C" | next_subtype == "N")
   data$adult_chi_swipe = cond1 | cond2
   data$turn_taking = data$adult_chi_swipe & data$less_than_5
   data[substr(data$filename,1,1) == "C", "tier_type"] = data[substr(data$filename,1,1) == "C", "utt_type"]
@@ -166,124 +152,104 @@ read_rttm <- function(data_folder) {
 }
 
 get_stats_gold <- function(gold_data){
-  # Child scale
-  child_CVC = gold_data %>%
-    filter(speaker_type == 'CHI', tier_subtype == 'C' | tier_subtype == 'N') %>%
-    dplyr::group_by(child_id) %>%
-    dplyr::summarise(CV_cum_dur = sum(duration, na.rm=TRUE),
-              CV_mean = mean(duration, na.rm=TRUE),
-              CV_count = length(duration))
-
-  child_CNVC = gold_data %>% 
-      filter(speaker_type == 'CHI', tier_subtype == 'L' | tier_subtype == 'U' | tier_subtype == 'Y') %>%
-    dplyr::group_by(child_id) %>%
-    dplyr::summarise(CNV_cum_dur = sum(duration, na.rm=TRUE),
-              CNV_mean = mean(duration, na.rm=TRUE),
-              CNV_count = length(duration))
-
-  child_CTC = gold_data %>% dplyr::group_by(child_id) %>%
-    dplyr::summarise(CTC_count = sum(turn_taking))
-
-  # File scale
-  file_CVC = gold_data %>%
+  CVC = gold_data %>%
     filter(speaker_type == 'CHI', tier_subtype == 'C' | tier_subtype == 'N') %>%
     dplyr::group_by(filename) %>%
-    dplyr::summarise(CV_cum_dur = sum(duration, na.rm=TRUE),
-              CV_mean = mean(duration, na.rm=TRUE),
-              CV_count = length(duration))
-
-  file_CNVC = gold_data %>%
-    filter(speaker_type == 'CHI', tier_subtype == 'L' | tier_subtype == 'U' | tier_subtype == 'Y') %>%
-    dplyr::group_by(filename) %>%
-    dplyr::summarise(CNV_cum_dur = sum(duration, na.rm=TRUE),
-              CNV_mean = mean(duration, na.rm=TRUE),
-              CNV_count = length(duration))
-
-  file_CTC = gold_data %>% dplyr::group_by(filename) %>%
-    dplyr::summarise(CTC_count = sum(turn_taking))
-
-  # Aggregated across child and files
-  all_CVC = gold_data %>%
-    filter(speaker_type == 'CHI', tier_subtype == 'C' | tier_subtype == 'N') %>%
     dplyr::summarise(CV_cum_dur = sum(duration, na.rm=TRUE),
               CV_mean = mean(duration, na.rm=TRUE),
               CV_count = length(duration),
               short_CV_count = sum(duration < 0.6))
 
-  all_CNVC = gold_data %>%
+  CNVC = gold_data %>%
     filter(speaker_type == 'CHI', tier_subtype == 'L' | tier_subtype == 'U' | tier_subtype == 'Y') %>%
+    dplyr::group_by(filename) %>%
     dplyr::summarise(CNV_cum_dur = sum(duration, na.rm=TRUE),
               CNV_mean = mean(duration, na.rm=TRUE),
               CNV_count = length(duration),
               short_CNV_count = sum(duration < 0.6))
-  all_CTC = gold_data %>% dplyr::summarise(CTC_count = sum(turn_taking))
 
-  child_stats = merge(child_CVC, child_CNVC, all = TRUE)
-  child_stats = merge(child_stats, child_CTC, all = TRUE)
-  file_stats = merge(file_CVC, file_CNVC, all = TRUE)
-  file_stats = merge(file_stats, file_CTC, all = TRUE)
-  all_stats = merge(all_CVC, all_CNVC, all = TRUE)
-  all_stats = merge(all_stats, all_CTC, all = TRUE)
+  CTC = gold_data %>% dplyr::group_by(filename) %>%
+    dplyr::summarise(CTC_count = sum(turn_taking))
 
-  stats <- list()
-  stats$child = child_stats
-  stats$file = file_stats
-  stats$all = all_stats
-  stats$child[is.na(stats$child)] = 0
-  stats$file[is.na(stats$file)] = 0
-  stats$all[is.na(stats$all)] = 0
+  stats = merge(CVC, CNVC, all = TRUE)
+  stats = merge(stats, CTC, all = TRUE)
+  stats[is.na(stats)] = 0
   return(stats)
 }
 
 get_stats_its <- function(its_data){
-
-  # Child level statistics
-  child_level = its_data %>% filter(spkr == "CHN") %>%
-    dplyr::group_by(child_id) %>%
-    dplyr::summarise(CV_cum_dur = sum(childUttLen, na.rm = TRUE),
-              CV_mean = mean(childUttLen, na.rm = TRUE),
-              CV_count = sum(childUttLen > 0, na.rm = TRUE),
-              CNV_cum_dur = sum(childCryVfxLen, na.rm = TRUE),
-              CNV_mean = mean(childCryVfxLen, na.rm = TRUE),
-              CNV_count = sum(childCryVfxLen > 0, na.rm = TRUE))
-  child_CTC = its_data %>% dplyr::group_by(child_id) %>%
-    dplyr::summarise(CTC_count = sum(turn_taking))
+  # Convert timestamp format to float
+  starts_cries = colnames(its_data)[str_detect(colnames(its_data), regex("startCry*"))]
+  ends_cries = colnames(its_data)[str_detect(colnames(its_data), regex("endCry*"))]
+  starts_utts = colnames(its_data)[str_detect(colnames(its_data), regex("startUtt*"))]
+  ends_utts = colnames(its_data)[str_detect(colnames(its_data), regex("endUtt*"))]
+  all_timestamps = c(starts_cries,ends_cries,starts_utts, ends_utts, "startVfx1", "endVfx1")
+  its_data[,all_timestamps] = apply(its_data[,all_timestamps], 2, function(x) gsub("PT|S", "",x))
   
-  # File level statistics
-  file_level = its_data %>% filter(spkr == "CHN") %>%
-    dplyr::group_by(filename) %>% 
-    dplyr::summarise(CV_cum_dur = sum(childUttLen, na.rm = TRUE),
-              CV_mean = mean(childUttLen, na.rm = TRUE),
-              CV_count = sum(childUttLen > 0, na.rm = TRUE),
-              CNV_cum_dur = sum(childCryVfxLen, na.rm = TRUE),
-              CNV_mean = mean(childCryVfxLen, na.rm = TRUE),
-              CNV_count = sum(childCryVfxLen > 0, na.rm = TRUE))
-  file_CTC = its_data %>% dplyr::group_by(filename) %>%
-    dplyr::summarise(CTC_count = sum(turn_taking))
+  # Replace NA timestamps by 0
+  na_to_0 = rep(0, length(all_timestamps))
+  names(na_to_0) = all_timestamps
+  na_to_0 = as.data.frame(t(na_to_0))
+  its_data = tidyr::replace_na(its_data, na_to_0)
+
+  # Count duration of voc and cries 
+  for (i in 1:length(starts_cries)){
+    name_dur = paste0("durCry", i)
+    name_start = paste0("startCry", i)
+    name_end = paste0("endCry", i)
+    its_data[name_dur] = as.numeric(its_data[[name_end]])-as.numeric(its_data[[name_start]])
+  }
   
-  # Aggregated across all
-  all_level = its_data %>% filter(spkr == "CHN") %>% 
-    dplyr::summarise(CV_cum_dur = sum(childUttLen, na.rm = TRUE),
-              CV_mean = mean(childUttLen, na.rm = TRUE),
-              CV_count = sum(childUttLen > 0, na.rm = TRUE),
-              CNV_cum_dur = sum(childCryVfxLen, na.rm = TRUE),
-              CNV_mean = mean(childCryVfxLen, na.rm = TRUE),
-              CNV_count = sum(childCryVfxLen > 0, na.rm = TRUE),
-              short_CV_count = sum((childUttLen > 0 & childUttLen < 0.6), na.rm=TRUE),
-              short_CNV_count = sum((childCryVfxLen > 0 & childCryVfxLen < 0.6), na.rm=TRUE))
-  all_CTC = its_data %>% dplyr::summarise(CTC_count = sum(turn_taking))
+  for (i in 1:length(starts_utts)){
+    name_dur = paste0("durUtt", i)
+    name_start = paste0("startUtt", i)
+    name_end = paste0("endUtt", i)
+    its_data[name_dur] = as.numeric(its_data[[name_end]])-as.numeric(its_data[[name_start]])
+  }
+  
+  # Count number of cries/vegetative/fixed for each segment
+  its_data$cryCnt = rowSums((its_data %>% dplyr::select(matches("startCry*|startVfx*"))) != 0)
+  
+  # Compute counts 
+  counts = its_data %>% dplyr::group_by(filename) %>% 
+    filter(spkr == "CHN") %>% 
+    dplyr::summarise(CV_count = sum(childUttCnt), CNV_count = sum(cryCnt))
+  
+  # Compute sums
+  sums = its_data %>% dplyr::group_by(filename) %>% 
+    filter(spkr == "CHN") %>% 
+    dplyr::summarise(CV_cum_dur = sum(childUttLen), CNV_cum_dur = sum(childCryVfxLen))
+  
+  # Compute means (should be done at the end)
+  means = data.frame(counts$filename, sums$CV_cum_dur/counts$CV_count,  sums$CNV_cum_dur/counts$CNV_count)
+  means[is.na(means)] <- 0
+  names(means) = c("filename", "CV_mean", "CNV_mean")
+  
+  # Compute short vocalizations
+  short_counts = its_data %>% dplyr::group_by(filename) %>% 
+                    filter(spkr == "CHN") %>% 
+                    dplyr::summarise(short_CV_count = sum(durUtt1 < 0.6 & durUtt1 != 0)+sum(durUtt2 < 0.6 & durUtt2 != 0)+
+                                       sum(durUtt3 < 0.6 & durUtt3 != 0)+sum(durUtt4 < 0.6 & durUtt4 != 0)+
+                                       sum(durUtt5 < 0.6 & durUtt5 != 0)+sum(durUtt6 < 0.6 & durUtt6 != 0)+
+                                       sum(durUtt7 < 0.6 & durUtt7 != 0 )+sum(durUtt8 < 0.6 & durUtt8 != 0)+
+                                       sum(durUtt9 < 0.6 & durUtt9 != 0)+sum(durUtt10 < 0.6 & durUtt10 != 0)+
+                                       sum(durUtt11 < 0.6 & durUtt11 != 0),
+                                     short_CNV_count = sum(durCry1 < 0.6 & durCry1 != 0)+sum(durCry2 < 0.6 & durCry2 != 0)+
+                                       sum(durCry3 < 0.6 & durCry3 != 0)+sum(durCry4 < 0.6 & durCry4 != 0)+
+                                       sum(durCry5 < 0.6 & durCry5 != 0)+sum(durCry6 < 0.6 & durCry6 != 0)+
+                                       sum(durCry7 < 0.6 & durCry7 != 0)+sum(durCry8 < 0.6 & durCry8 != 0)+
+                                       sum(durCry9 < 0.6 & durCry9 != 0)+sum(durCry10 < 0.6 & durCry10 != 0)+
+                                       sum(durCry11 < 0.6 & durCry11 != 0)+sum(durCry12 < 0.6 & durCry12 != 0)+
+                                       sum(durCry13 < 0.6 & durCry13 != 0))
+                                                      
+  CTC = its_data %>% dplyr::group_by(filename) %>%
+    dplyr::summarise(CTC_count = sum(convTurnType != "NT", na.rm=TRUE))
 
-  child_stats = merge(child_level, child_CTC, all=TRUE)
-  file_stats = merge(file_level, file_CTC, all=TRUE)
-  all_stats = merge(all_level, all_CTC, all=TRUE)
-
-  stats <- list()
-  stats$child = child_stats
-  stats$file = file_stats
-  stats$all = all_stats
-  stats$child[is.na(stats$child)] = 0
-  stats$file[is.na(stats$file)] = 0
-  stats$all[is.na(stats$all)] = 0
+  stats = merge(counts, short_counts, all=TRUE)
+  stats = merge(stats, means, all=TRUE)
+  stats = merge(stats, sums, all=TRUE)
+  stats = merge(stats, CTC, all=TRUE)
+  stats[is.na(stats)] = 0
   return(stats)
 }
 
@@ -315,27 +281,45 @@ lena_stats <- get_stats_its(its_data)
 output_folder = paste(getwd(), "evaluations", sep = "/")
 
 # Cleaning a bit naming convention
-colnames(gold_stats$child) = paste("gold", colnames(gold_stats$child), sep = "_")
-colnames(lena_stats$child) = paste("lena", colnames(lena_stats$child), sep = "_")
-colnames(gold_stats$file) = paste("gold", colnames(gold_stats$file), sep = "_")
-colnames(lena_stats$file) = paste("lena", colnames(lena_stats$file), sep = "_")
-colnames(gold_stats$all) = paste("gold", colnames(gold_stats$all), sep = "_")
-colnames(lena_stats$all) = paste("lena", colnames(lena_stats$all), sep = "_")
+colnames(gold_stats) = paste("gold", colnames(gold_stats), sep = "_")
+colnames(lena_stats) = paste("lena", colnames(lena_stats), sep = "_")
 
-child = merge(gold_stats$child, lena_stats$child, all=TRUE, by.x="gold_child_id", by.y="lena_child_id")
-file = merge(gold_stats$file, lena_stats$file, all=TRUE, by.x="gold_filename", by.y="lena_filename")
-all = merge(gold_stats$all, lena_stats$all, all=TRUE)
+stats = merge(gold_stats, lena_stats, all=TRUE, by.x="gold_filename", by.y="lena_filename")
+colnames(stats)[colnames(stats) == "gold_filename"] = "filename"
+stats[is.na(stats)] <- 0
+stats$child_id <- str_match(stats$filename, "(.*_.*)_.*_.*")[,2]
+
+file = stats
+child = stats %>% subset(select = -filename ) %>% 
+  dplyr::group_by(child_id) %>%
+  summarise(gold_CV_cum_dur = sum(gold_CV_cum_dur),
+            gold_CV_count = sum(gold_CV_count),
+            gold_short_CV_count = sum(gold_short_CV_count),
+            gold_CNV_cum_dur = sum(gold_CNV_cum_dur),
+            gold_CNV_count = sum(gold_CNV_count),
+            gold_short_CNV_count = sum(gold_short_CNV_count),
+            gold_CTC_count = sum(gold_CTC_count),
+            lena_CV_cum_dur = sum(lena_CV_cum_dur),
+            lena_CV_count = sum(lena_CV_count),
+            lena_short_CV_count = sum(lena_short_CV_count),
+            lena_CNV_cum_dur = sum(lena_CNV_cum_dur),
+            lena_CNV_count = sum(lena_CNV_count),
+            lena_short_CNV_count = sum(lena_short_CNV_count),
+            lena_CTC_count = sum(lena_CTC_count))
+# We have to recompute the mean
+child$gold_CV_mean = child$gold_CV_cum_dur / child$gold_CV_count
+child$gold_CNV_mean = child$gold_CNV_cum_dur / child$gold_CNV_count
+child$lena_CV_mean = child$lena_CV_cum_dur / child$lena_CV_count
+child$lena_CNV_mean = child$lena_CNV_cum_dur / child$lena_CNV_count
 child[is.na(child)] = 0
-file[is.na(file)] = 0
-all[is.na(all)] = 0
 
-
-# Remove useless columns
-colnames(child)[colnames(child) == "gold_child_id"] = "child_id"
-
-colnames(file)[colnames(file) == "gold_filename"] = "filename"
-
-
+all = stats %>% subset(select = -c(filename, child_id))
+all = colSums(all)
+all = data.frame(as.list(all))
+all$gold_CV_mean = all$gold_CV_cum_dur / all$gold_CV_count
+all$gold_CNV_mean = all$gold_CNV_cum_dur / all$gold_CNV_count
+all$lena_CV_mean = all$lena_CV_cum_dur / all$lena_CV_count
+all$lena_CNV_mean = all$lena_CNV_cum_dur / all$lena_CNV_count
 write.table(child, file=paste(output_folder, "key_child_voc_child_level.csv", sep="/"), row.names=FALSE)
 write.table(file, file=paste(output_folder, "key_child_voc_file_level.csv", sep="/"), row.names=FALSE)
 write.table(all, file=paste(output_folder, "key_child_voc_corpora_level.csv", sep="/"), row.names=FALSE)

@@ -1,2 +1,2 @@
-"gold_CV_cum_dur" "gold_CV_mean" "gold_CV_count" "gold_short_CV_count" "gold_CNV_cum_dur" "gold_CNV_mean" "gold_CNV_count" "gold_short_CNV_count" "gold_CTC_count" "lena_CV_cum_dur" "lena_CV_mean" "lena_CV_count" "lena_CNV_cum_dur" "lena_CNV_mean" "lena_CNV_count" "lena_short_CV_count" "lena_short_CNV_count" "lena_CTC_count"
-4202.78 0.76317051025967 5507 2866 1250.696 1.22617254901961 1020 477 0 2238.47 0.575146454265159 2426 1876.4 0.482117163412127 1456 513 346 1600
+"gold_CV_cum_dur" "gold_CV_mean" "gold_CV_count" "gold_short_CV_count" "gold_CNV_cum_dur" "gold_CNV_mean" "gold_CNV_count" "gold_short_CNV_count" "gold_CTC_count" "lena_CV_count" "lena_CNV_count" "lena_short_CV_count" "lena_short_CNV_count" "lena_CV_mean" "lena_CNV_mean" "lena_CV_cum_dur" "lena_CNV_cum_dur" "lena_CTC_count"
+4202.78 0.763170510259669 5507 2866 1250.696 1.22617254901961 1020 477 2248 2836 1561 1166 371 0.789305359661495 1.20204996796925 2238.47 1876.4 1621
