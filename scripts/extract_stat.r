@@ -104,11 +104,16 @@ read_rttm <- function(data_folder) {
   # Data post-processing to clean up a bit the tiers.
   data$utt_type <- stringi::stri_replace_all_charclass(data$utt_type, fixed('\\p{WHITE_SPACE}'), '')
   data$utt_type <- stringr::str_replace_all(data$utt_type, '\\.', '')
-
+  
   # Add new columns : tier_type amongst [xds, vcm, mwu, lex]
   data$tier_type = str_sub(data$utt_type,2,4)
   # And tier_subtype being a letter (N,C,L,Y...)
   data$tier_subtype = str_sub(data$utt_type,6,6)
+  # Process tsimane file differently
+  data[startsWith(data$filename,"C"), "tier_subtype"] = data[startsWith(data$filename,"C"), "utt_type"]
+  data[startsWith(data$filename,"C"), "tier_type"] = "vcm"
+  data[startsWith(data$filename,"C"), "utt_type"] = "vcm"
+  
   data$child_id = str_sub(data$filename,1,8)
   data[substr(data$filename,1,1) == "C", "child_id"] = str_sub(data[substr(data$filename,1,1) == "C", "filename"], 1, 12)
   data$end_time <- data$onset + data$duration
@@ -145,8 +150,6 @@ read_rttm <- function(data_folder) {
     next_spkr == 'CHI' & (next_subtype == "C" | next_subtype == "N")
   data$adult_chi_swipe = cond1 | cond2
   data$turn_taking = data$adult_chi_swipe & data$less_than_5
-  data[substr(data$filename,1,1) == "C", "tier_type"] = data[substr(data$filename,1,1) == "C", "utt_type"]
-  data[substr(data$filename,1,1) == "C", "tier_subtype"] = data[substr(data$filename,1,1) == "C", "utt_type"]
   data = data[,c(1,2,3,11,12,13,14,4,5,6,7,8,9,10)]
   return(data)
 }
@@ -264,15 +267,14 @@ gold_data <- read_rttm(gold_data_folder)
 # Optional : Just log some info !
 # List all the files containing utterances without associated tier (no xds, vcm lex or mwu tier)
 only_CHI = gold_data[gold_data$mapped_speaker_type == "CHI",]
-contains.na = unique(only_CHI[is.na(only_CHI['utt_type']), "filename"])
+contains.na = unique(only_CHI[only_CHI['tier_type'] != "vcm", "filename"])
 contains.na = contains.na[2:length(contains.na)]
-print("Files containing none of the 'xds', 'lex', 'vcm' or 'mwu' tier")
+print("Files containing not annotated as vcm")
 print(as.character(contains.na))
 
-# Remove SOD files that were annotated with lex tier
-child.contains.na = unique(sub("(.*_.*)_.*_.*", "\\1", contains.na, perl=TRUE))
-gold_data = gold_data[! gold_data$child_id %in% child.contains.na,]
-its_data = its_data[! its_data$child_id %in% child.contains.na,]
+# Remove files that were not annotated with vcm tier for the key child
+gold_data = gold_data[! gold_data$filename %in% contains.na,]
+its_data = its_data[! its_data$filename %in% contains.na,]
 
 # Compute CVC (vcm of type N and C) and CNVC (vcm of type L, U or Y) at multiple scales
 gold_stats <- get_stats_gold(gold_data)
@@ -290,7 +292,7 @@ stats[is.na(stats)] <- 0
 stats$child_id <- str_match(stats$filename, "(.*_.*)_.*_.*")[,2]
 
 file = stats
-child = stats %>% subset(select = -filename ) %>% 
+child = stats %>% subset(select = -filename ) %>%
   dplyr::group_by(child_id) %>%
   summarise(gold_CV_cum_dur = sum(gold_CV_cum_dur),
             gold_CV_count = sum(gold_CV_count),
