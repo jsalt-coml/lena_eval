@@ -144,10 +144,10 @@ read_rttm <- function(data_folder) {
   prev_subtype = data[1:nrow(data), "tier_subtype"]
   next_spkr = factor(append(as.character(data[2:nrow(data), "mapped_speaker_type"]), "UNKUNK"))
   next_subtype = factor(append(as.character(data[2:nrow(data), "tier_subtype"]), "UNKUNK"))
-  cond1 = (prev_subtype == "C" | prev_subtype == "N" ) & prev_spkr == 'CHI' &
+  cond1 = (prev_subtype == "C" | prev_subtype == "N" | next_subtype == "W") & prev_spkr == 'CHI' &
     (next_spkr == 'MAL' | next_spkr == 'FEM')
   cond2 = (prev_spkr == 'MAL' | prev_spkr == 'FEM') & 
-    next_spkr == 'CHI' & (next_subtype == "C" | next_subtype == "N")
+    next_spkr == 'CHI' & (next_subtype == "C" | next_subtype == "N" | next_subtype == "W")
   data$adult_chi_swipe = cond1 | cond2
   data$turn_taking = data$adult_chi_swipe & data$less_than_5
   data = data[,c(1,2,3,11,12,13,14,4,5,6,7,8,9,10)]
@@ -156,7 +156,7 @@ read_rttm <- function(data_folder) {
 
 get_stats_gold <- function(gold_data){
   CVC = gold_data %>%
-    filter(speaker_type == 'CHI', tier_subtype == 'C' | tier_subtype == 'N') %>%
+    filter(speaker_type == 'CHI', tier_subtype == 'C' | tier_subtype == 'N' | tier_subtype == "W") %>%
     dplyr::group_by(filename) %>%
     dplyr::summarise(CV_cum_dur = sum(duration, na.rm=TRUE),
               CV_mean = mean(duration, na.rm=TRUE),
