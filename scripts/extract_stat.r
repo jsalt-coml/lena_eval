@@ -75,13 +75,13 @@ read_rttm <- function(data_folder) {
                      duration = double(),
                      transcription = character(),
                      utt_type = character(),
-                     speaker_type = character())
+                     speaker_type = character(),stringsAsFactors = FALSE)
   for(rttm in rttm.files){
     filepath = paste(data_folder, rttm, sep ="/")
     info = file.info(filepath)
     filename = str_remove(basename(filepath), ".rttm")
     if (info['size'] != 0) {
-      file_data = read.csv(file=filepath, header=FALSE, sep="\t")
+      file_data = read.csv(file=filepath, header=FALSE, sep="\t",stringsAsFactors = FALSE)
       file_data = file_data %>% select(2, 4, 5, 6, 7, 8) %>% dplyr::rename(filename = V2,
                                        onset = V4,
                                        duration = V5,
@@ -89,7 +89,7 @@ read_rttm <- function(data_folder) {
                                        utt_type = V7,
                                        speaker_type = V8)
       file_data$filename = filename
-      file_data <- data.frame(file_data)
+      file_data <- data.frame(file_data, stringsAsFactors = FALSE)
       data <- rbind(data, file_data)
     } else {
       fake_row = data.frame(filename=filename,
@@ -97,7 +97,7 @@ read_rttm <- function(data_folder) {
                            duration=0,
                            transcription="0.",
                            utt_type=NA,
-                           speaker_type=NA)
+                           speaker_type=NA,stringsAsFactors = FALSE)
       data <- rbind(data, fake_row)
     }
   }
@@ -118,6 +118,7 @@ read_rttm <- function(data_folder) {
   data[substr(data$filename,1,1) == "C", "child_id"] = str_sub(data[substr(data$filename,1,1) == "C", "filename"], 1, 12)
   data$end_time <- data$onset + data$duration
   data[data==""]<-NA
+  data[is.na(data)] <- "<NA>" 
 
   ## Let's count turn-taking in the clearest way as possible
   next_starts = c(data[2:nrow(data), "onset"], 10000)
@@ -268,7 +269,6 @@ gold_data <- read_rttm(gold_data_folder)
 # List all the files containing utterances without associated tier (no xds, vcm lex or mwu tier)
 only_CHI = gold_data[gold_data$mapped_speaker_type == "CHI",]
 contains.na = unique(only_CHI[only_CHI['tier_type'] != "vcm", "filename"])
-contains.na = contains.na[2:length(contains.na)]
 print("Files containing not annotated as vcm")
 print(as.character(contains.na))
 
