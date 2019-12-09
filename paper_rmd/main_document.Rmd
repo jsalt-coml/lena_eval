@@ -104,8 +104,8 @@ The resulting LENA^®^ software takes as input a new audio recording and process
 After this broad speaker classification step, Female or Male Adult "Near" segments (FAN and MAN) are further processed using an adaptation of the Sphinx Phone Decoder [@lamere2003cmu] in order to form an automated estimate of the number of words in each segment (Adult Word Count, or AWC). Key Child (CHN) segments are further processed to sub-classify regions in them into vegetative noises, crying, and speech-like vocalizations. LENA^®^ provides counts (child vocalization count, or CVC) and durations for this last speech-like sub-segment category. A further metric, Conversational Turn Counts (CTC), reflects the number of alternations between an adult and the key child (or vice versa), bounded by a maximum 5s of non-speech. 
 
 ```{r tab-abb, echo = FALSE, results="asis"}
-
-read.table("figures/table_1.csv",header=F,sep="\t")->abbreviations_table
+#eb path change
+abbreviations_table <- read.table("paper_rmd/figures/table_1.csv",header=F,sep="\t")
 colnames(abbreviations_table)<-c("Abbreviations","Meanings")
 
 kable(abbreviations_table, "latex", booktabs = T, caption = "A partial listing of common LENA abbreviations and their meanings.") %>%
@@ -150,7 +150,7 @@ The data for the evaluation comes from five different corpora, annotated in the 
 
 ```{r tab-corp, echo = FALSE, results="asis"}
 
-read.csv("figures/table_2.csv",header=T)->datasets_table
+datasets_table <- read.csv("paper_rmd/figures/table_2.csv",header=T)
 colnames(datasets_table) <- c("Corpus", "Children", "Clips", "Clip duration  (seconds)", "Mean Age [range] (months)", "Location")
 
 kable(datasets_table, "latex", caption = "Key properties of the five corpora", booktabs = T, linesep = "", align = rep("c", 5)) %>%
@@ -256,12 +256,12 @@ For the LENA^®^ Adult Word Counts, the regions sampled for manual annotation we
 ## Results
 
 ```{r read-cm,echo=F}
-source("readin_cm.R")
+source("paper_rmd/readin_cm.R")
 ```
 
 ```{r DIAER,echo=F}
 
-source("readin_ider.R")
+source("paper_rmd/readin_ider.R")
 ```
 
 ```{r tabprops, echo=F}
@@ -335,9 +335,14 @@ We thought it most informative to report on several of these options, albeit bri
 # rownames(medians)<-c("Speakers","+ Overlap","+ Electronic","+ Far")
 
 # [CHI,OCH,MAL,FEM,OVL] // ELE mapped to SIL
-read.csv("../evaluations/gold_no_ele_lena_sil_no_tv_same/ider_report.csv")->pynotv
+
+#eb path change
+#read.csv("../evaluations/gold_no_ele_lena_sil_no_tv_same/ider_report.csv")->pynotv
+pynotv <- read.csv("evaluations/gold_no_ele_lena_sil_no_tv_same/ider_report.csv")->pynotv
 # [CHI,OCH,MAL,FEM,OVL,ELE] 
-read.csv("../evaluations/gold_lena_sil_same/ider_report.csv")->pynotvnoovl
+#eb path change
+#read.csv("../evaluations/gold_lena_sil_same/ider_report.csv")->pynotvnoovl
+pynotvnoovl <- read.csv("evaluations/gold_lena_sil_same/ider_report.csv")
 pytot=py[,colnames(pynotv)]
 pytot$type="pytot"
 pynotv$type<-"pynotv"
@@ -486,8 +491,9 @@ allpearsons=matrix(nrow=3,ncol=4)
 rownames(allpearsons)<-c("CVC","CTC","AWC")
 colnames(allpearsons)<-c("N clips","r all","N","r")
 
-
-read.table(paste0(thisdir,"/key_child_voc_file_level.csv"),header=T,sep=" ")->cvtc
+#eb path change
+#read.table(paste0(thisdir,"/key_child_voc_file_level.csv"),header=T,sep=" ")->cvtc
+cvtc <- read.table("evaluations/key_child_voc_file_level.csv",header=T,sep=" ")
 
 
 cor.cvc.all= cor.test(cvtc$lena_CV_count,cvtc$gold_CV_count)
@@ -569,51 +575,59 @@ Together, these data suggest that LENA tends to underestimate vocalization count
 myrange=range(cvtc[,c("gold_CTC_count","lena_CTC_count")],na.rm = T)
 plot(gold_CTC_count~lena_CTC_count,data=cvtc,pch=20,col=alpha("blue",.2),xlab="LENA CTC",ylab="Human CTC",xlim=myrange,ylim=myrange)
 abline(lm(gold_CTC_count~lena_CTC_count,data=cvtc))
-abline(lm(gold_CTC_count~lena_CTC_count,data=cvtc,subset=c(cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0)),lty=2)
+#eb this subset appears to be all false & breaks the rmd so i'm commenting out this line
+#abline(lm(gold_CTC_count~lena_CTC_count,data=cvtc,subset=c(cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0)),lty=2)
 
 ```
 
 ```{r ctc-er, echo=F}
+#eb: some funky stuff here preventing rendering; no quick fix that i see sorry
+#eb: note that sd = 0
+# cor.ctc.all=cor.test(cvtc$lena_CTC_count,cvtc$gold_CTC_count)
+# #eb: Error in cor.test.default(cvtc$lena_CTC_count[cvtc$lena_CTC_count > 0 &  : 
+#   #not enough finite observations
+# cor.ctc.noZeros=cor.test(cvtc$lena_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0],cvtc$gold_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0])
+# 
+# 
+# allpearsons["CTC","N clips"]<-round(cor.ctc.all$parameter)
+# allpearsons["CTC","r all"]<-round(cor.ctc.all$estimate,3)
+# allpearsons["CTC","N"]<-round(cor.ctc.noZeros$parameter)
+# allpearsons["CTC","r"]<-round(cor.ctc.noZeros$estimate,3)
+# 
+# # ER against human
+# aer=(cvtc$lena_CTC_count-cvtc$gold_CTC_count)
+# aer_no_zeros=(cvtc$lena_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count > 0]-cvtc$gold_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count > 0])
+# 
+# no_human_zeros=cvtc[ cvtc$gold_CTC_count>0,]
+# rer=(no_human_zeros$lena_CTC_count-no_human_zeros$gold_CTC_count)/no_human_zeros$gold_CTC_count*100
+# 
+# arer=abs(no_human_zeros$lena_CTC_count-no_human_zeros$gold_CTC_count)/no_human_zeros$gold_CTC_count*100
+# 
+# aer_ctc <-(cvtc$lena_CTC_count-cvtc$gold_CTC_count)
+# aer_nozeros_ctc <-(cvtc$lena_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count > 0]-cvtc$gold_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count > 0])
+# 
+# aller["CTC",]<-cbind(mean(aer),min(aer),max(aer),
+#                      mean(aer_no_zeros),min(aer_no_zeros),max(aer_no_zeros),
+#                      mean(rer),min(rer),max(rer),
+#                      mean(arer),min(arer),max(arer)
+#                      )
 
-cor.ctc.all=cor.test(cvtc$lena_CTC_count,cvtc$gold_CTC_count)
-cor.ctc.noZeros=cor.test(cvtc$lena_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0],cvtc$gold_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0])
-
-
-allpearsons["CTC","N clips"]<-round(cor.ctc.all$parameter)
-allpearsons["CTC","r all"]<-round(cor.ctc.all$estimate,3)
-allpearsons["CTC","N"]<-round(cor.ctc.noZeros$parameter)
-allpearsons["CTC","r"]<-round(cor.ctc.noZeros$estimate,3)
-
-# ER against human
-aer=(cvtc$lena_CTC_count-cvtc$gold_CTC_count)
-aer_no_zeros=(cvtc$lena_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count > 0]-cvtc$gold_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count > 0])
-
-no_human_zeros=cvtc[ cvtc$gold_CTC_count>0,]
-rer=(no_human_zeros$lena_CTC_count-no_human_zeros$gold_CTC_count)/no_human_zeros$gold_CTC_count*100
-
-arer=abs(no_human_zeros$lena_CTC_count-no_human_zeros$gold_CTC_count)/no_human_zeros$gold_CTC_count*100
-
-aer_ctc <-(cvtc$lena_CTC_count-cvtc$gold_CTC_count)
-aer_nozeros_ctc <-(cvtc$lena_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count > 0]-cvtc$gold_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count > 0])
-
-aller["CTC",]<-cbind(mean(aer),min(aer),max(aer),
-                     mean(aer_no_zeros),min(aer_no_zeros),max(aer_no_zeros),
-                     mean(rer),min(rer),max(rer),
-                     mean(arer),min(arer),max(arer)
-                     )
-
+# Again, we only considered "near" speaker categories in the turn count, and applied the same rule the LENA^®^ does, where a turn can be from the key child to an adult or vice versa, and should happen within 5 seconds to be counted. The association between clip-level LENA^®^ and human CTC was weaker than that found for CVC (Figure 5):  the Pearson correlation between the two was r = `r round(cor.ctc.all$estimate,3)` (p = `r signif(cor.ctc.all$p.value,3)`) when all clips were taken into account, and r = `r round(cor.ctc.noZeros$estimate,3)` (p = `r signif(cor.ctc.noZeros$p.value,3)`)  when only clips with some child speech (i.e., excluding `r sum(cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0)` clips with 0 counts in both LENA^®^ and human annotations) were considered.  
+# 
+# The *absolute error rate* ranged from `r min(aer)`% to `r max(aer)`%, with a mean of `r mean(aer)`% and a median of `r median(aer)`%. Excluding clips where both human and LENA^®^ counts were zero,
+# the mean was `r mean(aer_no_zeros)`% and the median was `r median(aer_no_zeros)`%. Again, *relative error rates* require non-null denominators, and we thus removed the `r sum(cvtc$gold_CTC_count==0)` clips in which the human annotator said there were no child-adult or adult-child turns at all. The mean relative error rate ranged from `r min(rer)`% to `r max(rer)`%, with a mean of `r mean(rer)`% and a median of `r median(rer)`%. Finally, the *absolute relative error* rate ranged from `r min(arer)`% to `r max(arer)`%, with a mean of `r mean(arer)`% and a median of `r median(arer)`%. For CTCs, as for CVCs, the LENA^®^ seems to be underestimating counts rather systematically, leading to counts that are on average `r mean(rer)`% smaller than what they actually are.
 ```
 
-Again, we only considered "near" speaker categories in the turn count, and applied the same rule the LENA^®^ does, where a turn can be from the key child to an adult or vice versa, and should happen within 5 seconds to be counted. The association between clip-level LENA^®^ and human CTC was weaker than that found for CVC (Figure 5):  the Pearson correlation between the two was r = `r round(cor.ctc.all$estimate,3)` (p = `r signif(cor.ctc.all$p.value,3)`) when all clips were taken into account, and r = `r round(cor.ctc.noZeros$estimate,3)` (p = `r signif(cor.ctc.noZeros$p.value,3)`)  when only clips with some child speech (i.e., excluding `r sum(cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0)` clips with 0 counts in both LENA^®^ and human annotations) were considered.  
 
-The *absolute error rate* ranged from `r min(aer)`% to `r max(aer)`%, with a mean of `r mean(aer)`% and a median of `r median(aer)`%. Excluding clips where both human and LENA^®^ counts were zero,
-the mean was `r mean(aer_no_zeros)`% and the median was `r median(aer_no_zeros)`%. Again, *relative error rates* require non-null denominators, and we thus removed the `r sum(cvtc$gold_CTC_count==0)` clips in which the human annotator said there were no child-adult or adult-child turns at all. The mean relative error rate ranged from `r min(rer)`% to `r max(rer)`%, with a mean of `r mean(rer)`% and a median of `r median(rer)`%. Finally, the *absolute relative error* rate ranged from `r min(arer)`% to `r max(arer)`%, with a mean of `r mean(arer)`% and a median of `r median(arer)`%. For CTCs, as for CVCs, the LENA^®^ seems to be underestimating counts rather systematically, leading to counts that are on average `r mean(rer)`% smaller than what they actually are.
 
 
 ### Adult Word Counts accuracy 
 
 ```{r awc, echo=F}
-read.table("../LENA_AWC_rel_v1_June.txt")->awc
+#eb path change
+#read.table("../LENA_AWC_rel_v1_June.txt")->awc
+read.table("LENA_AWC_rel_v1_June.txt")->awc
+
 colnames(awc)<-c("filename","gold","LENA")
 gsub("LUC","ROW",awc$filename)->awc$filename
 
@@ -691,33 +705,39 @@ Together, these results suggest that the direction of errors for AWC is less sta
 The preceding sections include results that are wholesale, with all but AWC conducted over all corpora. However, it's possible that performance would be higher for the corpora collected in North America (BER, WAR, SOD) than those collected in other English-speaking countries (L05) or non-English speaking populations (TSI). Additionally, our age ranges are wide, and in the case of TSI children, some of the children are older than the oldest children in the LENA^®^ training set. To assess whether accuracy varies as a function of corpora and child age, we fit mixed models.
 
 ```{r lmer-dm, echo=F}
-read.csv(paste0(thisdir,"gold_no_ele_no_ovl_lena_sil_no_tv_no_oln_same/ider_report.csv"))->py
+#eb: was going to change path but i THINK this is all the same as in the readin_ider.R script
+# so is just redundant with what's soruced in above, commenting out.
+#read.csv(paste0(thisdir,"gold_no_ele_no_ovl_lena_sil_no_tv_no_oln_same/ider_report.csv"))->py
 
-#other fixes and addtions
-py=subset(py,item!="TOTAL")
-py$cor=substr(py$item,1,3)
-py$cor[grep("[0-9]",py$cor)]<-"TSI"
-py$cor=factor(py$cor)
 
-py$child=substr(py$item,1,8)
-py$child[py$cor=="TSI"]=substr(py$item[py$cor=="TSI"],1,3)
+# #other fixes and addtions
+# py=subset(py,item!="TOTAL")
+# py$cor=substr(py$item,1,3)
+# py$cor[grep("[0-9]",py$cor)]<-"TSI"
+# py$cor=factor(py$cor)
+# 
+# py$child=substr(py$item,1,8)
+# py$child[py$cor=="TSI"]=substr(py$item[py$cor=="TSI"],1,3)
+# 
+# py$false.alarm..[py$total==0 & py$false.alarm!=0]<-100
+# py$false.alarm..[py$total==0 & py$false.alarm==0]<-0
+# 
+# py$missed.detection..[py$total==0 ]<-0
+# py$missed.detection..[py$missed.detection==0 ]<-0
+# 
+# # add in age info
 
-py$false.alarm..[py$total==0 & py$false.alarm!=0]<-100
-py$false.alarm..[py$total==0 & py$false.alarm==0]<-0
+# #spreadsheet = read.csv(paste0("../ACLEW_list_of_corpora.csv"), header=TRUE, sep = ",")
+# spreadsheet$child=paste0(spreadsheet$labname,"_",ifelse(nchar(spreadsheet$aclew_id)==3,paste0("0",spreadsheet$aclew_id),spreadsheet$aclew_id))
+# spreadsheet = spreadsheet[,c("child","age_mo_round")]
+# colnames(spreadsheet) = c("child","age")
+# 
 
-py$missed.detection..[py$total==0 ]<-0
-py$missed.detection..[py$missed.detection==0 ]<-0
-
-# add in age info
-spreadsheet = read.csv(paste0("../ACLEW_list_of_corpora.csv"), header=TRUE, sep = ",")
-spreadsheet$child=paste0(spreadsheet$labname,"_",ifelse(nchar(spreadsheet$aclew_id)==3,paste0("0",spreadsheet$aclew_id),spreadsheet$aclew_id))
-spreadsheet = spreadsheet[,c("child","age_mo_round")]
-colnames(spreadsheet) = c("child","age")
-spreadsheet_tsi = read.csv(paste0(thisdir,"../anon_metadata.csv"), header=TRUE, sep = ",")
-spreadsheet_tsi = spreadsheet_tsi[c("id","age_mo")]
-colnames(spreadsheet_tsi) = c("child","age")
-age_id = rbind(spreadsheet, spreadsheet_tsi)
-py=merge(py,age_id,by.x="child",by.y="child") 
+# #spreadsheet_tsi = read.csv(paste0(thisdir,"../anon_metadata.csv"), header=TRUE, sep = ",")
+# spreadsheet_tsi = spreadsheet_tsi[c("id","age_mo")]
+# colnames(spreadsheet_tsi) = c("child","age")
+# age_id = rbind(spreadsheet, spreadsheet_tsi)
+# py=merge(py,age_id,by.x="child",by.y="child") 
 
 mydv=c("false.alarm..","missed.detection..","confusion..")
 
@@ -772,7 +792,10 @@ We predicted false alarm, miss, and confusion rates in clips where there was som
 
 
 ```{r cvc-age, echo=F}
-read.table(paste0(thisdir,"/key_child_voc_file_level.csv"),header=T,sep=" ")->cvtc
+#eb path change
+#read.table(paste0(thisdir,"/key_child_voc_file_level.csv"),header=T,sep=" ")->cvtc
+cvtc <- read.table("evaluations/key_child_voc_file_level.csv",header=T,sep=" ")
+
 cvtc$cor=substr(cvtc$filename,1,3)
 cvtc$cor[substr(cvtc$filename,1,1)=="C"]<-"TSI"
 cvtc$cor=factor(cvtc$cor)
@@ -856,7 +879,7 @@ In terms of recall (how accurately LENA^®^ captured the human annotations), per
 
 Our second set of analyses tested the accuracy of three of the aggregated counts automatically provided by LENA^®^, namely Child Vocalization Counts (CVC), Conversational Turn Counts (CTC) and Adult Word Counts (AWC).  We found high correlations between clip-level counts estimated via the LENA^®^ system and those from the human annotations for AWC and CVC, with weaker performance for CTC. 
 
-However, such correlational analyses do not establish whether LENA^®^ systematically over- or under-estimates.  For this we examined several types of error rates. For absolute error rate (i.e. how far was the LENA^®^ count from the human annotators'), the median across clips for CVC, CTC, and AWC was an encouraging `r median(aer_cvc)`%,`r median(aer_ctc)`%, and `r median(aer_awc)`%, respectively. Notably, this was partly due to many clips lacking vocalizations, turns, or adult words altogether as without these zero valued counts, the medians were `r median(aer_nozeros_cvc)`%,`r median(aer_nozeros_ctc)`%, and `r median(aer_nozeros_awc)`%. By and large, LENA^®^ systematically underestimates the raw counts of its main quantitative measures - particularly child vocalizations and conversational turns, and to a lesser extent, adult words, which showed more erratic error patterns. 
+However, such correlational analyses do not establish whether LENA^®^ systematically over- or under-estimates.  For this we examined several types of error rates. For absolute error rate (i.e. how far was the LENA^®^ count from the human annotators'), the median across clips for CVC, CTC, and AWC was an encouraging `r median(aer_cvc)`%,`r "median(aer_ctc)FIXTHIS"`%, and `r median(aer_awc)`%, respectively. Notably, this was partly due to many clips lacking vocalizations, turns, or adult words altogether as without these zero valued counts, the medians were `r median(aer_nozeros_cvc)`%,`r "median(aer_nozeros_ctc)FIXTHIS"`%, and `r median(aer_nozeros_awc)`%. By and large, LENA^®^ systematically underestimates the raw counts of its main quantitative measures - particularly child vocalizations and conversational turns, and to a lesser extent, adult words, which showed more erratic error patterns. 
 
 That said, LENA^®^ results were surprisingly robust to dialect, language, and child age, as we found in our final set of analyses, which tested how well all of these metrics generalized across corpora. We predicted that performance would be higher for the corpora collected in North America (BER, WAR, SOD) than for corpora collected in other English-speaking countries (L05) or non-English speaking populations (TSI), and that accuracy would decrease with age, since our sample contains children older than those included in the LENA^®^ training set.  Contrary to our predictions, there were no significant differences in rates of false alarms, misses, or confusion by corpus, child age or their interaction, nor were there differences between North American and other corpora in terms of CTC.  
 
