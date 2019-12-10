@@ -7,4 +7,4 @@ if [ "$#" -ne 1 ]; then
 fi
 
 username=$1
-scp -r ${username}@129.199.81.135:/home/mlavechin/DATA_Marvin/LENA_eval/data .
+scp -r ${username}@129.199.81.135:/DATA2T/LENA_eval/data .
