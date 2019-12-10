@@ -1,6 +1,4 @@
-#all=read.table(paste0(thisdir,"all","_cm.txt"),header=T)
-#eb i think this means but lmk if it should be LENA_eval_201906/all_cm.txt
-all <- read.table("evaluations/all_cm.txt")
+all=read.table(paste0(evaldir,"all","_cm.txt"),header=T)
 
 #remove empty rows
 all=all[rownames(all)[rowSums(all)>0],]

@@ -1,11 +1,13 @@
 # This script must be run from the root folder
 # Rscript scripts/extract_stat.r data/gold
+
+###### HELPER FUNCTIONS ###### 
 library(plyr)
 library(dplyr, warn.conflicts = FALSE)
 library(magrittr) 
 library(stringr)
 library(stringi)
-library(rlena)
+library(rlena) #if needed, devtools::install_github("HomeBankCode/rlena", dependencies = TRUE)
 library(tidyr)
 
 read_its <- function(data_folder, gold_folder) {
@@ -101,6 +103,8 @@ read_rttm <- function(data_folder) {
       data <- rbind(data, fake_row)
     }
   }
+  #by now, all files have been read in, so data are complete
+  
   # Data post-processing to clean up a bit the tiers.
   data$utt_type <- stringi::stri_replace_all_charclass(data$utt_type, fixed('\\p{WHITE_SPACE}'), '')
   data$utt_type <- stringr::str_replace_all(data$utt_type, '\\.', '')
@@ -127,11 +131,13 @@ read_rttm <- function(data_folder) {
   less_than_5 = c(FALSE, less_than_5[1:length(less_than_5)-1])
   data$less_than_5 = less_than_5
 
+  # invalidate all the rows that are at a point where the file name changes 
+  # -- those cannot be turns because they span 2 different files
   change_files = c(data$filename,0) != c(0, data$filename)
   change_files = change_files[1:length(change_files)-1]
   data[change_files, "less_than_5"] = FALSE
 
-  # How to map in R
+  # remap speakers into a clearer list (left are lena-like labels, right are the annotated labels)
   gold_mapping.levels <- list(
     OCH = c('C1', 'C2', 'FC1', 'MC1', 'MC2', 'MC3', 'MI1', 'UC1', 'UC2', 'UC3', 'UC4', 'UC5', 'UC6'),
     FEM = c('FA1', 'FA2', 'FA3', 'FA4', 'FA5', 'FA6', 'FA7', 'FA8', 'MOT*'),
@@ -141,12 +147,24 @@ read_rttm <- function(data_folder) {
   data$mapped_speaker_type = data$speaker_type
   levels(data$mapped_speaker_type) <- gold_mapping.levels
 
+  # generate vectors containing shifted data, to find previous/next events
+  # imagine a point where you have to make a decision whether there is a turn
+  # the previous person who spoke from that point is prev_spkr; the next person is next_spkr
   prev_spkr = data[1:nrow(data), "mapped_speaker_type"]
   prev_subtype = data[1:nrow(data), "tier_subtype"]
+  # "UNKUNK" is just some random code, to make sure that speaker is not matched with anything
   next_spkr = factor(append(as.character(data[2:nrow(data), "mapped_speaker_type"]), "UNKUNK"))
   next_subtype = factor(append(as.character(data[2:nrow(data), "tier_subtype"]), "UNKUNK"))
-  cond1 = (prev_subtype == "C" | prev_subtype == "N" | next_subtype == "W") & prev_spkr == 'CHI' &
+
+  #here are our conditions for whether there is a turn:
+  #cond1: if CHI produces a voc before the putative turn, 
+  #       and this voc is linguistic (C or N (or W)) 
+  #       and the next speaker is male or female adult 
+  cond1 = prev_spkr == 'CHI' & (prev_subtype == "C" | prev_subtype == "N" | prev_subtype == "W") & 
     (next_spkr == 'MAL' | next_spkr == 'FEM')
+  #cond2: if FEM/MAL produce a voc before the putative turn, 
+  #       and the next speaker isCHI 
+  #       and this voc is linguistic (C or N (or W)) 
   cond2 = (prev_spkr == 'MAL' | prev_spkr == 'FEM') & 
     next_spkr == 'CHI' & (next_subtype == "C" | next_subtype == "N" | next_subtype == "W")
   data$adult_chi_swipe = cond1 | cond2
@@ -256,6 +274,8 @@ get_stats_its <- function(its_data){
   stats[is.na(stats)] = 0
   return(stats)
 }
+
+###### SCRIPT STARTS HERE ###### 
 
 # Read the data
 lena_its_folder = "data/its/lena"
