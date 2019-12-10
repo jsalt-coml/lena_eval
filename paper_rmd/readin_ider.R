@@ -1,4 +1,7 @@
-read.csv(paste0(thisdir,"/gold_no_ele_no_ovl_lena_sil_no_tv_no_oln_same/ider_report.csv"))->py
+#read.csv(paste0(thisdir,"/gold_no_ele_no_ovl_lena_sil_no_tv_no_oln_same/ider_report.csv"))->py
+#eb: i think this is intended file, right?
+py <- read.csv("evaluations/gold_no_ele_no_ovl_lena_sil_no_tv_no_oln_same/ider_report.csv", header = T)
+
 #dim(py) #873 clips
 #summary(py)
 
@@ -18,11 +21,17 @@ py$child=substr(py$item,1,8)
 py$child[py$cor=="TSI"]=substr(py$item[py$cor=="TSI"],1,3)
 
 # add in age info
-spreadsheet = read.csv(paste0("../ACLEW_list_of_corpora.csv"), header=TRUE, sep = ",")
+#spreadsheet = read.csv(paste0("../ACLEW_list_of_corpora.csv"), header=TRUE, sep = ",")
+#eb: this spreadsheet isn't anywhere in this repo afaik...i redownloaded it from gdrive
+spreadsheet <- read.csv(paste0("paper_rmd/ACLEW_list_of_corpora.csv"), header=TRUE, sep = ",")
+
 spreadsheet$child=paste0(spreadsheet$labname,"_",ifelse(nchar(spreadsheet$aclew_id)==3,paste0("0",spreadsheet$aclew_id),spreadsheet$aclew_id))
 spreadsheet = spreadsheet[,c("child","age_mo_round")]
 colnames(spreadsheet) = c("child","age")
-spreadsheet_tsi = read.csv(paste0("../anon_metadata.csv"), header=TRUE, sep = ",")
+
+#eb changed path
+#spreadsheet_tsi = read.csv(paste0("../anon_metadata.csv"), header=TRUE, sep = ",")
+spreadsheet_tsi = read.csv("anon_metadata.csv", header=TRUE, sep = ",")
 spreadsheet_tsi = spreadsheet_tsi[c("id","age_mo")]
 colnames(spreadsheet_tsi) = c("child","age")
 age_id = rbind(spreadsheet, spreadsheet_tsi)
