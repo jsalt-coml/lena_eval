@@ -77,13 +77,13 @@ read_rttm <- function(data_folder) {
                      duration = double(),
                      transcription = character(),
                      utt_type = character(),
-                     speaker_type = character(),stringsAsFactors = FALSE)
+                     speaker_type = character())
   for(rttm in rttm.files){
     filepath = paste(data_folder, rttm, sep ="/")
     info = file.info(filepath)
     filename = str_remove(basename(filepath), ".rttm")
     if (info['size'] != 0) {
-      file_data = read.csv(file=filepath, header=FALSE, sep="\t",stringsAsFactors = FALSE)
+      file_data = read.csv(file=filepath, header=FALSE, sep="\t")
       file_data = file_data %>% select(2, 4, 5, 6, 7, 8) %>% dplyr::rename(filename = V2,
                                        onset = V4,
                                        duration = V5,
@@ -91,7 +91,7 @@ read_rttm <- function(data_folder) {
                                        utt_type = V7,
                                        speaker_type = V8)
       file_data$filename = filename
-      file_data <- data.frame(file_data, stringsAsFactors = FALSE)
+      file_data <- data.frame(file_data)
       data <- rbind(data, file_data)
     } else {
       fake_row = data.frame(filename=filename,
@@ -99,7 +99,7 @@ read_rttm <- function(data_folder) {
                            duration=0,
                            transcription="0.",
                            utt_type=NA,
-                           speaker_type=NA,stringsAsFactors = FALSE)
+                           speaker_type=NA)
       data <- rbind(data, fake_row)
     }
   }
