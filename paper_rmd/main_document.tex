@@ -462,6 +462,11 @@ Together, these data suggest that LENA tends to underestimate vocalization count
 \caption{\label{fig:ctc-fig}Conversational Turn Counts according to LENA (x axis) and humans (y axis). Each point represents the CTC totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA\textsuperscript{®} said zero child-adult or adult-child turns. The x and y ranges have been adjusted to be equal regardless of the data distribution.}
 \end{figure}
 
+Again, we only considered \enquote{near} speaker categories in the turn count, and applied the same rule the LENA\textsuperscript{®} does, where a turn can be from the key child to an adult or vice versa, and should happen within 5 seconds to be counted. The association between clip-level LENA\textsuperscript{®} and human CTC was weaker than that found for CVC (Figure 5): the Pearson correlation between the two was r = 0.57 (p = 0.00) when all clips were taken into account, and r = 0.37 (p = 0.00) when only clips with some child speech (i.e., excluding 203 clips with 0 counts in both LENA\textsuperscript{®} and human annotations) were considered.
+
+The \emph{absolute error rate} ranged from -42\% to 15\%, with a mean of -1.75\% and a median of 0\%. Excluding clips where both human and LENA\textsuperscript{®} counts were zero,
+the mean was -5.36\% and the median was -3\%. Again, \emph{relative error rates} require non-null denominators, and we thus removed the 480 clips in which the human annotator said there were no child-adult or adult-child turns at all. The mean relative error rate ranged from -100\% to 1100\%, with a mean of -36.60\% and a median of -76.19\%. Finally, the \emph{absolute relative error} rate ranged from 0\% to 1100\%, with a mean of 87.01\% and a median of 87.50\%. For CTCs, as for CVCs, the LENA\textsuperscript{®} seems to be underestimating counts rather systematically, leading to counts that are on average -36.60\% smaller than what they actually are.
+
 \hypertarget{adult-word-counts-accuracy}{%
 \subsubsection{Adult Word Counts accuracy}\label{adult-word-counts-accuracy}}
 
@@ -476,9 +481,9 @@ Together, these data suggest that LENA tends to underestimate vocalization count
 \toprule
  & \multicolumn{1}{c}{N clips} & \multicolumn{1}{c}{r all} & \multicolumn{1}{c}{N} & \multicolumn{1}{c}{r}\\
 \midrule
-CVC & 799.00 & 1 & 337.00 & 1\\
-CTC & NA & NA & NA & NA\\
-AWC & 598.00 & 1 & 307.00 & 1\\
+CVC & 799 & 0.756 & 337 & 0.653\\
+CTC & 799 & 0.572 & 201 & 0.370\\
+AWC & 598 & 0.751 & 307 & 0.687\\
 \bottomrule
 \end{tabular}
 
@@ -499,7 +504,7 @@ AWC & 598.00 & 1 & 307.00 & 1\\
  & \multicolumn{1}{c}{AER} & \multicolumn{1}{c}{min} & \multicolumn{1}{c}{max} & \multicolumn{1}{c}{AER-0} & \multicolumn{1}{c}{min} & \multicolumn{1}{c}{max} & \multicolumn{1}{c}{RER} & \multicolumn{1}{c}{min1} & \multicolumn{1}{c}{max1} & \multicolumn{1}{c}{ARER} & \multicolumn{1}{c}{min2} & \multicolumn{1}{c}{max2}\\
 \midrule
 CVC & -4 & -39 & 14 & -8 & -39 & 14 & -49 & -100 & 600 & 76 & 0 & 600\\
-CTC & NA & NA & NA & NA & NA & NA & NA & NA & NA & NA & NA & NA\\
+CTC & -2 & -42 & 15 & -5 & -42 & 15 & -37 & -100 & 1,100 & 87 & 0 & 1,100\\
 AWC & 0 & -211 & 157 & 0 & -211 & 157 & 55 & -100 & 7,400 & 124 & 0 & 7,400\\
 \bottomrule
 \end{tabular}
