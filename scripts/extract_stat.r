@@ -174,7 +174,15 @@ read_rttm <- function(data_folder) {
 }
 
 get_stats_gold <- function(gold_data){
-  CVC = gold_data %>%
+  CC = gold_data %>%
+    filter(speaker_type == 'CHI') %>%
+    dplyr::group_by(filename) %>%
+    dplyr::summarise(CHI_cum_dur = sum(duration, na.rm=TRUE),
+                     CHI_mean = mean(duration, na.rm=TRUE),
+                     CHI_count = length(duration))
+  #ac added whole block above
+
+    CVC = gold_data %>%
     filter(speaker_type == 'CHI', tier_subtype == 'C' | tier_subtype == 'N' | tier_subtype == "W") %>%
     dplyr::group_by(filename) %>%
     dplyr::summarise(CV_cum_dur = sum(duration, na.rm=TRUE),
@@ -194,6 +202,7 @@ get_stats_gold <- function(gold_data){
     dplyr::summarise(CTC_count = sum(turn_taking))
 
   stats = merge(CVC, CNVC, all = TRUE)
+  stats = merge(stats, CC, all = TRUE)
   stats = merge(stats, CTC, all = TRUE)
   stats[is.na(stats)] = 0
   return(stats)
@@ -207,7 +216,8 @@ get_stats_its <- function(its_data){
   ends_utts = colnames(its_data)[str_detect(colnames(its_data), regex("endUtt*"))]
   all_timestamps = c(starts_cries,ends_cries,starts_utts, ends_utts, "startVfx1", "endVfx1")
   its_data[,all_timestamps] = apply(its_data[,all_timestamps], 2, function(x) gsub("PT|S", "",x))
-  
+  its_data$dur=its_data$endTime-its_data$startTime #ac
+    
   # Replace NA timestamps by 0
   na_to_0 = rep(0, length(all_timestamps))
   names(na_to_0) = all_timestamps
@@ -235,17 +245,20 @@ get_stats_its <- function(its_data){
   # Compute counts 
   counts = its_data %>% dplyr::group_by(filename) %>% 
     filter(spkr == "CHN") %>% 
-    dplyr::summarise(CV_count = sum(childUttCnt), CNV_count = sum(cryCnt))
+    dplyr::summarise(CHN_count = length(spkr), CV_count = sum(childUttCnt), CNV_count = sum(cryCnt))
+  #ac added CHN_count = length(spkr), 
   
   # Compute sums
   sums = its_data %>% dplyr::group_by(filename) %>% 
     filter(spkr == "CHN") %>% 
-    dplyr::summarise(CV_cum_dur = sum(childUttLen), CNV_cum_dur = sum(childCryVfxLen))
+    dplyr::summarise(CHN_cum_dur = sum(dur), CV_cum_dur = sum(childUttLen), CNV_cum_dur = sum(childCryVfxLen))
+  #ac added CHN_cum_dur = sum(dur),  
   
   # Compute means (should be done at the end)
-  means = data.frame(counts$filename, sums$CV_cum_dur/counts$CV_count,  sums$CNV_cum_dur/counts$CNV_count)
+  means = data.frame(counts$filename, sums$CHN_cum_dur/counts$CHN_count,  sums$CV_cum_dur/counts$CV_count,  sums$CNV_cum_dur/counts$CNV_count)
+  #ac added sums$CHN_cum_dur/counts$CHN_count, 
   means[is.na(means)] <- 0
-  names(means) = c("filename", "CV_mean", "CNV_mean")
+  names(means) = c("filename", "CHN_mean", "CV_mean", "CNV_mean")
   
   # Compute short vocalizations
   short_counts = its_data %>% dplyr::group_by(filename) %>% 
@@ -314,13 +327,17 @@ stats$child_id <- str_match(stats$filename, "(.*_.*)_.*_.*")[,2]
 file = stats
 child = stats %>% subset(select = -filename ) %>%
   dplyr::group_by(child_id) %>%
-  summarise(gold_CV_cum_dur = sum(gold_CV_cum_dur),
+  summarise(gold_CHI_cum_dur = sum(gold_CHI_cum_dur), #ac
+            gold_CHI_count = sum(gold_CHI_count), #ac
+            gold_CV_cum_dur = sum(gold_CV_cum_dur),
             gold_CV_count = sum(gold_CV_count),
             gold_short_CV_count = sum(gold_short_CV_count),
             gold_CNV_cum_dur = sum(gold_CNV_cum_dur),
             gold_CNV_count = sum(gold_CNV_count),
             gold_short_CNV_count = sum(gold_short_CNV_count),
             gold_CTC_count = sum(gold_CTC_count),
+            lena_CHN_cum_dur = sum(lena_CHN_cum_dur), #ac
+            lena_CHN_count = sum(lena_CHN_count), #ac
             lena_CV_cum_dur = sum(lena_CV_cum_dur),
             lena_CV_count = sum(lena_CV_count),
             lena_short_CV_count = sum(lena_short_CV_count),
@@ -329,8 +346,10 @@ child = stats %>% subset(select = -filename ) %>%
             lena_short_CNV_count = sum(lena_short_CNV_count),
             lena_CTC_count = sum(lena_CTC_count))
 # We have to recompute the mean
+child$gold_CHI_mean = child$gold_CHI_cum_dur / child$gold_CHI_count  #ac
 child$gold_CV_mean = child$gold_CV_cum_dur / child$gold_CV_count
 child$gold_CNV_mean = child$gold_CNV_cum_dur / child$gold_CNV_count
+child$lena_CHN_mean = child$lena_CHN_cum_dur / child$lena_CHN_count  #ac
 child$lena_CV_mean = child$lena_CV_cum_dur / child$lena_CV_count
 child$lena_CNV_mean = child$lena_CNV_cum_dur / child$lena_CNV_count
 child[is.na(child)] = 0
