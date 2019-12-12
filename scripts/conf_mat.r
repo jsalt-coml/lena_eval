@@ -1,12 +1,16 @@
 args<-commandArgs(TRUE)
 
 # Parse parameters
-if (length(args)!=2) {
+if (length(args)<2) {
   stop("lena and gold folders must be provided by the user", call.=FALSE)
 } else {
   # default output file
   lena_folder = args[1]
   gold_folder = args[2]
+  no_corpora=FALSE
+  if(args[3] == "no_corpora"){
+    no_corpora=TRUE
+  }
 }
 
 # First, we start to list all the labels that appear in gold and lena files.
@@ -39,6 +43,9 @@ lena_levels = lena_levels[order(nchar(lena_levels))]
 #print(lena_levels)
 
 corpora = c("BER", "ROW", "SOD","WAR","TSI")
+if(no_corpora){
+  corpora= c("")
+}
 
 # Let's start by listing the files
 
@@ -51,8 +58,12 @@ for(corpus in corpora){
 
   if(corpus=="TSI") {
     corpus_filenames = filenames[substr(filenames,1,1) == "C"]
-  } else { 
+  } else {
     corpus_filenames = filenames[substr(filenames,1,3) == corpus]
+  }
+
+  if(no_corpora){
+    corpus_filenames = filenames
   }
 
   # Create confusion matrices
@@ -96,7 +107,9 @@ for(corpus in corpora){
   }
   #print(corpus)
   #print(confusion_corp)
-  write.table(confusion_corp,file=paste(gold_folder,paste0(corpus,"_cm.txt"), sep = "/"))
+  if(corpus != ""){
+    write.table(confusion_corp,file=paste(gold_folder,paste0(corpus,"_cm.txt"), sep = "/"))
+  }
   confusion_all = confusion_all + confusion_corp
   #print(paste0("Nb frames : ", sum(rowSums(confusion_corp)))) # nb frames
 }

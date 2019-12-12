@@ -91,7 +91,7 @@ mv data/gold/mapped_gold_no_ele_no_ovl/gold_no_ele_no_ovl_lena_sil_no_tv_no_oln_
 
 python scripts/frame_cutter.py  --i data/lena/mapped_lena_sil/ --o framed_lena_sil
 python scripts/frame_cutter.py  --i data/gold/mapped_gold/ --o framed_gold
-Rscript scripts/conf_mat.r data/lena/framed_lena_sil data/gold/framed_gold
+Rscript scripts/conf_mat.r data/lena/framed_lena_sil data/gold/framed_gold corpora
 mv data/gold/framed_gold/*.txt evaluations
 
 ##################################

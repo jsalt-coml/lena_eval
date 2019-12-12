@@ -9,6 +9,7 @@ gold_dict = {
     'CHI': 'CHI',
     'CHI*': 'CHI',
     'EE1': 'ELE',
+    'FA0': 'FEM',
     'FA1': 'FEM',
     'FA2': 'FEM',
     'FA3': 'FEM',
@@ -19,6 +20,7 @@ gold_dict = {
     'FA8': 'FEM',
     'FAE': 'ELE',
     'FC1': 'OCH',
+    'MA0': 'MAL',
     'MA1': 'MAL',
     'MA2': 'MAL',
     'MA3': 'MAL',
@@ -30,6 +32,7 @@ gold_dict = {
     'MC3': 'OCH',
     'MI1': 'OCH',
     'MOT*': 'FEM',
+    'OC0': 'OCH',
     'UC1': 'OCH',
     'UC2': 'OCH',
     'UC3': 'OCH',
@@ -45,6 +48,7 @@ gold_dict_no_ele = {
     'CHI': 'CHI',
     'CHI*': 'CHI',
     'EE1': 'SIL',
+    'FA0': 'FEM',
     'FA1': 'FEM',
     'FA2': 'FEM',
     'FA3': 'FEM',
@@ -55,6 +59,7 @@ gold_dict_no_ele = {
     'FA8': 'FEM',
     'FAE': 'SIL',
     'FC1': 'OCH',
+    'MA0': 'MAL',
     'MA1': 'MAL',
     'MA2': 'MAL',
     'MA3': 'MAL',
@@ -66,6 +71,7 @@ gold_dict_no_ele = {
     'MC3': 'OCH',
     'MI1': 'OCH',
     'MOT*': 'FEM',
+    'OC0': 'OCH',
     'UC1': 'OCH',
     'UC2': 'OCH',
     'UC3': 'OCH',
@@ -209,7 +215,7 @@ def map_rttm(rttm, overlap, dict, same, output_folder):
                                 #       |---------|
                                 if onset-prev_onset > 0:
                                     fo.write("SPEAKER\t%s\t1\t%.2f\t%.2f\t%s\t%s\t%s\t<NA>\t<NA>\n"
-                                             % (basename, prev_onset, onset-prev_onset, sentence, sentence_type, prev_speaker))
+                                             % (basename, prev_onset, onset-prev_onset, prev_sentence, prev_sentence_type, prev_speaker))
                                 if prev_offset - onset > 0:
                                     fo.write("SPEAKER\t%s\t1\t%.2f\t%.2f\t%s\t%s\t%s\t<NA>\t<NA>\n"
                                              % (basename, onset, prev_offset - onset, sentence, sentence_type, "OVL"))
@@ -222,7 +228,7 @@ def map_rttm(rttm, overlap, dict, same, output_folder):
                                 #       |----|
                                 if onset-prev_onset > 0:
                                     fo.write("SPEAKER\t%s\t1\t%.2f\t%.2f\t%s\t%s\t%s\t<NA>\t<NA>\n"
-                                             % (basename, prev_onset, onset-prev_onset, sentence, sentence_type, prev_speaker))
+                                             % (basename, prev_onset, onset-prev_onset, prev_sentence, prev_sentence_type, prev_speaker))
                                 if duration > 0:
                                     fo.write("SPEAKER\t%s\t1\t%.2f\t%.2f\t%s\t%s\t%s\t<NA>\t<NA>\n"
                                              % (basename, onset, duration, sentence, sentence_type, "OVL"))
@@ -240,7 +246,7 @@ def map_rttm(rttm, overlap, dict, same, output_folder):
                     prev_offset = offset
                     prev_speaker = target_speaker
                     prev_sentence = sentence
-                    prev_sentence_type = prev_sentence_type
+                    prev_sentence_type = sentence_type
 
                 # Write last utterance
                 if prev_duration > 0 and prev_speaker != "SIL":

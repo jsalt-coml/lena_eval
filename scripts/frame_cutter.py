@@ -7,7 +7,7 @@ import numpy as np
 from scipy.io import wavfile
 import math
 
-def cutter(path_to_rttm, frame_length, output_file, prefix):
+def cutter(path_to_rttm, frame_length, output_file, prefix, duration):
     """
     Given a rttm file, create a new file whose represents the same rttm cutted in frames.
     If one frame has been classified as several classes in the original rttm, it concatenates classes.
@@ -30,6 +30,9 @@ def cutter(path_to_rttm, frame_length, output_file, prefix):
     else:
         tot_dur_s = 120.0
 
+    if duration is not None:
+        tot_dur_s = 60.0
+
     frame_length_s = float(frame_length)/1000.0
  
     with open(path_to_rttm, 'r') as rttm:
@@ -39,6 +42,7 @@ def cutter(path_to_rttm, frame_length, output_file, prefix):
             onset_s = None
 
             for line in rttm:
+
                 anno_fields = line.split('\t')
                 onset_s = float(anno_fields[3])
                 dur_s = float(anno_fields[4])
@@ -140,7 +144,7 @@ def aggregate_overlap(path_to_rttm, output_file):
                     if onset_k != onset_j:
                         if len(frame_activity) >= 2 and 'SIL' in frame_activity:
                             frame_activity.remove("SIL")
-                        output.write("SPEAKER\t%s\t1\t%s\t%s\t<NA>\t<NA\t%s\t<NA>\n" % \
+                        output.write("SPEAKER\t%s\t1\t%s\t%s\t<NA>\t<NA>\t%s\t<NA>\n" % \
                                      (basename, onset_k, dur_k, '/'.join(frame_activity)))
                         break
                     else:   # onset_k == onset_j:
@@ -169,6 +173,10 @@ def main():
     parser.add_argument('-p', '--prefix', type=str, default="",
                         help="the prefix that needs to be removed to map the rttm to the wav.")
     parser.add_argument('-o', '--output', type=str, default="framed")
+    parser.add_argument('-d', '--duration', type=int, default=None,
+                        help="Indicates the duration of wav files. "
+                             "If not provided, the script will consider 60 seconds for files "
+                             "whose name start by C, 120 otherwise")
     args = parser.parse_args()
 
     data_dir = os.path.dirname(os.path.dirname(args.input))
@@ -190,7 +198,7 @@ def main():
             #print("Processing %s" % rttm_path)
 
             output_file = os.path.join(output, os.path.basename(rttm_path))
-            cutter(rttm_path, args.length, output_file + '.tmp', args.prefix)
+            cutter(rttm_path, args.length, output_file + '.tmp', args.prefix, args.duration)
             aggregate_overlap(output_file + '.tmp', output_file)
             num_lines = sum(1 for line in open(output_file))
             # Sanity check, should be removed in the user decides to change the frame size

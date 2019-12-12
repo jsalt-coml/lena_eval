@@ -36,6 +36,7 @@ conda activate lena_eval
 
 # Install necessary packages
 pip install pyannote-metrics
+pip install pympi-ling ipdb
 ```
 
 You must also verify that [R](https://www.r-project.org/) is installed and have the following packages: dplyr, magrittr, stringr, stringi, and [rlena](https://github.com/HomeBankCode/rlena).
