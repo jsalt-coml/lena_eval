@@ -302,41 +302,11 @@ We thought it most informative to report on several of these options, albeit bri
 
 
 ```{r cf-dm,echo=F}
-# Old version based on identification error rate.
-# We switched to identification error rate
-# read.csv("../LENA_eval_201906/diaer_LENA_sil.csv")->pysil
-# read.csv("../LENA_eval_201906/diaer_LENA_far.csv")->pyfar
-# read.csv("../LENA_eval_201906/diaer_gold_no_ele_LENA_sil_no_tv_report.csv")->pynotv
-# pytot=py[,colnames(pysil)]
-# pytot$type="pytot"
-# pysil$type<-"pysil"
-# pyfar$type<-"pyfar"
-# pynotv$type<-"pynotv"
-# 
-# clean<-function(py){
-#   py[py$item!="Total",]->py
-#   py$cor=substr(py$item,1,1)
-#   py$cor[py$cor=="C"] ="T"
-#   py
-# }
-# 
-# allpy= rbind(pytot,pysil,pyfar,pynotv)
-# 
-# clean(allpy)->allpy 
-# 
-# medians=aggregate(allpy[,c("false.alarm..","missed.detection..","confusion..")],by=list(allpy$type),median,na.rm=T)
-# 
-# colnames(medians)[1]<-c("type")
-# medians[2:4]<-round(medians[2:4])
-# medians$der=rowSums(medians[2:4])
-# medians=medians[c(4,2,3,1),]
-# rownames(medians)<-c("Speakers","+ Overlap","+ Electronic","+ Far")
 
 # [CHI,OCH,MAL,FEM,OVL] // ELE mapped to SIL
-
 read.csv(paste0(evaldir,"gold_no_ele_lena_sil_no_tv_same/ider_report.csv"))->pynotv
-# [CHI,OCH,MAL,FEM,OVL,ELE] 
 
+# [CHI,OCH,MAL,FEM,OVL,ELE] 
 read.csv(paste0(evaldir,"gold_lena_sil_same/ider_report.csv"))->pynotvnoovl
 pytot=py[,colnames(pynotv)]
 pytot$type="pytot"
@@ -363,10 +333,7 @@ rownames(medians)<-c("Speakers","+ Overlap","+ Electronic")
 ```
 
 ```{r tabalts, echo=F}
-# Old version
-# colnames(medians)<-c("FAR","MR","CR","IDER")
-# 
-# apa_table(medians,caption="False Alarm Rate (FAR), Miss Rate (MR), Confusion Rate, and total Identification Error Rate (IDER, sum of the medians of the other three categories), as a function of which categories are considered. Speakers indicates that only speaker categories are considers (all others are mapped onto Other); + Overlap that overlap in both human and LENA annotation were also scored; + Electronic that also electronic was scored; + Far that all far LENA categories were also scored.")
+
 
 colnames(medians)<-c("FAR","MR","CR","IDER")
 
@@ -573,63 +540,51 @@ abline(lm(gold_CTC_count~lena_CTC_count,data=cvtc,subset=c(cvtc$lena_CTC_count>0
 ```
 
 ```{r ctc-er, echo=F}
-#eb: some funky stuff here preventing rendering; no quick fix that i see sorry
-#eb: note that sd = 0
-# cor.ctc.all=cor.test(cvtc$lena_CTC_count,cvtc$gold_CTC_count)
-# #eb: Error in cor.test.default(cvtc$lena_CTC_count[cvtc$lena_CTC_count > 0 &  : 
-#   #not enough finite observations
-# cor.ctc.noZeros=cor.test(cvtc$lena_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0],cvtc$gold_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0])
-# 
-# 
-# allpearsons["CTC","N clips"]<-round(cor.ctc.all$parameter)
-# allpearsons["CTC","r all"]<-round(cor.ctc.all$estimate,3)
-# allpearsons["CTC","N"]<-round(cor.ctc.noZeros$parameter)
-# allpearsons["CTC","r"]<-round(cor.ctc.noZeros$estimate,3)
-# 
-# # ER against human
-# aer=(cvtc$lena_CTC_count-cvtc$gold_CTC_count)
-# aer_no_zeros=(cvtc$lena_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count > 0]-cvtc$gold_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count > 0])
-# 
-# no_human_zeros=cvtc[ cvtc$gold_CTC_count>0,]
-# rer=(no_human_zeros$lena_CTC_count-no_human_zeros$gold_CTC_count)/no_human_zeros$gold_CTC_count*100
-# 
-# arer=abs(no_human_zeros$lena_CTC_count-no_human_zeros$gold_CTC_count)/no_human_zeros$gold_CTC_count*100
-# 
-# aer_ctc <-(cvtc$lena_CTC_count-cvtc$gold_CTC_count)
-# aer_nozeros_ctc <-(cvtc$lena_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count > 0]-cvtc$gold_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count > 0])
-# 
-# aller["CTC",]<-cbind(mean(aer),min(aer),max(aer),
-#                      mean(aer_no_zeros),min(aer_no_zeros),max(aer_no_zeros),
-#                      mean(rer),min(rer),max(rer),
-#                      mean(arer),min(arer),max(arer)
-#                      )
+cor.ctc.all=cor.test(cvtc$lena_CTC_count,cvtc$gold_CTC_count)
 
-# Again, we only considered "near" speaker categories in the turn count, and applied the same rule the LENA^®^ does, where a turn can be from the key child to an adult or vice versa, and should happen within 5 seconds to be counted. The association between clip-level LENA^®^ and human CTC was weaker than that found for CVC (Figure 5):  the Pearson correlation between the two was r = `r round(cor.ctc.all$estimate,3)` (p = `r signif(cor.ctc.all$p.value,3)`) when all clips were taken into account, and r = `r round(cor.ctc.noZeros$estimate,3)` (p = `r signif(cor.ctc.noZeros$p.value,3)`)  when only clips with some child speech (i.e., excluding `r sum(cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0)` clips with 0 counts in both LENA^®^ and human annotations) were considered.  
-# 
-# The *absolute error rate* ranged from `r min(aer)`% to `r max(aer)`%, with a mean of `r mean(aer)`% and a median of `r median(aer)`%. Excluding clips where both human and LENA^®^ counts were zero,
-# the mean was `r mean(aer_no_zeros)`% and the median was `r median(aer_no_zeros)`%. Again, *relative error rates* require non-null denominators, and we thus removed the `r sum(cvtc$gold_CTC_count==0)` clips in which the human annotator said there were no child-adult or adult-child turns at all. The mean relative error rate ranged from `r min(rer)`% to `r max(rer)`%, with a mean of `r mean(rer)`% and a median of `r median(rer)`%. Finally, the *absolute relative error* rate ranged from `r min(arer)`% to `r max(arer)`%, with a mean of `r mean(arer)`% and a median of `r median(arer)`%. For CTCs, as for CVCs, the LENA^®^ seems to be underestimating counts rather systematically, leading to counts that are on average `r mean(rer)`% smaller than what they actually are.
+cor.ctc.noZeros=cor.test(cvtc$lena_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0],cvtc$gold_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0])
+
+
+allpearsons["CTC","N clips"]<-round(cor.ctc.all$parameter)
+allpearsons["CTC","r all"]<-round(cor.ctc.all$estimate,3)
+allpearsons["CTC","N"]<-round(cor.ctc.noZeros$parameter)
+allpearsons["CTC","r"]<-round(cor.ctc.noZeros$estimate,3)
+
+# ER against human
+aer=(cvtc$lena_CTC_count-cvtc$gold_CTC_count)
+aer_no_zeros=(cvtc$lena_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count > 0]-cvtc$gold_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count > 0])
+
+no_human_zeros=cvtc[ cvtc$gold_CTC_count>0,]
+rer=(no_human_zeros$lena_CTC_count-no_human_zeros$gold_CTC_count)/no_human_zeros$gold_CTC_count*100
+
+arer=abs(no_human_zeros$lena_CTC_count-no_human_zeros$gold_CTC_count)/no_human_zeros$gold_CTC_count*100
+
+aer_ctc <-(cvtc$lena_CTC_count-cvtc$gold_CTC_count)
+aer_nozeros_ctc <-(cvtc$lena_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count > 0]-cvtc$gold_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count > 0])
+
+aller["CTC",]<-cbind(mean(aer),min(aer),max(aer),
+                     mean(aer_no_zeros),min(aer_no_zeros),max(aer_no_zeros),
+                     mean(rer),min(rer),max(rer),
+                     mean(arer),min(arer),max(arer)
+                     )
+
+
 ```
 
 
-
+Again, we only considered "near" speaker categories in the turn count, and applied the same rule the LENA^®^ does, where a turn can be from the key child to an adult or vice versa, and should happen within 5 seconds to be counted. The association between clip-level LENA^®^ and human CTC was weaker than that found for CVC (Figure 5):  the Pearson correlation between the two was r = `r round(cor.ctc.all$estimate,3)` (p = `r signif(cor.ctc.all$p.value,3)`) when all clips were taken into account, and r = `r round(cor.ctc.noZeros$estimate,3)` (p = `r signif(cor.ctc.noZeros$p.value,3)`)  when only clips with some child speech (i.e., excluding `r sum(cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0)` clips with 0 counts in both LENA^®^ and human annotations) were considered.  
+ 
+The *absolute error rate* ranged from `r min(aer)`% to `r max(aer)`%, with a mean of `r mean(aer)`% and a median of `r median(aer)`%. Excluding clips where both human and LENA^®^ counts were zero,
+the mean was `r mean(aer_no_zeros)`% and the median was `r median(aer_no_zeros)`%. Again, *relative error rates* require non-null denominators, and we thus removed the `r sum(cvtc$gold_CTC_count==0)` clips in which the human annotator said there were no child-adult or adult-child turns at all. The mean relative error rate ranged from `r min(rer)`% to `r max(rer)`%, with a mean of `r mean(rer)`% and a median of `r median(rer)`%. Finally, the *absolute relative error* rate ranged from `r min(arer)`% to `r max(arer)`%, with a mean of `r mean(arer)`% and a median of `r median(arer)`%. For CTCs, as for CVCs, the LENA^®^ seems to be underestimating counts rather systematically, leading to counts that are on average `r mean(rer)`% smaller than what they actually are.
 
 ### Adult Word Counts accuracy 
 
 ```{r awc, echo=F}
 #AC2EB this may be annoying across labs, let's see...
 read.table(paste0("../","LENA_AWC_rel_v1_June.txt"))->awc
-
 colnames(awc)<-c("filename","gold","LENA")
 gsub("LUC","ROW",awc$filename)->awc$filename
-
-awc$cor=substr(awc$filename,1,3)
-awc$cor[grep("[0-9]",awc$cor)]<-"TSI"
-awc$cor=factor(awc$cor)
-
 awc$child=substr(awc$filename,1,8)
-awc$child[awc$cor=="TSI"]=substr(awc$X[awc$cor=="TSI"],1,3)
-
-
 merge(awc,age_id,by="child")->awc
 
 
@@ -665,7 +620,7 @@ aller["AWC",]<-cbind(mean(aer),min(aer),max(aer),
 
 ```{r tabrs, echo=F}
 
-apa_table(allpearsons,caption="For each measure (CVC, CTC, AWC), N all stands for the total number of clips considered in the general correlation analysis and resulting Pearson r coefficient; N stands for the number of non-null clips (i.e., having some vocalizations, turns, and adult words respectively) as well as Pearson r in the analyses restricted to the non-null clips.",digits=c(0,2,0,2))
+apa_table(allpearsons,caption="For each measure (CVC, CTC, AWC), N all stands for the total number of clips considered in the general correlation analysis and resulting Pearson r coefficient; N stands for the number of non-null clips (i.e., having some vocalizations, turns, and adult words respectively) as well as Pearson r in the analyses restricted to the non-null clips.",digits=c(0,0,3,0,3))
 ```
 
 

@@ -31,11 +31,11 @@ py$missed.detection..[py$total==0 ]<-0
 py$missed.detection..[py$missed.detection==0 ]<-0
 
 # add in age info
-spreadsheet = read.csv(paste0(thisdir,"/ACLEW_list_of_corpora.csv"), header=TRUE, sep = ",")
+spreadsheet = read.csv(paste0("../ACLEW_list_of_corpora.csv"), header=TRUE, sep = ",")
 spreadsheet$child=paste0(spreadsheet$labname,"_",ifelse(nchar(spreadsheet$aclew_id)==3,paste0("0",spreadsheet$aclew_id),spreadsheet$aclew_id))
 spreadsheet = spreadsheet[,c("child","age_mo_round")]
 colnames(spreadsheet) = c("child","age")
-spreadsheet_tsi = read.csv(paste0(thisdir,"/anon_metadata.csv"), header=TRUE, sep = ",")
+spreadsheet_tsi = read.csv(paste0("../anon_metadata.csv"), header=TRUE, sep = ",")
 spreadsheet_tsi = spreadsheet_tsi[c("id","age_mo")]
 colnames(spreadsheet_tsi) = c("child","age")
 age_id = rbind(spreadsheet, spreadsheet_tsi)
@@ -62,42 +62,47 @@ colapall=all
 # Old version with FAR
 #colapall$Other=all$FAF+all$CHF+all$CXF+all$MAF+all$OLN+all$OLF+all$TVN+all$TVF+all$SIL
 # New version without FAR
-colapall$Other=all$OLN+all$TVN+all$SIL
+colapall$NonSpeech=all$OLN+all$TVN+all$SIL
 # Old version
 # colapall["SIL",]<-colapall["SIL",]+colapall["OVL",]+colapall["ELE",]
 # New version : we map all overlapping classes to SIL
-colapall["SIL",]<-colapall["SIL",]+colapall["OVL",]+colapall["ELE",]+colSums(all[which(grepl("/", rownames(all))),])
-colapall[c("FEM","CHI","OCH","MAL","SIL"),c("FAN","CHN","CXN","MAN","Other")]->colapall
-rownames(colapall)[5]<-"Other"
-colnames(colapall)[1:4]<-c("FEM","CHI","OCH","MAL")
+colapall["NonSpeech",]<-colapall["SIL",]+colapall["OVL",]+colapall["ELE",]+colSums(all[which(grepl("/", rownames(all))),])
+colapall[c("FEM","CHI","OCH","MAL","NonSpeech"),c("CHN","FAN","MAN","CXN","NonSpeech")]->colapall
+#rownames(colapall)[5]<-"NonSpeech"
+colnames(colapall)[1:4]<-c("CHI","FEM","MAL","OCH")
 colapall=colapall[,c(2,1,4,3,5)]
 
 prop_cat=data.frame(apply(colapall,2,dodiv)*100) #generates precision because columns
 #colSums(prop_cat)
 stack(colapall)->stcolapall
 colnames(stcolapall)<-c("n","LENA")
-stcolapall$human=factor(rownames(colapall))
+stcolapall$human=factor(rownames(colapall),levels=c("FEM","CHI","OCH","MAL","NonSpeech"))
 stcolapall$pr=stack(prop_cat)$values
 
-
+pdf("prec.pdf",height=12,width=15)
 ggplot(data = stcolapall, mapping = aes(y = stcolapall$human, x=stcolapall$LENA)) +
   geom_tile(aes(fill= rescale(stcolapall$pr)), colour = "white") +
-  geom_text(aes(label = paste(round(stcolapall$pr),"%")), vjust = -1,size=4) +
-  geom_text(aes(label = stcolapall$n), vjust = 1,size=4) +
+  geom_text(aes(label = paste(round(stcolapall$pr),"%")), vjust = -1,size=8) +
+  geom_text(aes(label = stcolapall$n), vjust = 1,size=8) +
   scale_fill_gradient(low = "white", high = "red", name = "Proportion") +
-  xlab("LENA(R)") + ylab("Human")
+  xlab("LENA(R)") + ylab("Human")+ 
+  theme(text = element_text(size = 30))
+dev.off()
 
 prop_cat=data.frame(apply(colapall,1,dodiv)*100) #generates recall because rows
 #colSums(prop_cat)
 stack(colapall)->stcolapall
 colnames(stcolapall)<-c("n","LENA")
-stcolapall$human=factor(rownames(colapall))
+stcolapall$human=factor(rownames(colapall),levels=c("FEM","CHI","OCH","MAL","NonSpeech"))
 stcolapall$pr=stack(prop_cat)$values
 
 
+pdf("rec.pdf",height=12,width=15)
 ggplot(data = stcolapall, mapping = aes(y = stcolapall$human, x=stcolapall$LENA)) +
   geom_tile(aes(fill= rescale(stcolapall$pr)), colour = "white") +
-  geom_text(aes(label = paste(round(stcolapall$pr),"%")), vjust = -1,size=4) +
-  geom_text(aes(label = stcolapall$n), vjust = 1,size=4) +
+  geom_text(aes(label = paste(round(stcolapall$pr),"%")), vjust = -1,size=8) +
+  geom_text(aes(label = stcolapall$n), vjust = 1,size=8) +
   scale_fill_gradient(low = "white", high = "red", name = "Proportion") +
-  xlab("LENA(R)") + ylab("Human")
+  xlab("LENA(R)") + ylab("Human") + 
+  theme(text = element_text(size = 30))
+dev.off()
