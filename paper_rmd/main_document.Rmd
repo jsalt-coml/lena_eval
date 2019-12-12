@@ -582,18 +582,9 @@ the mean was `r mean(aer_no_zeros)`% and the median was `r median(aer_no_zeros)`
 ```{r awc, echo=F}
 #AC2EB this may be annoying across labs, let's see...
 read.table(paste0("../","LENA_AWC_rel_v1_June.txt"))->awc
-
 colnames(awc)<-c("filename","gold","LENA")
 gsub("LUC","ROW",awc$filename)->awc$filename
-
-awc$cor=substr(awc$filename,1,3)
-awc$cor[grep("[0-9]",awc$cor)]<-"TSI"
-awc$cor=factor(awc$cor)
-
 awc$child=substr(awc$filename,1,8)
-awc$child[awc$cor=="TSI"]=substr(awc$X[awc$cor=="TSI"],1,3)
-
-
 merge(awc,age_id,by="child")->awc
 
 
