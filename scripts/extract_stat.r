@@ -302,6 +302,7 @@ gold_data <- read_rttm(gold_data_folder)
 # List all the files containing utterances without associated tier (no xds, vcm lex or mwu tier)
 only_CHI = gold_data[gold_data$mapped_speaker_type == "CHI",]
 contains.na = unique(only_CHI[only_CHI['tier_type'] != "vcm", "filename"])
+contains.na = contains.na[! is.na(contains.na)]
 print("Files not annotated as vcm")
 print(as.character(contains.na))
 
