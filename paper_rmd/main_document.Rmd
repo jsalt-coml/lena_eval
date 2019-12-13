@@ -234,7 +234,7 @@ When two or more annotators provide data on the same classification, one can cal
 
 ### CVC and CTC evaluation
 
-From the human annotation, each vocalization by the key child counted towards the total Child Vocalization Count (CVC) for a given clip. For the Conversational Turn Count (CTC), a sequence of key child and any adult (or vice versa) within 5 seconds counted towards the clip total CTC. The Pearson correlation across LENA^®^ and human estimations was calculated.
+From the human annotation, each vocalization by the key child counted towards the total Child Vocalization Count (CVC) for a given clip if and only if the vocalization had been annotated as being linguistic (canonical or non-canonical in the ACLEW notation). For the Conversational Turn Count (CTC), a sequence of key child and any adult (or vice versa) within 5 seconds counted towards the clip total CTC. The Pearson correlation across LENA^®^ and human estimations was calculated.
 
 Users may also wish to interpret the absolute number of vocalizations or turns found by LENA^®^. Therefore, it is important to also bear in mind absolute error rates, relative error rates, and relative absolute error rates. Despite the similarity in their names, these three metrics provide different information. The *absolute error rate* tells us, given a LENA^®^ estimate, how close the actual number may be. It is calculated as NL-NH, where  NL is the number according to LENA^®^ and NH is the number according to humans; this is done separately for each clip. By then averaging across clips, we then get an idea of the bias towards overestimation (if this number is positive) or underestimation (if this difference is negative). 
 
