@@ -175,7 +175,7 @@ colnames(gold_stats2) = paste("gold2", colnames(gold_stats2), sep = "_")
 stats = merge(gold_stats1, gold_stats2, all=TRUE, by.x="gold1_filename", by.y="gold2_filename")
 colnames(stats)[colnames(stats) == "gold1_filename"] = "filename"
 stats[is.na(stats)] <- 0
-stats$child_id <- str_match(stats$filename, "(.*)_.*_.*")[,2]
+stats$child_id <- str_match(stats$filename, "(.*_.*)_.*_.*")[,2]
 
 file = stats
 child = stats %>% subset(select = -filename ) %>%

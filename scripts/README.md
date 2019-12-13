@@ -1,4 +1,4 @@
-This README.md will give you a step-by-step guide to run the LENA evaluation.
+it This README.md will give you a step-by-step guide to run the LENA evaluation.
 
 ## Prerequisites and Data downloading
 

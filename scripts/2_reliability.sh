@@ -1,4 +1,4 @@
-##!/usr/bin/env bash
+#!/usr/bin/env bash
 
 rm -rf data/reliability/*/match
 rm -rf data/reliability/*/rttm
@@ -30,9 +30,9 @@ for rttm in data/reliability/gold2/rttm/*.rttm; do
 done
 
 
-###########################
-#   1) pyannote metrics  ##
-###########################
+############################
+##   1) pyannote metrics  ##
+############################
 source activate lena_eval
 
 python scripts/labels_mapper.py -p data/reliability/gold1/match -m gold -o
@@ -71,7 +71,7 @@ mv data/reliability/gold1/match/mapped_gold/gold_gold reliability_evaluations/me
 
 python scripts/frame_cutter.py  --i data/reliability/gold1/match/mapped_gold --o framed_mapped -d 60
 python scripts/frame_cutter.py  --i data/reliability/gold2/match/mapped_gold --o framed_mapped -d 60
-Rscript scripts/conf_mat.r data/reliability/gold1/framed_mapped data/reliability/gold2/framed_mapped no_corpora
+Rscript scripts/conf_mat.r data/reliability/gold1/framed_mapped data/reliability/gold2/framed_mapped reliability
 mv data/reliability/gold2/framed_mapped/*.txt reliability_evaluations
 
 ###################################
