@@ -7,9 +7,9 @@ if (length(args)<2) {
   # default output file
   lena_folder = args[1]
   gold_folder = args[2]
-  no_corpora=FALSE
-  if(args[3] == "no_corpora"){
-    no_corpora=TRUE
+  reliability=FALSE
+  if(args[3] == "reliability"){
+    reliability=TRUE
   }
 }
 
@@ -43,8 +43,8 @@ lena_levels = lena_levels[order(nchar(lena_levels))]
 #print(lena_levels)
 
 corpora = c("BER", "ROW", "SOD","WAR","TSI")
-if(no_corpora){
-  corpora= c("")
+if(reliability){
+  corpora= c("BER", "ROW", "WAR", "SOD", "TSE", "ROS")
 }
 
 # Let's start by listing the files
@@ -60,10 +60,6 @@ for(corpus in corpora){
     corpus_filenames = filenames[substr(filenames,1,1) == "C"]
   } else {
     corpus_filenames = filenames[substr(filenames,1,3) == corpus]
-  }
-
-  if(no_corpora){
-    corpus_filenames = filenames
   }
 
   # Create confusion matrices
