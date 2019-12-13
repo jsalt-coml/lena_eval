@@ -142,6 +142,9 @@ Finally, the present study relies on a collaborative effort across several labs.
 
 ## Methods
 
+This paper was written using RMarkDown [@baumer2014r] in R [@team2013r] running on Rstudio [@rstudio]. It can be downloaded and reproduced using the data also available from the Open Science Framework, https://osf.io/zdg6s. These online supplementary materials also include a document with additional analyses. 
+
+
 ### Corpora
 
 The data for the evaluation comes from five different corpora, annotated in the context of two research projects. The largest one is the ACLEW project [@bergelson2017;  @soderstrom]; in this paper we focus on four different corpora of child daylong recordings that have been pooled together, sampled, and annotated in a coordinated manner. These four corpora are: the Bergelson corpus ("BER") from US English families from the upstate New York area [@bergelson2016bergelson], the LuCiD Language 0–5 corpus ("L05") consisting of English-speaking families from Northwest England [@rowland2018], the McDivitt and Winnipeg corpora ("SOD") of Canadian English families [@mcdivitt2016mcdivitt], and the Warlaumont corpus ("WAR") of US English from Merced, California [@warlaumont2016warlaumont]. Some recordings in BER, and all recordings in SOD and WAR are available from HomeBank repository [@vandam2016homebank]. The second project contains a single corpus collected from Tsimane' speaking families in Bolivia ["TSI"; @scaff].  Socioeconomic status varies both within and across corpora.  Key properties of the five corpora are summarized in Table 2.   
@@ -247,7 +250,7 @@ Finally, the *relative absolute error rate* is calculated with the formula abs(N
 
 For the AWC portion of this evaluation, we could only use transcriptions from the four ACLEW corpora, since the TSI corpus has not been transcribed (and thus lacks word counts). Annotators for the four ACLEW corpora were proficient in the language spoken in the daylong recording, and transcribed all adult speech based using canonical lexical forms (e.g. 'wanna', not 'want to') in keeping with minCHAT format [@macwhinney2017tools]. 
 
-Reference adult word counts were determined by counting all unambiguously transcribed words spoken by adult talkers. This was achieved by first discarding all non-lexical transcript entries such as non-linguistic communicative sounds, paralinguistic markers, and markers indicating incomprehensible speech. In addition, all utterances from the key child and other children were omitted from the Adult Word Count(AWC). The remaining orthographic entries separated by whitespaces were then counted as gold standard target words for LENA^®^ to detect.\footnote{It turned out that one child in the (otherwise English) SOD corpus was learning French. Given our definition of orthographic words which is not language-specific processing, we have included this child to increase power, but results without them are nearly identical.}  
+Reference adult word counts were determined by counting all unambiguously transcribed words spoken by adult talkers. This was achieved by first discarding all non-lexical transcript entries such as non-linguistic communicative sounds, paralinguistic markers, and markers indicating incomprehensible speech. In addition, all utterances from the key child and other children were omitted from the Adult Word Count(AWC). The remaining orthographic entries separated by whitespaces were then counted as gold standard target words for LENA^®^ to detect.\footnote{It turned out that one child in the (otherwise English) SOD corpus was learning French. Given our definition of orthographic words which is not language-specific processing, we have included this child to increase power, but results without them are nearly identical. See online Supplementary Materials for analyses excluding this child.}  
 
 For the LENA^®^ Adult Word Counts, the regions sampled for manual annotation were not guaranteed to perfectly align with LENA^®^ segments. Of all LENA^®^ segments found within the extracted clips, 14% straddled a clip boundary (i.e., the segment began before the clip started; or it ended after the extracted clip ended). To match LENA^®^ AWCs with the annotated word counts, words from these straddling LENA^®^ segments were included in proportion to the length of the LENA^®^ segment included in the clip (e.g., if 10% of the duration of a LENA^®^ segment fell within a clip, 10% of the LENA^®^ AWC estimate for that segment was included in the LENA^®^ word count estimate for that clip). AWC was evaluated using Pearson correlations and error rates, similarly to CVC and CTC.
 
@@ -296,42 +299,20 @@ Another topic that needs to be breached before going into the detailed results i
 
 Our first analysis is based on standard speech technology metrics, which put errors in the perspective of how much speech there is. That is, if 10 frames are wrong in a file where there are 100 frames with speech, this is a much smaller problem than if 10 frames are wrong in a file where there is 1 frame with speech. In other words, these metrics should be considered *relative error* metrics. 
 
-However, one problem emerges when there is no speech whatsoever in a given file. In the speech technology literature, this is never discussed, because most researchers working on this are basing their analyses on files that have been selected to contain speech (e.g., recorded in a meeting, or during a phone conversation). We still wanted to take into account clips with no speech inside because this was central for our research goals: We need systems that can deal well with long stretches of Other, because we want to measure in an unbiased manner how much speech (and silence!) children hear. Unfortunately, in the `r round(sum(is.na(py$confusion..))/dim(py)[1]*100)`% of  clips that had no speech whatsoever, the false alarm, miss, and confusion rates are all undefined, because the denominator is zero. 
-  To be able to take clips with no speech into account, we defined the following rules, to deal with the cases that arose. First, if a clip had no speech according to the human annotator, while LENA said there was speech, then the false alarm rate was 100%, and the miss and confusion rates were zero. Second, if on the contrary,  both the human annotator and LENA said there was no speech, then all the error rates were zero. Finally, in some cases there was just a little speech; in this case, the denominator was very small, and therefore the ratio for these two metrics ended up being a very large number. To be maximally informative, we report results in three ways: (1) Overall false alarm, miss, and confusion rates over all clips together, thus giving more weight to clips with more speech; (2) As means across clips, which represent central tendency when giving equal weight to clips with more versus less or no speech; and (3) since means are not robust to outliers, we also report the median across all clips.
+However, one problem emerges when there is no speech whatsoever in a given file. In the speech technology literature, this is never discussed, because most researchers working on this are basing their analyses on files that have been selected to contain speech (e.g., recorded in a meeting, or during a phone conversation). We still wanted to take into account clips with no speech inside because this was central for our research goals: We need systems that can deal well with long stretches of Other (i.e., non-speech or silence), because we want to measure in an unbiased manner how much speech (and silence!) children hear. Unfortunately, in the `r round(sum(is.na(py$confusion..))/dim(py)[1]*100)`% of  clips that had no speech whatsoever, the false alarm, miss, and confusion rates are all undefined, because the denominator is zero. 
+  To be able to take clips with no speech into account, we defined the following rules. First, if a clip had no speech according to the human annotator, while LENA said there was speech, then the false alarm rate was 100%, and the miss and confusion rates were zero. Second, if on the contrary,  both the human annotator and LENA said there was no speech, then all the error rates were zero. Finally, in some cases there was just a little speech; in this case, the denominator was very small, and therefore the ratio for these two metrics ended up being a very large number. To be maximally informative, we report results in three ways: (1) Overall false alarm, miss, and confusion rates over all clips together, thus giving more weight to clips with more speech; (2) As means across clips, which represent central tendency when giving equal weight to clips with more versus less or no speech; and (3) since means are not robust to outliers, we also report the median across all clips.
 
 As mentioned briefly above, there were, *a priori*, several ways of analyzing the data: 
 
 - collapsing LENA^®^ "near" and "far" together (e.g., mapping CHN and CHF onto a single CH category);
-- distinguishing the "near" and "far" categories (e.g., treating CHN and CHF as distinct "speakers");
 - excluding TV as a speaker category, since it is conceptually not identical to the electronic voices detected by ACLEW human annotators; in this case, the TV labels would be mapped post hoc to "Other", as would the electronic voices in the human annotation;
 - omitting OLN as a speaker category, since it is not conceptually identical to the overlap derived from humans' annotating different speaker categories; in this case, LENA^®^'s OL labels would be mapped post hoc to "Other", as would the regions of overlap in the human annotation.
 
-We thought it most informative to report on several of these options, albeit briefly. We start with the situation that yields the best LENA^®^ performance: mapping electronic voices and overlap in the human annotation onto Other, so that the categories found in the human annotation are FEM, MAL, CHI, OCH, alongside using only CHN, FAN, MAN, and CXN as speakers in the LENA^®^ annotation, (with all "far" categories, TVN, and OLN all mapped onto Other; see Tables 1 and 3). 
+We thought it most informative to report on several of these options, albeit briefly. We start with the situation that yields the best LENA^®^ performance: mapping electronic voices and overlap in the human annotation onto Other, so that the categories considered in the human annotation are FEM, MAL, CHI, OCH, alongside using only CHN, FAN, MAN, and CXN as speakers in the LENA^®^ annotation, (with all "far" categories, TVN, and OLN all mapped onto Other; see Tables 1 and 3). 
   Calculated in this way, LENA^®^'s *false alarm* rate (i.e., tagging a speech category when there was none) was  `r round(median(pytot$false.alarm..,na.rm=T))`% overall, with a mean across all clips of `r round(mean(py$false.alarm..,na.rm=T))`% and a median of `r round(median(py$false.alarm..,na.rm=T))`%. The *miss rate* was `r round(median(pytot$missed.detection..,na.rm=T))`% overall, with a mean across all clips of `r round(mean(py$missed.detection..,na.rm=T))`% and a median of `r round(median(py$missed.detection..,na.rm=T))`%. The *confusion rate*, as mentioned above, is only calculated for the correctly detected speech (i.e., not speech that was missed, which counts towards the miss rate, nor the speech that was falsely identified, which is part of false alarms). The confusion rate was very low, `r round(median(pytot$confusion..,na.rm=T))`% overall, with a mean across all clips of `r round(mean(py$confusion..,na.rm=T))`% and a median of `r round(median(py$confusion..,na.rm=T))`%. These three metrics (*false alarms*, *misses*, and *confusions*) are summed to yield the *identification error rate*. The overall identification error rate was  `r round(median(pytot$identification.error.rate..,na.rm=T))`%, with a mean across all clips of `r round(mean(py$identification.error.rate..,na.rm=T))`% and a median of `r round(median(py$identification.error.rate..,na.rm=T))`%.
 
 
 ```{r cf-dm,echo=F}
-
-# [CHI,OCH,MAL,FEM,OVL] // ELE mapped to SIL
-read.csv(paste0(evaldir,"gold_no_ele_lena_sil_no_tv_same/ider_report.csv"))->pynotv
-
-# [CHI,OCH,MAL,FEM,OVL,ELE] 
-read.csv(paste0(evaldir,"gold_lena_sil_same/ider_report.csv"))->pynotvnoovl
-pytot=py[,colnames(pynotv)]
-pytot$type="pytot"
-pynotv$type<-"pynotv"
-pynotvnoovl$type<-"pynotvnoovl"
-
-clean<-function(py){
-  py[py$item!="Total",]->py
-  py$cor=substr(py$item,1,1)
-  py$cor[py$cor=="C"] ="T"
-  py
-}
-
-allpy= rbind(pytot,pynotv,pynotvnoovl)
-
-clean(allpy)->allpy 
 
 medians=aggregate(allpy[,c("false.alarm..","missed.detection..","confusion..")],by=list(allpy$type),median,na.rm=T)
 
