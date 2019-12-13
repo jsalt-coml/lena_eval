@@ -73,6 +73,26 @@ You can run all the evaluations by typing:
 
 This will take a bit of time (but probably less than 10 mn ! Go get yourself a cup of coffee...)
 
+
+## Run the reliability study
+
+First, you must download the reliability data :
+
+```bash
+./scripts/1_get_reliability_data.sh
+```
+
+This will download all the needed folders from the [git ACLEW repo](https://github.com/aclew/).
+Your git account must have been configured for ssh connnections (see [here](https://build-me-the-docs-please.readthedocs.io/en/latest/Using_Git/SetUpSSHForGit.html))
+
+Then, you can run the reliability study by typing : 
+
+```bash
+./scripts/2_reliability.sh
+```
+
+This will generate the results in the _**reliability_evaluations**_ folder.
+
 ## Understanding the results
 
 All the steps described above are generating something in the _**evaluations**_ folder.

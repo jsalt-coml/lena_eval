@@ -17,9 +17,26 @@ git clone git@github.com:aclew/ROW_rely.git
 git clone git@github.com:aclew/raw_BER.git
 git clone git@github.com:aclew/BER_rely.git
 
+# Fix folder name
+mv raw_LUC raw_ROW
+
+# Rename something.eaf into corpora_something.eaf
+for eaf in */*.eaf; do
+    dirname=$(dirname $eaf)
+    basename=$(basename $eaf)
+
+    if [[ $dirname =~ rely$ ]]; then
+        corpora="${dirname%%_*}"
+    else
+        corpora="${dirname#*_}"
+    fi
+    mv $eaf ${dirname}/${corpora}_${basename}
+done
+
 mv */*.eaf .
+rm -rf gold{1,2}
 mkdir -p gold1/eaf gold2/eaf
-mv rely_*.eaf gold2/eaf
+mv *_rely_*.eaf gold2/eaf
 mv *.eaf gold1/eaf
 rm -rf raw_*
 rm -rf *_rely

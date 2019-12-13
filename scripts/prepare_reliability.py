@@ -46,13 +46,17 @@ rttm_files2 = glob.glob(os.path.join(gold2, "*.rttm"))
 for rttm2 in rttm_files2:
     basename2 = os.path.basename(rttm2).replace(".rttm", "")
     splitted2 = basename2.split("_")
-    id2, onset2, offset2 = splitted2[1], int(splitted2[2]), int(splitted2[3])
+    id2, onset2, offset2 = splitted2[0]+'_'+splitted2[2], int(splitted2[3]), int(splitted2[4])
 
     for rttm1 in rttm_files1:
         basename1 = os.path.basename(rttm1).replace(".rttm", "")
         splitted1 = basename1.split("_")
 
-        id1, onset1, offset1 = splitted1[0], int(splitted1[1]), int(splitted1[2])
+        id1, onset1, offset1 = splitted1[0]+'_'+splitted1[1], int(splitted1[2]), int(splitted1[3])
+        # print("2")
+        # print("%s %s %s" % (id2, onset2, offset2))
+        # print("1")
+        # print("%s %s %s" % (id1, onset1, offset1))
         if id1 == id2:
             if onset2 >= onset1 and offset2 <= offset1:
                 beg = onset2-onset1
