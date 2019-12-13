@@ -122,6 +122,25 @@ lena_dict_near_only_no_tv = {
     'TVF': 'SIL'
 }
 
+# Near classes without TV
+lena_all = {
+    'CHF': 'CHF',
+    'CHN': 'CHN',
+    'CXF': 'CXF',
+    'CXN': 'CXN',
+    'FAF': 'FAF',
+    'FAN': 'FAN',
+    'MAF': 'MAF',
+    'MAN': 'MAN',
+    'NOF': 'NOF',
+    'NON': 'NON',
+    'OLF': 'OLF',
+    'OLN': 'OLN',
+    'SIL': 'SIL',
+    'TVN': 'TVN',
+    'TVF': 'TVF'
+}
+
 # Near classes without tv and overlap
 lena_dict_near_only_no_tv_no_oln = {
     'CHF': 'SIL',
@@ -174,6 +193,8 @@ def map_rttm(rttm, overlap, dict, same, output_folder):
         dict = gold_dict
     elif dict == "gold_no_ele":
         dict = gold_dict_no_ele
+    elif dict == "lena_all":
+        dict = lena_all
     else:
         raise ValueError("Value of dict unknown, must be in [lena_sil, lena_sil_no_tv, lena_sil_no_tv_no_oln, gold, gold_no_ele")
 
@@ -263,7 +284,7 @@ def main():
                                                  "called mapped")
     parser.add_argument('-p', '--path', type=str, required=True,
                         help="Path to the folder containing .rttm files")
-    parser.add_argument('-m', '--map', type=str, required=True, choices=["lena_sil", "lena_sil_no_tv", "lena_sil_no_tv_no_oln", "gold", "gold_no_ele"],
+    parser.add_argument('-m', '--map', type=str, required=True, choices=["lena_all", "lena_sil", "lena_sil_no_tv", "lena_sil_no_tv_no_oln", "gold", "gold_no_ele"],
                         help="Indicates if this is lena files that needs to be mapped or gold files."
                              "Must be in [lena_sil,lena_far, lena_sil_no_tv,lena_sil_no_tv_no_oln,gold,gold_no_ele]")
     parser.add_argument('-o', '--overlap', action="store_true",
@@ -277,7 +298,7 @@ def main():
     dict = args.map
 
     same = False
-    if dict == "lena_sil" or dict == "lena_sil_no_tv" or dict == "lena_sil_no_tv_no_oln":
+    if dict == "lena_sil" or dict == "lena_sil_no_tv" or dict == "lena_sil_no_tv_no_oln" or dict == "lena_same":
         same = args.same
 
     rttm_files = glob.glob(os.path.join(folder_path, "*.rttm"))

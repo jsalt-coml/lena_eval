@@ -116,6 +116,13 @@ read_rttm <- function(data_folder) {
 }
 
 get_stats_gold <- function(gold_data){
+  CC = gold_data %>%
+    filter(speaker_type == 'CHI') %>%
+    dplyr::group_by(filename) %>%
+    dplyr::summarise(CH_cum_dur = sum(duration, na.rm=TRUE),
+                     CH_mean = mean(duration, na.rm=TRUE),
+                     CH_count = length(duration))
+  
   CVC = gold_data %>%
     filter(speaker_type == 'CHI', tier_subtype == 'C' | tier_subtype == 'N' | tier_subtype == "W") %>%
     dplyr::group_by(filename) %>%
@@ -136,6 +143,7 @@ get_stats_gold <- function(gold_data){
     dplyr::summarise(CTC_count = sum(turn_taking))
 
   stats = merge(CVC, CNVC, all = TRUE)
+  stats = merge(stats, CC, all = TRUE)
   stats = merge(stats, CTC, all = TRUE)
   stats[is.na(stats)] = 0
   return(stats)
@@ -180,13 +188,17 @@ stats$child_id <- str_match(stats$filename, "(.*_.*)_.*_.*")[,2]
 file = stats
 child = stats %>% subset(select = -filename ) %>%
   dplyr::group_by(child_id) %>%
-  summarise(gold1_CV_cum_dur = sum(gold1_CV_cum_dur),
+  summarise(gold1_CH_cum_dur = sum(gold1_CH_cum_dur), #ac
+            gold1_CH_count = sum(gold1_CH_count), #ac
+            gold1_CV_cum_dur = sum(gold1_CV_cum_dur),
             gold1_CV_count = sum(gold1_CV_count),
             gold1_short_CV_count = sum(gold1_short_CV_count),
             gold1_CNV_cum_dur = sum(gold1_CNV_cum_dur),
             gold1_CNV_count = sum(gold1_CNV_count),
             gold1_short_CNV_count = sum(gold1_short_CNV_count),
             gold1_CTC_count = sum(gold1_CTC_count),
+            gold2_CH_cum_dur = sum(gold2_CH_cum_dur), #ac
+            gold2_CH_count = sum(gold2_CH_count), #ac
             gold2_CV_cum_dur = sum(gold2_CV_cum_dur),
             gold2_CV_count = sum(gold2_CV_count),
             gold2_short_CV_count = sum(gold2_short_CV_count),
@@ -195,8 +207,10 @@ child = stats %>% subset(select = -filename ) %>%
             gold2_short_CNV_count = sum(gold2_short_CNV_count),
             gold2_CTC_count = sum(gold2_CTC_count))
 # We have to recompute the mean
+child$gold1_CH_mean = child$gold1_CH_cum_dur / child$gold1_CH_count  #ac
 child$gold1_CV_mean = child$gold1_CV_cum_dur / child$gold1_CV_count
 child$gold1_CNV_mean = child$gold1_CNV_cum_dur / child$gold1_CNV_count
+child$gold2_CH_mean = child$gold2_CH_cum_dur / child$gold2_CH_count  #ac
 child$gold2_CV_mean = child$gold2_CV_cum_dur / child$gold2_CV_count
 child$gold2_CNV_mean = child$gold2_CNV_cum_dur / child$gold2_CNV_count
 child[is.na(child)] = 0

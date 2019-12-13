@@ -202,7 +202,6 @@ get_stats_gold <- function(gold_data){
     dplyr::summarise(CTC_count = sum(turn_taking))
 
   stats = merge(CVC, CNVC, all = TRUE)
-  stats = merge(stats, CC, all = TRUE)
   stats = merge(stats, CTC, all = TRUE)
   stats[is.na(stats)] = 0
   return(stats)

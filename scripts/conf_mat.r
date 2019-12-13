@@ -37,10 +37,10 @@ for (filename in filenames){
 gold_levels = gold_levels[order(nchar(gold_levels))]
 lena_levels = lena_levels[order(nchar(lena_levels))]
 
-#print("Gold labels found :")
-#print(gold_levels)
-#print("Lena labels found :")
-#print(lena_levels)
+print("Gold labels found :")
+print(gold_levels)
+print("Lena labels found :")
+print(lena_levels)
 
 corpora = c("BER", "ROW", "SOD","WAR","TSI")
 if(reliability){

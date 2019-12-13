@@ -252,7 +252,9 @@ kable(prerec, row.names=FALSE) %>%
 library(scales)
 library(gridExtra)
 confmat = read.table(file=paste0(evaldir_rel,"/all_cm.txt"), header=TRUE, sep=" ")
-labels = c("SIL", "CHI", "OCH", "FEM", "MAL", "ELE", "OVL")
+confmat$Other=confmat$SIL+confmat$OVL+confmat$ELE
+confmat["Other",]<-confmat["SIL",]+confmat["OVL",]+confmat["ELE",]
+labels = c("CHI", "OCH", "FEM", "MAL", "Other")
 confmat = confmat[labels,labels]
 dodiv=function(x) x/sum(x, na.rm=T)
 
@@ -292,7 +294,9 @@ library(gridExtra)
 corpus = c("BER", "ROW", "WAR", "TSE", "ROS", "SOD")
 for(corpora in corpus){
   confmat = read.table(file=paste0(evaldir_rel, "/",corpora,"_cm.txt"), header=TRUE, sep=" ")
-  labels = c("SIL", "CHI", "OCH", "FEM", "MAL", "ELE", "OVL")
+  confmat$Other=confmat$SIL+confmat$OVL+confmat$ELE
+  confmat["Other",]<-confmat["SIL",]+confmat["OVL",]+confmat["ELE",]
+  labels = c("CHI", "OCH", "FEM", "MAL", "Other")
   confmat = confmat[labels,labels]
   dodiv=function(x) x/sum(x, na.rm=T)
   all=confmat
@@ -344,6 +348,10 @@ cohen = data.frame(corpora=corpus)
 
 for(corpora in corpus){
   confmat = read.table(file=paste0(evaldir_rel, "/", corpora, "_cm.txt"), header=TRUE, sep=" ")
+  confmat$Other=confmat$SIL+confmat$OVL+confmat$ELE
+  confmat["Other",]<-confmat["SIL",]+confmat["OVL",]+confmat["ELE",]
+  labels = c("CHI", "OCH", "FEM", "MAL", "Other")
+  confmat = confmat[labels, labels]
   cohen.kappa(confmat)->ck
   n_obs = ck$n.obs
   kappa = ck$kappa
@@ -365,29 +373,37 @@ For this study, we considered only the children that have been annotated as vcm 
 ```{r, echo=FALSE, message=FALSE}
 data = read.table(file=paste0(evaldir_rel,"/key_child_voc_file_level.csv"), header=TRUE, sep=" ")
 
-par(mfrow=c(1,3))
-myrange=range(data[,c("gold1_CV_count","gold2_CV_count")],na.rm=T)
-plot1 = plot(gold1_CV_count~gold2_CV_count,data=data,pch=20,col=alpha("black",.2),xlab="Human 2",ylab="Human 1",xlim=myrange,ylim=myrange, main="Level of agreement on \n CV_count") + abline(lm(gold1_CV_count~gold2_CV_count,data=data)) + abline(lm(gold1_CV_count~gold2_CV_count,data=data,subset=c(data$gold2_CV_count>0 & data$gold1_CV_count>0)),lty=2)
+par(mfrow=c(1,2))
 
+score = cor.test(data$gold1_CV_count, data$gold2_CV_count, method="pearson")$estimate
+myrange=range(data[,c("gold1_CV_count","gold2_CV_count")],na.rm=T)
+plot1 = plot(gold1_CV_count~gold2_CV_count,data=data,pch=20,col=alpha("black",.2),xlab="Human 2",ylab="Human 1",xlim=myrange,ylim=myrange, main="Level of agreement on \n CV_count") + abline(lm(gold1_CV_count~gold2_CV_count,data=data)) + abline(lm(gold1_CV_count~gold2_CV_count,data=data,subset=c(data$gold2_CV_count>0 & data$gold1_CV_count>0)),lty=2)+ mtext(paste0("Pearson's R score : ", format(score, digits=2)), side=4, col='red', adj=1)
+
+score = cor.test(data$gold1_CNV_count, data$gold2_CNV_count, method="pearson")$estimate
 myrange=range(data[,c("gold1_CNV_count","gold2_CNV_count")],na.rm=T)
 plot3 = plot(gold1_CNV_count~gold2_CNV_count,data=data,pch=20,col=alpha("black",.2),xlab="Human 2",ylab="Human 1",xlim=myrange,ylim=myrange, main="Level of agreement \n on CNV_count") +
 abline(lm(gold1_CNV_count~gold2_CNV_count,data=data)) +
-abline(lm(gold1_CNV_count~gold2_CNV_count,data=data,subset=c(data$gold2_CNV_count>0 & data$gold1_CNV_count>0)),lty=2)
-
-myrange=range(data[,c("gold1_CTC_count","gold2_CTC_count")],na.rm=T)
-plot3 = plot(gold1_CTC_count~gold2_CTC_count,data=data,pch=20,col=alpha("black",.2),xlab="Human 2",ylab="Human 1",xlim=myrange,ylim=myrange, main="Level of agreement \n on CTC_count") +
-abline(lm(gold1_CTC_count~gold2_CTC_count,data=data)) +
-abline(lm(gold1_CTC_count~gold2_CTC_count,data=data,subset=c(data$gold2_CTC_count>0 & data$gold1_CTC_count>0)),lty=2)
+abline(lm(gold1_CNV_count~gold2_CNV_count,data=data,subset=c(data$gold2_CNV_count>0 & data$gold1_CNV_count>0)),lty=2)+ mtext(paste0("Pearson's R score : ", format(score, digits=2)), side=4, col='red', adj=1)
 ```
 
 ```{r, echo=FALSE, message=FALSE}
 par(mfrow=c(1,2))
+score = cor.test(data$gold1_CV_cum_dur, data$gold2_CV_cum_dur, method="pearson")$estimate
 myrange=range(data[,c("gold1_CV_cum_dur","gold2_CV_cum_dur")],na.rm=T)
-plot1 = plot(gold1_CV_cum_dur~gold2_CV_cum_dur,data=data,pch=20,col=alpha("black",.2),xlab="Human 2",ylab="Human 1",xlim=myrange,ylim=myrange, main="Level of agreement on \n CV_cum_dur") + abline(lm(gold1_CV_cum_dur~gold2_CV_cum_dur,data=data)) + abline(lm(gold1_CV_cum_dur~gold2_CV_cum_dur,data=data,subset=c(data$gold2_CV_cum_dur>0 & data$gold1_CV_cum_dur>0)),lty=2)
+plot1 = plot(gold1_CV_cum_dur~gold2_CV_cum_dur,data=data,pch=20,col=alpha("black",.2),xlab="Human 2",ylab="Human 1",xlim=myrange,ylim=myrange, main="Level of agreement on \n CV_cum_dur") + abline(lm(gold1_CV_cum_dur~gold2_CV_cum_dur,data=data)) + abline(lm(gold1_CV_cum_dur~gold2_CV_cum_dur,data=data,subset=c(data$gold2_CV_cum_dur>0 & data$gold1_CV_cum_dur>0)),lty=2) + mtext(paste0("Pearson's R score : ", format(score, digits=2)), side=4, col='red', adj=1)
 
+score = cor.test(data$gold1_CNV_cum_dur, data$gold2_CNV_cum_dur, method="pearson")$estimate
 myrange=range(data[,c("gold1_CNV_cum_dur","gold2_CNV_cum_dur")],na.rm=T)
-plot3 = plot(gold1_CNV_cum_dur~gold2_CNV_cum_dur,data=data,pch=20,col=alpha("black",.2),xlab="Human 2",ylab="Human 1",xlim=myrange,ylim=myrange, main="Level of agreement \n on CNV_cum_dur") +
+plot2 = plot(gold1_CNV_cum_dur~gold2_CNV_cum_dur,data=data,pch=20,col=alpha("black",.2),xlab="Human 2",ylab="Human 1",xlim=myrange,ylim=myrange, main="Level of agreement \n on CNV_cum_dur") +
 abline(lm(gold1_CNV_cum_dur~gold2_CNV_cum_dur,data=data)) +
-abline(lm(gold1_CNV_cum_dur~gold2_CNV_cum_dur,data=data,subset=c(data$gold2_CNV_cum_dur>0 & data$gold1_CNV_cum_dur>0)),lty=2)
+abline(lm(gold1_CNV_cum_dur~gold2_CNV_cum_dur,data=data,subset=c(data$gold2_CNV_cum_dur>0 & data$gold1_CNV_cum_dur>0)),lty=2) + mtext(paste0("Pearson's R score : ", format(score, digits=2)), side=4, col='red', adj=1)
 
+```
+
+```{r, echo=FALSE, message=FALSE}
+score = cor.test(data$gold1_CTC_count, data$gold2_CTC_count, method="pearson")$estimate
+myrange=range(data[,c("gold1_CTC_count","gold2_CTC_count")],na.rm=T)
+plot3 = plot(gold1_CTC_count~gold2_CTC_count,data=data,pch=20,col=alpha("black",.2),xlab="Human 2",ylab="Human 1",xlim=myrange,ylim=myrange, main="Level of agreement \n on CTC_count") +
+abline(lm(gold1_CTC_count~gold2_CTC_count,data=data)) +
+abline(lm(gold1_CTC_count~gold2_CTC_count,data=data,subset=c(data$gold2_CTC_count>0 & data$gold1_CTC_count>0)),lty=2)+ mtext(paste0("Pearson's R score : ", format(score, digits=2)), side=4, col='red', adj=1)
 ```
