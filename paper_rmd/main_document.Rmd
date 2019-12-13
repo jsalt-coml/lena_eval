@@ -257,10 +257,16 @@ For the LENA^®^ Adult Word Counts, the regions sampled for manual annotation we
 source("readin_cm.R")
 ```
 
-```{r DIAER,echo=F}
+```{r read-DIAER,echo=F}
 
 source("readin_ider.R")
 ```
+
+```{r read-derived,echo=F}
+
+source("readin_derived.R")
+```
+
 
 ```{r tabprops, echo=F}
 tab=matrix(nrow=7,ncol=3)
@@ -282,6 +288,9 @@ apa_table(tab,caption="Number of frames, percentage of frames, and number of min
 
 
 Before starting, we provide some general observations based on the manual human annotations. The "Other" category (meaning no speech, potentially silence but also non-human noise) was extremely common, constituting `r round(sum(sumref[grep("SIL",rownames(all))])/sum(sumref)*100)`% of the 10 ms frames. In fact, `r round(sum(is.na(py$confusion..))/dim(py)[1]*100)`% of the 1-2 minute clips contained no speech by any of the  speaker types (according to the human annotators). As for speakers, female adults made up `r round(sum(sumref[grep("FEM",rownames(all))])/sum(sumref)*100)`% of the frames, the child contributed to `r round(sum(sumref[grep("CHI",rownames(all))])/sum(sumref)*100)`%, and male adult voices, other child voices, and electronic voices were only found in `r round(sum(sumref[grep("MAL",rownames(all))])/sum(sumref)*100)`% of the frames each. Overlap made up the remaining `r round(sum(sumref[grep("OVL",rownames(all))])/sum(sumref)*100)`% of frames. The following consequences ensue. If frame-based accuracy is sought, a system that classifies every frame as Other would be `r round(sum(sumref[grep("SIL",rownames(all))])/sum(sumref)*100)`% correct. This is of course not what we want, but it indicates that systems well adapted to this kind of speech should tend to have low false alarm rates, being very conservative as to when there is speech. If the system does say there is speech, then it had better say that this speech comes from female adults, who provide a great majority of the speech, nearly 3 times as much as the key child and 10 times more than other children or male adults. In fact, given that speech by male adults and other children is so rare, a system that makes a lot of mistakes in these categories may still have a good global performance, because males and other children jointly accounted for only 2% of the frames.
+
+
+Another topic that needs to be breached before going into the detailed results is the level of agreement obtained across two human annotators. Members of the ACLEW project kindly shared preliminary results of their reliability for their corpora, including the 4 ACLEW corpora used here. For the present analysis, they considered the "gold" to be the original complete annotations, and the "system" the reliability annotations, which were done later and in only a subset of the corpus (one minute per child, for a total of 60 minutes across their 6 corpora). While we cannot report on these results in full because their publication is intended elsewhere, we can state the following overall observations, that can be compared against the LENA data reported on below. Among two human annotators, the ACLEW team reported an identification error rate of 56% (due to 20% false alarms, 19% miss rates, and 17% of confusion). Precision for key child was the highest, at 79%; for the other speakers it was: 71% female adult, 64% male adult, and 59% other child. For the non-speech categories, precision was 50% for overlap; 68% for electronic, and 79% for silence. As for recall,  the key child scores was 80%; for the other speakers it was: 72% female adult, 72% male adult, and 65% other child. For the non-speech categories, recall was 35% for overlap; 50% for electronic, and 84% for silence. 
 
 ### LENA^®^ classification accuracy: False alarms, misses, confusion 
 
@@ -453,8 +462,6 @@ allpearsons=matrix(nrow=3,ncol=4)
 rownames(allpearsons)<-c("CVC","CTC","AWC")
 colnames(allpearsons)<-c("N clips","r all","N","r")
 
-cvtc <- read.table(paste0(evaldir,"key_child_voc_file_level.csv"),header=T,sep=" ")
-
 
 cor.cvc.all= cor.test(cvtc$lena_CV_count,cvtc$gold_CV_count)
 cor.cvc.noZeros= cor.test(cvtc$lena_CV_count[cvtc$lena_CV_count>0 & cvtc$gold_CV_count>0],cvtc$gold_CV_count[cvtc$lena_CV_count>0 & cvtc$gold_CV_count>0])
@@ -580,13 +587,6 @@ the mean was `r mean(aer_no_zeros)`% and the median was `r median(aer_no_zeros)`
 ### Adult Word Counts accuracy 
 
 ```{r awc, echo=F}
-#AC2EB this may be annoying across labs, let's see...
-read.table(paste0("../","LENA_AWC_rel_v1_June.txt"))->awc
-colnames(awc)<-c("filename","gold","LENA")
-gsub("LUC","ROW",awc$filename)->awc$filename
-awc$child=substr(awc$filename,1,8)
-merge(awc,age_id,by="child")->awc
-
 
 cor.awc.all= cor.test(awc$gold,awc$LENA)
 cor.awc.noZeros= cor.test(awc$gold[awc$gold>0 & awc$LENA>0],awc$LENA[awc$gold>0 & awc$LENA>0])
@@ -705,20 +705,7 @@ We predicted false alarm, miss, and confusion rates in clips where there was som
 
 
 ```{r cvc-age, echo=F}
-read.table(paste0(evaldir,"/key_child_voc_file_level.csv"),header=T,sep=" ")->cvtc
 
-cvtc$cor=substr(cvtc$filename,1,3)
-cvtc$cor[substr(cvtc$filename,1,1)=="C"]<-"TSI"
-cvtc$cor=factor(cvtc$cor)
-
-cvtc$child=substr(cvtc$filename,1,8)
-cvtc$child[cvtc$cor=="TSI"]<-substr(cvtc$filename[cvtc$cor=="TSI"],1,3) 
-
-#REMOVE WHEN FILENAME=ZERO BUG IS FIXED 
-cvtc=subset(cvtc,filename!=0)
-cvtc$cor=factor(cvtc$cor)
-
-merge(cvtc,age_id,by="child")->cvtc
 
 mymodel<-lmer(gold_CV_count~lena_CV_count*age*cor + (1|child), data=cvtc)
 #summary(mymodel)
