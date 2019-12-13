@@ -25,3 +25,27 @@ spreadsheet_tsi = spreadsheet_tsi[c("id","age_mo")]
 colnames(spreadsheet_tsi) = c("child","age")
 age_id = rbind(spreadsheet, spreadsheet_tsi)
 py=merge(py,age_id,by.x="child",by.y="child",all.x=T)
+
+
+# [CHI,OCH,MAL,FEM,OVL] // ELE mapped to SIL
+read.csv(paste0(evaldir,"gold_no_ele_lena_sil_no_tv_same/ider_report.csv"))->pynotv
+
+pytot=py[,colnames(pynotv)]
+
+# [CHI,OCH,MAL,FEM,OVL,ELE] 
+read.csv(paste0(evaldir,"gold_lena_sil_same/ider_report.csv"))->pynotvnoovl
+
+pynotvnoovl$type<-"pynotvnoovl"
+pynotv$type<-"pynotv"
+pytot$type="pytot"
+
+clean<-function(py){
+  py[py$item!="Total",]->py
+  py$cor=substr(py$item,1,1)
+  py$cor[py$cor=="C"] ="T"
+  py
+}
+
+allpy= rbind(pytot,pynotv,pynotvnoovl)
+
+clean(allpy)->allpy 
