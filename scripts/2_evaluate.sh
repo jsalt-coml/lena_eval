@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-source activate lena_eval
-
 ####################################
 ## 1) Create appropriate mappings ##
 ####################################
