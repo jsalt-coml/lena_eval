@@ -119,11 +119,11 @@ No additional results.
 
 #create matrices that will hold all results
 allpearsons=matrix(nrow=6,ncol=4) #r's
-rownames(allpearsons)<-c("CVC","CHN counts","CTC","CTC all CHN","AWC","AWC no French")
+rownames(allpearsons)<-c("CVC","CHN c","CTC","\" all CHI","AWC","\" no French")
 colnames(allpearsons)<-c("N clips","r all","N","r")
 
 aller=matrix(nrow=6,ncol=12) #error rates
-rownames(aller)<-c("CVC","CHN counts","CTC","CTC all CHN","AWC","AWC no French")
+rownames(aller)<-c("CVC","CHN c","CTC","\" all CHI","AWC","\" no French")
 colnames(aller)<-c("AER","min","max","AER-0","min","max","RER","min1","max1","ARER","min2","max2")
 
 #CVC, same as in main paper
@@ -152,24 +152,24 @@ aller["CVC",]<-cbind(mean(aer),min(aer),max(aer),
 
 
 #CHN counts, added here
-cor.chnc.all= cor.test(cvtc$lena_CHN_count,cvtc$gold_CHI_count)
-cor.chnc.noZeros= cor.test(cvtc$lena_CHN_count[cvtc$lena_CHN_count>0 & cvtc$gold_CHI_count>0],cvtc$gold_CHI_count[cvtc$lena_CHN_count>0 & cvtc$gold_CHI_count>0])
+cor.chnc.all= cor.test(cvtc$lena_CH_count,cvtc$gold_CH_count)
+cor.chnc.noZeros= cor.test(cvtc$lena_CH_count[cvtc$lena_CH_count>0 & cvtc$gold_CH_count>0],cvtc$gold_CH_count[cvtc$lena_CH_count>0 & cvtc$gold_CH_count>0])
 
-allpearsons["CHN counts","N clips"]<-round(cor.cvc.all$parameter)
-allpearsons["CHN counts","r all"]<-round(cor.cvc.all$estimate,3)
-allpearsons["CHN counts","N"]<-round(cor.cvc.noZeros$parameter)
-allpearsons["CHN counts","r"]<-round(cor.cvc.noZeros$estimate,3)
+allpearsons["CHN c","N clips"]<-round(cor.cvc.all$parameter)
+allpearsons["CHN c","r all"]<-round(cor.cvc.all$estimate,3)
+allpearsons["CHN c","N"]<-round(cor.cvc.noZeros$parameter)
+allpearsons["CHN c","r"]<-round(cor.cvc.noZeros$estimate,3)
 
-aer=(cvtc$lena_CHN_count-cvtc$gold_CHI_count)
-aer_no_zeros=(cvtc$lena_CHN_count[cvtc$lena_CHN_count>0 & cvtc$gold_CHI_count > 0]-cvtc$gold_CHI_count[cvtc$lena_CHN_count>0 & cvtc$gold_CHI_count > 0])
-no_human_zeros=cvtc[ cvtc$gold_CHI_count>0,]
-rer=(no_human_zeros$lena_CHN_count-no_human_zeros$gold_CHI_count)/no_human_zeros$gold_CV_count*100
-arer=abs(no_human_zeros$lena_CHN_count-no_human_zeros$gold_CHI_count)/no_human_zeros$gold_CV_count*100
-aer_cvc <-(cvtc$lena_CHN_count-cvtc$gold_CHI_count)
-aer_nozeros_cvc <-(cvtc$lena_CHN_count[cvtc$lena_CHN_count>0 & cvtc$gold_CHI_count > 0]-cvtc$gold_CHI_count[cvtc$lena_CHN_count>0 & cvtc$gold_CHI_count > 0])
+aer=(cvtc$lena_CH_count-cvtc$gold_CH_count)
+aer_no_zeros=(cvtc$lena_CH_count[cvtc$lena_CH_count>0 & cvtc$gold_CH_count > 0]-cvtc$gold_CH_count[cvtc$lena_CH_count>0 & cvtc$gold_CH_count > 0])
+no_human_zeros=cvtc[ cvtc$gold_CH_count>0,]
+rer=(no_human_zeros$lena_CH_count-no_human_zeros$gold_CH_count)/no_human_zeros$gold_CH_count*100
+arer=abs(no_human_zeros$lena_CH_count-no_human_zeros$gold_CH_count)/no_human_zeros$gold_CH_count*100
+aer_cvc <-(cvtc$lena_CH_count-cvtc$gold_CH_count)
+aer_nozeros_cvc <-(cvtc$lena_CH_count[cvtc$lena_CH_count>0 & cvtc$gold_CH_count > 0]-cvtc$gold_CH_count[cvtc$lena_CH_count>0 & cvtc$gold_CH_count > 0])
 
 
-aller["CHN counts",]<-cbind(mean(aer),min(aer),max(aer),
+aller["CHN c",]<-cbind(mean(aer),min(aer),max(aer),
                      mean(aer_no_zeros),min(aer_no_zeros),max(aer_no_zeros),
                      mean(rer),min(rer),max(rer),
                      mean(arer),min(arer),max(arer)
@@ -200,6 +200,30 @@ aller["CTC",]<-cbind(mean(aer),min(aer),max(aer),
                      mean(arer),min(arer),max(arer)
                      )
 
+#CTC counting all vocs in human
+cor.ctc.all=cor.test(cvtc$lena_CTC_count,cvtc$gold_CTC_count_all)
+
+cor.ctc.noZeros=cor.test(cvtc$lena_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count_all>0],cvtc$gold_CTC_count_all[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count_all>0])
+
+
+allpearsons["\" all CHI","N clips"]<-round(cor.ctc.all$parameter)
+allpearsons["\" all CHI","r all"]<-round(cor.ctc.all$estimate,3)
+allpearsons["\" all CHI","N"]<-round(cor.ctc.noZeros$parameter)
+allpearsons["\" all CHI","r"]<-round(cor.ctc.noZeros$estimate,3)
+
+aer=(cvtc$lena_CTC_count-cvtc$gold_CTC_count_all)
+aer_no_zeros=(cvtc$lena_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count_all > 0]-cvtc$gold_CTC_count_all[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count_all > 0])
+no_human_zeros=cvtc[ cvtc$gold_CTC_count_all>0,]
+rer=(no_human_zeros$lena_CTC_count-no_human_zeros$gold_CTC_count_all)/no_human_zeros$gold_CTC_count_all*100
+arer=abs(no_human_zeros$lena_CTC_count-no_human_zeros$gold_CTC_count_all)/no_human_zeros$gold_CTC_count_all*100
+aer_ctc <-(cvtc$lena_CTC_count-cvtc$gold_CTC_count_all)
+aer_nozeros_ctc <-(cvtc$lena_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count_all > 0]-cvtc$gold_CTC_count_all[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count_all > 0])
+
+aller["\" all CHI",]<-cbind(mean(aer),min(aer),max(aer),
+                     mean(aer_no_zeros),min(aer_no_zeros),max(aer_no_zeros),
+                     mean(rer),min(rer),max(rer),
+                     mean(arer),min(arer),max(arer)
+                     )
 
 #AWC as in main paper
 cor.awc.all= cor.test(awc$gold,awc$LENA)
@@ -231,10 +255,10 @@ cor.noFrench.all= cor.test(noFrench$gold,noFrench$LENA)
 cor.noFrench.noZeros= cor.test(noFrench$gold[noFrench$gold>0 & noFrench$LENA>0],noFrench$LENA[noFrench$gold>0 & noFrench$LENA>0])
 
 
-allpearsons["AWC no French","N clips"]<-round(cor.noFrench.all$parameter)
-allpearsons["AWC no French","r all"]<-round(cor.noFrench.all$estimate,3)
-allpearsons["AWC no French","N"]<-round(cor.noFrench.noZeros$parameter)
-allpearsons["AWC no French","r"]<-round(cor.noFrench.noZeros$estimate,3)
+allpearsons["\" no French","N clips"]<-round(cor.noFrench.all$parameter)
+allpearsons["\" no French","r all"]<-round(cor.noFrench.all$estimate,3)
+allpearsons["\" no French","N"]<-round(cor.noFrench.noZeros$parameter)
+allpearsons["\" no French","r"]<-round(cor.noFrench.noZeros$estimate,3)
 
 aer=(noFrench$LENA-noFrench$gold)
 aer_no_zeros=(noFrench$LENA[noFrench$LENA>0 & noFrench$gold > 0]-noFrench$gold[noFrench$LENA>0 & noFrench$gold > 0])
@@ -244,7 +268,7 @@ arer=abs(no_human_zeros$LENA-no_human_zeros$gold)/no_human_zeros$gold*100
 aer_noFrench <-(noFrench$LENA-noFrench$gold)
 aer_nozeros_noFrench <-(noFrench$LENA[noFrench$LENA>0 & noFrench$gold > 0]-noFrench$gold[noFrench$LENA>0 & noFrench$gold > 0])
 
-aller["AWC no French",]<-cbind(mean(aer),min(aer),max(aer),
+aller["\" no French",]<-cbind(mean(aer),min(aer),max(aer),
                      mean(aer_no_zeros),min(aer_no_zeros),max(aer_no_zeros),
                      mean(rer),min(rer),max(rer),
                      mean(arer),min(arer),max(arer)
@@ -258,10 +282,10 @@ In the present version of the main paper, we followed the LENA^®^ definitions o
 
 
 ```{r CHN-count-fig, ig.pos = "T!", fig.width=3.5, fig.height=3.5, fig.cap="Key Child Segment counts recalculated from LENA reports (x axis; CHN counts, counting CHN segments regardless of whether they contain some linguistic stretches or not) and humans (y axis; CHI counts, counting segments attributed to the key child regardless of whether they were classified as linguistic or not). Each point represents the child segments totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA^®^  found zero child segments. The x and y ranges have been adjusted to be equal regardless of the data distribution."}
-myrange=range(cvtc[,c("gold_CHI_count","lena_CHN_count")],na.rm=T)
-plot(gold_CHI_count~lena_CHN_count,data=cvtc,pch=20,col=alpha("black",.2),xlab="LENA CHN counts",ylab="Human CHI counts",xlim=myrange,ylim=myrange)
-abline(lm(gold_CHI_count~lena_CHN_count,data=cvtc))
-abline(lm(gold_CHI_count~lena_CHN_count,data=cvtc,subset=c(cvtc$lena_CHN_count>0 & cvtc$gold_CHI_count>0)),lty=2)
+myrange=range(cvtc[,c("gold_CH_count","lena_CH_count")],na.rm=T)
+plot(gold_CH_count~lena_CH_count,data=cvtc,pch=20,col=alpha("black",.2),xlab="LENA CHN counts",ylab="Human CHI counts",xlim=myrange,ylim=myrange)
+abline(lm(gold_CH_count~lena_CH_count,data=cvtc))
+abline(lm(gold_CH_count~lena_CH_count,data=cvtc,subset=c(cvtc$lena_CH_count>0 & cvtc$gold_CH_count>0)),lty=2)
 
 ```
 
@@ -269,13 +293,13 @@ abline(lm(gold_CHI_count~lena_CHN_count,data=cvtc,subset=c(cvtc$lena_CHN_count>0
 
 ```{r tabrs, echo=F}
 
-apa_table(allpearsons,caption="For each measure (CVC, CHN counts, CTC, CTC all CHN, AWC, AWC no French -- see main text for details), N all stands for the total number of clips considered in the general correlation analysis and resulting Pearson r coefficient; N stands for the number of non-null clips (i.e., having some vocalizations, turns, and adult words respectively) as well as Pearson r in the analyses restricted to the non-null clips.",digits=c(0,0,3,0,3))
+apa_table(allpearsons,caption="For each measure (CVC, CHN counts, CTC, \" all CHI, AWC, \" no French -- see main text for details), N all stands for the total number of clips considered in the general correlation analysis and resulting Pearson r coefficient; N stands for the number of non-null clips (i.e., having some vocalizations, turns, and adult words respectively) as well as Pearson r in the analyses restricted to the non-null clips.",digits=c(0,0,3,0,3))
 ```
 
 
 ```{r tabrers, echo=F}
 
-apa_table(aller,caption="For each measure (CVC, CHN counts, CTC, CTC all CHN, AWC, AWC no French -- see main text for details), AER is the absolute error rate, AER-0 the same excluding clips with counts of zero according to either the human or the system, RER is the relative error rate and ARER the absolute relative error rate (the latter two exclude clips where the human count is zero). ",digits=0)
+apa_table(aller,caption="For each measure (CVC, CHN counts, CTC, \" all CHI, AWC, \" no French -- see main text for details), AER is the absolute error rate, AER-0 the same excluding clips with counts of zero according to either the human or the system, RER is the relative error rate and ARER the absolute relative error rate (the latter two exclude clips where the human count is zero). ",digits=0)
 ```
 
 
@@ -285,10 +309,10 @@ As with CVC, LENA^®^ counts infant-adult turns only if a child vocalization con
 
 
 ```{r CTC-all-count-fig, ig.pos = "T!", fig.width=3.5, fig.height=3.5, fig.cap="Conversational turns between Key Child and an adult recalculated from LENA reports and counting all CHN vocalizations, even if they do not contain any linguistic material (x axis) and humans (y axis; similarly counting all segments attributed to the key child regardless of whether they were classified as linguistic or not). Each point represents the turns totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA^®^  found zero turns. The x and y ranges have been adjusted to be equal regardless of the data distribution."}
-myrange=range(cvtc[,c("gold_CHI_count","lena_CHN_count")],na.rm=T)
-plot(gold_CHI_count~lena_CHN_count,data=cvtc,pch=20,col=alpha("black",.2),xlab="LENA CHN counts",ylab="Human CHI counts",xlim=myrange,ylim=myrange)
-abline(lm(gold_CHI_count~lena_CHN_count,data=cvtc))
-abline(lm(gold_CHI_count~lena_CHN_count,data=cvtc,subset=c(cvtc$lena_CHN_count>0 & cvtc$gold_CHI_count>0)),lty=2)
+myrange=range(cvtc[,c("gold_CH_count","lena_CH_count")],na.rm=T)
+plot(gold_CH_count~lena_CH_count,data=cvtc,pch=20,col=alpha("black",.2),xlab="LENA CHN counts",ylab="Human CHI counts",xlim=myrange,ylim=myrange)
+abline(lm(gold_CH_count~lena_CH_count,data=cvtc))
+abline(lm(gold_CH_count~lena_CH_count,data=cvtc,subset=c(cvtc$lena_CH_count>0 & cvtc$gold_CH_count>0)),lty=2)
 
 ```
 

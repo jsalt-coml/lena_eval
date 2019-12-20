@@ -56,7 +56,7 @@ read_its <- function(data_folder, gold_folder) {
     }
   }
   
-  data <- data %>% filter(spkr == "CHN" | spkr == "CHF" | spkr == "MAN" | spkr == "FAN" | spkr == "CXN") #ac added CHF for CVC/CTC counts
+  data <- data %>% filter(spkr == "CHN" | spkr == "CHF" | spkr == "MAN" | spkr == "FAN" | spkr == "CXN") #ac added CHF for CVC/CTC lena-like counts
   # columns to paste together
   cols <- c('child_id', 'onset', 'offset')
   data$onset = str_pad(data$onset, 6, pad = "0")
@@ -156,6 +156,7 @@ read_rttm <- function(data_folder) {
   next_spkr = factor(append(as.character(data[2:nrow(data), "mapped_speaker_type"]), "UNKUNK"))
   next_subtype = factor(append(as.character(data[2:nrow(data), "tier_subtype"]), "UNKUNK"))
 
+  #~~~~~~~~~~ CTC AS DEFINED CONCEPTUALLY BY LENA ~~~~~~~~~~~
   #here are our conditions for whether there is a turn:
   #cond1: if CHI produces a voc before the putative turn, 
   #       and this voc is linguistic (C or N (or W)) 
@@ -167,9 +168,18 @@ read_rttm <- function(data_folder) {
   #       and this voc is linguistic (C or N (or W)) 
   cond2 = (prev_spkr == 'MAL' | prev_spkr == 'FEM') & 
     next_spkr == 'CHI' & (next_subtype == "C" | next_subtype == "N" | next_subtype == "W")
-  data$adult_chi_swipe = cond1 | cond2
-  data$turn_taking = data$adult_chi_swipe & data$less_than_5
-  data = data[,c(1,2,3,11,12,13,14,4,5,6,7,8,9,10)]
+  data$adult_chi_swipe_lena = cond1 | cond2
+  data$turn_taking_lena = data$adult_chi_swipe_lena & data$less_than_5
+  
+    #~~~~~~~~~~ CTC with all child turns ~~~~~~~~~~~ #ac added
+  cond1_all = prev_spkr == 'CHI' & 
+    (next_spkr == 'MAL' | next_spkr == 'FEM')
+  cond2_all = (prev_spkr == 'MAL' | prev_spkr == 'FEM') & 
+    next_spkr == 'CHI'
+  data$adult_chi_swipe_all = cond1_all | cond2_all
+  data$turn_taking_all = data$adult_chi_swipe_all & data$less_than_5
+  
+  data = data[,c(1,2,3,11,12,13,14, 15, 16,4,5,6,7,8,9,10)] #ac
   return(data)
 }
 
@@ -199,11 +209,15 @@ get_stats_gold <- function(gold_data){
               short_CNV_count = sum(duration < 0.6))
 
   CTC = gold_data %>% dplyr::group_by(filename) %>%
-    dplyr::summarise(CTC_count = sum(turn_taking))
+    dplyr::summarise(CTC_count = sum(turn_taking_lena))
 
+  CTC_all = gold_data %>% dplyr::group_by(filename) %>%
+    dplyr::summarise(CTC_count_all = sum(turn_taking_all))
+  
   stats = merge(CVC, CNVC, all = TRUE)
-  stats = merge(stats, CC, all = TRUE)
+  stats = merge(stats, CC, all = TRUE) #ac added
   stats = merge(stats, CTC, all = TRUE)
+  stats = merge(stats, CTC_all, all = TRUE) #ac added
   stats[is.na(stats)] = 0
   return(stats)
 }
