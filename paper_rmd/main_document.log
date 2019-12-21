@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.11.1)  13 DEC 2019 12:19
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.5.23)  21 DEC 2019 14:41
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -599,10 +599,7 @@ Now handling font encoding U ...
    defining Unicode char U+2026 (decimal 8230)
    defining Unicode char U+2122 (decimal 8482)
    defining Unicode char U+2423 (decimal 9251)
-)) (/usr/local/texlive/2017/texmf-dist/tex/latex/upquote/upquote.sty
-Package: upquote 2012/04/19 v1.3 upright-quote and grave-accent glyphs in verba
-tim
-(/usr/local/texlive/2017/texmf-dist/tex/latex/base/textcomp.sty
+)) (/usr/local/texlive/2017/texmf-dist/tex/latex/base/textcomp.sty
 Package: textcomp 2017/04/05 v2.0i Standard LaTeX package
 Package textcomp Info: Sub-encoding information:
 (textcomp)               5 = only ISO-Adobe without \textcurrency
@@ -755,7 +752,10 @@ Package textcomp Info: Setting pplx sub-encoding to TS1/3 on input line 406.
 Package textcomp Info: Setting pplj sub-encoding to TS1/3 on input line 407.
 Package textcomp Info: Setting ptmx sub-encoding to TS1/4 on input line 408.
 Package textcomp Info: Setting ptmj sub-encoding to TS1/4 on input line 409.
-)) (/usr/local/texlive/2017/texmf-dist/tex/latex/microtype/microtype.sty
+) (/usr/local/texlive/2017/texmf-dist/tex/latex/upquote/upquote.sty
+Package: upquote 2012/04/19 v1.3 upright-quote and grave-accent glyphs in verba
+tim
+) (/usr/local/texlive/2017/texmf-dist/tex/latex/microtype/microtype.sty
 Package: microtype 2016/05/14 v2.6a Micro-typographical refinements (RS)
 \MT@toks=\toks26
 \MT@count=\count116
@@ -773,7 +773,9 @@ LaTeX Info: Redefining \lslig on input line 916.
 Package microtype Info: Loading configuration file microtype.cfg.
 (/usr/local/texlive/2017/texmf-dist/tex/latex/microtype/microtype.cfg
 File: microtype.cfg 2016/05/14 v2.6a microtype main configuration file (RS)
-)) (/usr/local/texlive/2017/texmf-dist/tex/latex/hyperref/hyperref.sty
+)) (/usr/local/texlive/2017/texmf-dist/tex/latex/parskip/parskip.sty
+Package: parskip 2001/04/09 non-zero parskip adjustments
+) (/usr/local/texlive/2017/texmf-dist/tex/latex/hyperref/hyperref.sty
 Package: hyperref 2017/03/14 v6.85a Hypertext links for LaTeX
 (/usr/local/texlive/2017/texmf-dist/tex/generic/oberdiek/hobsub-hyperref.sty
 Package: hobsub-hyperref 2016/05/16 v1.14 Bundle oberdiek, subset hyperref (HO)
@@ -831,6 +833,12 @@ Now handling font encoding PD1 ...
 (/usr/local/texlive/2017/texmf-dist/tex/latex/latexconfig/hyperref.cfg
 File: hyperref.cfg 2002/06/06 v1.2 hyperref configuration of TeXLive
 )
+Package hyperref Info: Option `unicode' set `true' on input line 4374.
+(/usr/local/texlive/2017/texmf-dist/tex/latex/hyperref/puenc.def
+File: puenc.def 2017/03/14 v6.85a Hyperref: PDF Unicode definition (HO)
+Now handling font encoding PU ...
+... no UTF-8 mapping file for font encoding PU
+)
 Package hyperref Info: Hyper figures OFF on input line 4498.
 Package hyperref Info: Link nesting OFF on input line 4503.
 Package hyperref Info: Hyper index ON on input line 4506.
@@ -875,43 +883,21 @@ Package uniquecounter Info: New unique counter `rerunfilecheck' on input line 2
 )
 \Hy@SectionHShift=\skip69
 )
-Package hyperref Info: Option `unicode' set `true' on input line 30.
-(/usr/local/texlive/2017/texmf-dist/tex/latex/hyperref/puenc.def
-File: puenc.def 2017/03/14 v6.85a Hyperref: PDF Unicode definition (HO)
-Now handling font encoding PU ...
-... no UTF-8 mapping file for font encoding PU
-)
-Package hyperref Info: Option `breaklinks' set `true' on input line 30.
-(/usr/local/texlive/2017/texmf-dist/tex/generic/babel/babel.sty
-Package: babel 2017/05/19 3.10 The Babel package
-(/usr/local/texlive/2017/texmf-dist/tex/generic/babel-english/english.ldf
-Language: english 2017/01/24 v3.3q English support from the babel system
-(/usr/local/texlive/2017/texmf-dist/tex/generic/babel/babel.def
-File: babel.def 2017/05/19 3.10 Babel common definitions
-\babel@savecnt=\count128
-\U@D=\dimen147
-)
-\l@canadian = a dialect from \language\l@american 
-\l@australian = a dialect from \language\l@british 
-\l@newzealand = a dialect from \language\l@british 
-) (/usr/local/texlive/2017/texmf-dist/tex/generic/babel-english/english.ldf
-Language: english 2017/01/24 v3.3q English support from the babel system
-)) (/usr/local/texlive/2017/texmf-dist/tex/latex/oberdiek/grffile.sty
+Package hyperref Info: Option `breaklinks' set `true' on input line 35.
+(/usr/local/texlive/2017/texmf-dist/tex/latex/oberdiek/grffile.sty
 Package: grffile 2016/05/16 v1.17 Extended file name support for graphics (HO)
 Package grffile Info: Option `multidot' is set to `true'.
 Package grffile Info: Option `extendedchars' is set to `false'.
 Package grffile Info: Option `space' is set to `true'.
 Package grffile Info: \Gin@ii of package `graphicx' fixed on input line 486.
-) (/usr/local/texlive/2017/texmf-dist/tex/latex/parskip/parskip.sty
-Package: parskip 2001/04/09 non-zero parskip adjustments
 ) (/usr/local/texlive/2017/texmf-dist/tex/latex/csquotes/csquotes.sty
 Package: csquotes 2017/03/11 v5.2b context-sensitive quotations (JAW)
-\csq@reset=\count129
-\csq@gtype=\count130
-\csq@glevel=\count131
-\csq@qlevel=\count132
-\csq@maxlvl=\count133
-\csq@tshold=\count134
+\csq@reset=\count128
+\csq@gtype=\count129
+\csq@glevel=\count130
+\csq@qlevel=\count131
+\csq@maxlvl=\count132
+\csq@tshold=\count133
 \csq@ltx@everypar=\toks27
 (/usr/local/texlive/2017/texmf-dist/tex/latex/csquotes/csquotes.def
 File: csquotes.def 2017/03/11 v5.2b csquotes generic definitions (JAW)
@@ -932,41 +918,41 @@ Package: longtable 2014/10/28 v4.11 Multi-page Table package (DPC)
 \LTright=\skip71
 \LTpre=\skip72
 \LTpost=\skip73
-\LTchunksize=\count135
-\LTcapwidth=\dimen148
+\LTchunksize=\count134
+\LTcapwidth=\dimen147
 \LT@head=\box32
 \LT@firsthead=\box33
 \LT@foot=\box34
 \LT@lastfoot=\box35
-\LT@cols=\count136
-\LT@rows=\count137
-\c@LT@tables=\count138
-\c@LT@chunks=\count139
+\LT@cols=\count135
+\LT@rows=\count136
+\c@LT@tables=\count137
+\c@LT@chunks=\count138
 \LT@p@ftn=\toks28
 ) (/usr/local/texlive/2017/texmf-dist/tex/latex/graphics/lscape.sty
 Package: lscape 2000/10/22 v3.01 Landscape Pages (DPC)
 ) (/usr/local/texlive/2017/texmf-dist/tex/latex/multirow/multirow.sty
 Package: multirow 2016/11/25 v2.2 Span multiple rows of a table
 \multirow@colwidth=\skip74
-\multirow@cntb=\count140
+\multirow@cntb=\count139
 \multirow@dima=\skip75
-\bigstrutjot=\dimen149
+\bigstrutjot=\dimen148
 ) (/usr/local/texlive/2017/texmf-dist/tex/latex/tools/tabularx.sty
 Package: tabularx 2016/02/03 v2.11 `tabularx' package (DPC)
 (/usr/local/texlive/2017/texmf-dist/tex/latex/tools/array.sty
 Package: array 2016/10/06 v2.4d Tabular extension package (FMi)
-\col@sep=\dimen150
-\extrarowheight=\dimen151
+\col@sep=\dimen149
+\extrarowheight=\dimen150
 \NC@list=\toks29
 \extratabsurround=\skip76
 \backup@length=\skip77
 )
-\TX@col@width=\dimen152
-\TX@old@table=\dimen153
-\TX@old@col=\dimen154
-\TX@target=\dimen155
-\TX@delta=\dimen156
-\TX@cols=\count141
+\TX@col@width=\dimen151
+\TX@old@table=\dimen152
+\TX@old@col=\dimen153
+\TX@target=\dimen154
+\TX@delta=\dimen155
+\TX@cols=\count140
 \TX@ftn=\toks30
 )
 (/usr/local/texlive/2017/texmf-dist/tex/latex/threeparttablex/threeparttablex.s
@@ -980,6 +966,21 @@ Package: trimspaces 2009/09/17 v1.1 Trim spaces around a token list
 \TPTL@width=\skip78
 )
 \longtablewidth=\skip79
+(/usr/local/texlive/2017/texmf-dist/tex/generic/babel/babel.sty
+Package: babel 2017/05/19 3.10 The Babel package
+(/usr/local/texlive/2017/texmf-dist/tex/generic/babel-english/english.ldf
+Language: english 2017/01/24 v3.3q English support from the babel system
+(/usr/local/texlive/2017/texmf-dist/tex/generic/babel/babel.def
+File: babel.def 2017/05/19 3.10 Babel common definitions
+\babel@savecnt=\count141
+\U@D=\dimen156
+)
+\l@canadian = a dialect from \language\l@american 
+\l@australian = a dialect from \language\l@british 
+\l@newzealand = a dialect from \language\l@british 
+) (/usr/local/texlive/2017/texmf-dist/tex/generic/babel-english/english.ldf
+Language: english 2017/01/24 v3.3q English support from the babel system
+))
 Package csquotes Info: Checking for multilingual support...
 Package csquotes Info: ... found 'babel' package.
 Package csquotes Info: Adjusting default style.
@@ -991,30 +992,30 @@ LaTeX Warning: Unused global option(s):
 (./main_document.aux)
 \openout1 = `main_document.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 112.
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 112.
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 112.
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 112.
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 112.
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 112.
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 112.
-LaTeX Font Info:    Try loading font information for TS1+cmr on input line 112.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 144.
+LaTeX Font Info:    ... okay on input line 144.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 144.
+LaTeX Font Info:    ... okay on input line 144.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 144.
+LaTeX Font Info:    ... okay on input line 144.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 144.
+LaTeX Font Info:    ... okay on input line 144.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 144.
+LaTeX Font Info:    ... okay on input line 144.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 144.
+LaTeX Font Info:    ... okay on input line 144.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 144.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 144.
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 112.
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 112.
-LaTeX Font Info:    ... okay on input line 112.
-LaTeX Font Info:    Try loading font information for T1+lmr on input line 112.
+LaTeX Font Info:    ... okay on input line 144.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 144.
+LaTeX Font Info:    ... okay on input line 144.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 144.
+LaTeX Font Info:    ... okay on input line 144.
+LaTeX Font Info:    Try loading font information for T1+lmr on input line 144.
 (/usr/local/texlive/2017/texmf-dist/tex/latex/lm/t1lmr.fd
 File: t1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
@@ -1090,7 +1091,7 @@ Package caption Info: longtable package is loaded.
 Package: ltcaption 2013/06/09 v1.4-94 longtable captions (AR)
 )
 Package caption Info: End \AtBeginDocument code.
-LaTeX Info: Redefining \microtypecontext on input line 112.
+LaTeX Info: Redefining \microtypecontext on input line 144.
 Package microtype Info: Generating PDF output.
 Package microtype Info: Character protrusion enabled (level 2).
 Package microtype Info: Using protrusion set `basicmath'.
@@ -1105,7 +1106,7 @@ File: mt-cmr.cfg 2013/05/19 v2.2 microtype config. file: Computer Modern Roman
 (RS)
 )
 \AtBeginShipoutBox=\box37
-Package hyperref Info: Link coloring OFF on input line 112.
+Package hyperref Info: Link coloring OFF on input line 144.
 (/usr/local/texlive/2017/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2016/05/21 v2.44 Cross-referencing by name of section
 (/usr/local/texlive/2017/texmf-dist/tex/generic/oberdiek/gettitlestring.sty
@@ -1113,46 +1114,46 @@ Package: gettitlestring 2016/05/16 v1.5 Cleanup title references (HO)
 )
 \c@section@level=\count148
 )
-LaTeX Info: Redefining \ref on input line 112.
-LaTeX Info: Redefining \pageref on input line 112.
-LaTeX Info: Redefining \nameref on input line 112.
+LaTeX Info: Redefining \ref on input line 144.
+LaTeX Info: Redefining \pageref on input line 144.
+LaTeX Info: Redefining \nameref on input line 144.
 (./main_document.out) (./main_document.out)
 \@outlinefile=\write5
 \openout5 = `main_document.out'.
 
-LaTeX Font Info:    Try loading font information for OT1+lmr on input line 114.
+LaTeX Font Info:    Try loading font information for OT1+lmr on input line 146.
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/lm/ot1lmr.fd
 File: ot1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OML+lmm on input line 114.
+LaTeX Font Info:    Try loading font information for OML+lmm on input line 146.
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/lm/omllmm.fd
 File: omllmm.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 114
+LaTeX Font Info:    Try loading font information for OMS+lmsy on input line 146
 .
 (/usr/local/texlive/2017/texmf-dist/tex/latex/lm/omslmsy.fd
 File: omslmsy.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
-LaTeX Font Info:    Try loading font information for OMX+lmex on input line 114
+LaTeX Font Info:    Try loading font information for OMX+lmex on input line 146
 .
 (/usr/local/texlive/2017/texmf-dist/tex/latex/lm/omxlmex.fd
 File: omxlmex.fd 2009/10/30 v1.6 Font defs for Latin Modern
 )
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <12> on input line 114.
+(Font)              <12> on input line 146.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <8> on input line 114.
+(Font)              <8> on input line 146.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <6> on input line 114.
-LaTeX Font Info:    Try loading font information for U+msa on input line 114.
+(Font)              <6> on input line 146.
+LaTeX Font Info:    Try loading font information for U+msa on input line 146.
 (/usr/local/texlive/2017/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 ) (/usr/local/texlive/2017/texmf-dist/tex/latex/microtype/mt-msa.cfg
 File: mt-msa.cfg 2006/02/04 v1.1 microtype config. file: AMS symbols (a) (RS)
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 114.
+LaTeX Font Info:    Try loading font information for U+msb on input line 146.
 (/usr/local/texlive/2017/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) (/usr/local/texlive/2017/texmf-dist/tex/latex/microtype/mt-msb.cfg
@@ -1162,20 +1163,20 @@ File: mt-eur.cfg 2006/07/31 v1.1 microtype config. file: AMS Euler Roman (RS)
 ) [1{/usr/local/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
 
 ]
-LaTeX Font Info:    Try loading font information for TS1+lmr on input line 114.
+LaTeX Font Info:    Try loading font information for TS1+lmr on input line 146.
 
 (/usr/local/texlive/2017/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2009/10/30 v1.6 Font defs for Latin Modern
 ) [2] [3]
 
 Package hyperref Warning: Difference (2) between bookmark levels is greater 
-(hyperref)                than one, level fixed on input line 125.
+(hyperref)                than one, level fixed on input line 157.
 
 
 Underfull \vbox (badness 2384) has occurred while \output is active []
 
 [4]
-Overfull \hbox (24.23827pt too wide) in paragraph at lines 135--149
+Overfull \hbox (24.23827pt too wide) in paragraph at lines 167--181
  [][] 
  []
 
@@ -1183,135 +1184,369 @@ Overfull \hbox (24.23827pt too wide) in paragraph at lines 135--149
 Underfull \vbox (badness 4805) has occurred while \output is active []
 
 [6] [7] [8] [9]
-Overfull \hbox (7.43579pt too wide) in paragraph at lines 192--192
+Overfull \hbox (7.43579pt too wide) in paragraph at lines 226--226
  []|\T1/lmr/m/n/12 (-20) Corpus| 
  []
 
 
-Overfull \hbox (29.03627pt too wide) in paragraph at lines 190--201
+Overfull \hbox (29.03627pt too wide) in paragraph at lines 224--235
  [][] 
  []
 
 [10]
 Underfull \vbox (badness 4752) has occurred while \output is active []
 
-[11] <fig_levels.pdf, id=164, 1156.32pt x 561.09625pt>
+[11] <fig_levels.pdf, id=161, 1156.32pt x 561.09625pt>
 File: fig_levels.pdf Graphic file (type pdf)
 <use fig_levels.pdf>
-Package pdftex.def Info: fig_levels.pdf used on input line 219.
+Package pdftex.def Info: fig_levels.pdf used on input line 252.
 (pdftex.def)             Requested size: 469.75385pt x 227.9448pt.
-[12] [13 <./fig_levels.pdf>] [14] [15] [16]
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 298.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 298.
-LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <5> on input line 298.
-[17] [18]
-Underfull \vbox (badness 6047) has occurred while \output is active []
+[12]
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[19]
+[13 <./fig_levels.pdf>]
 Underfull \vbox (badness 2384) has occurred while \output is active []
 
-[20] [21]
-Underfull \vbox (badness 6047) has occurred while \output is active []
+[14] [15] [16] [17]
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <10> on input line 331.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <7> on input line 331.
+LaTeX Font Info:    External font `lmex10' loaded for size
+(Font)              <5> on input line 331.
 
-[22] [23]
-<main_document_files/figure-latex/ggprec-fig-1.pdf, id=257, 453.695pt x 315.177
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[18] [19]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[20]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[21]
+Underfull \vbox (badness 4752) has occurred while \output is active []
+
+[22] [23] [24]
+<main_document_files/figure-latex/ggprec-fig-1.pdf, id=258, 453.695pt x 315.177
 5pt>
 File: main_document_files/figure-latex/ggprec-fig-1.pdf Graphic file (type pdf)
 
 <use main_document_files/figure-latex/ggprec-fig-1.pdf>
 Package pdftex.def Info: main_document_files/figure-latex/ggprec-fig-1.pdf used
- on input line 399.
+ on input line 430.
 (pdftex.def)             Requested size: 453.6939pt x 315.17673pt.
-[24]
+[25]
 Underfull \vbox (badness 8056) has occurred while \output is active []
 
-[25 <./main_document_files/figure-latex/ggprec-fig-1.pdf>]
-Underfull \vbox (badness 4752) has occurred while \output is active []
-
-[26]
-<main_document_files/figure-latex/ggrec-fig-1.pdf, id=283, 453.695pt x 315.1775
+[26 <./main_document_files/figure-latex/ggprec-fig-1.pdf>]
+<main_document_files/figure-latex/ggrec-fig-1.pdf, id=280, 453.695pt x 315.1775
 pt>
 File: main_document_files/figure-latex/ggrec-fig-1.pdf Graphic file (type pdf)
 <use main_document_files/figure-latex/ggrec-fig-1.pdf>
 Package pdftex.def Info: main_document_files/figure-latex/ggrec-fig-1.pdf used 
-on input line 418.
+on input line 450.
 (pdftex.def)             Requested size: 453.6939pt x 315.17673pt.
 
-Underfull \vbox (badness 1325) has occurred while \output is active []
+Underfull \vbox (badness 1406) has occurred while \output is active []
 
-[27 <./main_document_files/figure-latex/ggrec-fig-1.pdf>] [28]
-<main_document_files/figure-latex/cvc-fig-1.pdf, id=304, 223.83624pt x 179.6712
+[27]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[28 <./main_document_files/figure-latex/ggrec-fig-1.pdf>] [29]
+<main_document_files/figure-latex/cvc-fig-1.pdf, id=305, 223.83624pt x 179.6712
 5pt>
 File: main_document_files/figure-latex/cvc-fig-1.pdf Graphic file (type pdf)
 <use main_document_files/figure-latex/cvc-fig-1.pdf>
 Package pdftex.def Info: main_document_files/figure-latex/cvc-fig-1.pdf used on
- input line 447.
+ input line 479.
 (pdftex.def)             Requested size: 223.84251pt x 179.67627pt.
-[29] [30 <./main_document_files/figure-latex/cvc-fig-1.pdf>]
-<main_document_files/figure-latex/ctc-fig-1.pdf, id=328, 223.83624pt x 179.6712
+[30]
+<main_document_files/figure-latex/ctc-fig-1.pdf, id=313, 223.83624pt x 179.6712
 5pt>
 File: main_document_files/figure-latex/ctc-fig-1.pdf Graphic file (type pdf)
 <use main_document_files/figure-latex/ctc-fig-1.pdf>
 Package pdftex.def Info: main_document_files/figure-latex/ctc-fig-1.pdf used on
- input line 463.
+ input line 495.
 (pdftex.def)             Requested size: 223.84251pt x 179.67627pt.
-[31 <./main_document_files/figure-latex/ctc-fig-1.pdf>]
-Overfull \hbox (27.27986pt too wide) in paragraph at lines 501--515
+
+Underfull \vbox (badness 2582) has occurred while \output is active []
+
+[31 <./main_document_files/figure-latex/cvc-fig-1.pdf>]
+Overfull \hbox (27.27986pt too wide) in paragraph at lines 533--547
  [] 
  []
 
 
-<main_document_files/figure-latex/awc-fig-1.pdf, id=347, 223.83624pt x 213.7987
+<main_document_files/figure-latex/awc-fig-1.pdf, id=333, 223.83624pt x 213.7987
 5pt>
 File: main_document_files/figure-latex/awc-fig-1.pdf Graphic file (type pdf)
 <use main_document_files/figure-latex/awc-fig-1.pdf>
 Package pdftex.def Info: main_document_files/figure-latex/awc-fig-1.pdf used on
- input line 521.
+ input line 553.
 (pdftex.def)             Requested size: 223.8357pt x 213.79822pt.
 
-Underfull \vbox (badness 3029) has occurred while \output is active []
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[32] [33]
-<main_document_files/figure-latex/der-fig2-1.pdf, id=363, 444.66125pt x 251.941
-25pt>
+[32 <./main_document_files/figure-latex/ctc-fig-1.pdf>] [33]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[34 <./main_document_files/figure-latex/awc-fig-1.pdf>]
+<main_document_files/figure-latex/der-fig2-1.pdf, id=375, 443.6575pt x 309.155p
+t>
 File: main_document_files/figure-latex/der-fig2-1.pdf Graphic file (type pdf)
 <use main_document_files/figure-latex/der-fig2-1.pdf>
 Package pdftex.def Info: main_document_files/figure-latex/der-fig2-1.pdf used o
-n input line 562.
-(pdftex.def)             Requested size: 444.66016pt x 251.94063pt.
-[34 <./main_document_files/figure-latex/awc-fig-1.pdf>] [35]
-Underfull \vbox (badness 2478) has occurred while \output is active []
+n input line 594.
+(pdftex.def)             Requested size: 443.6564pt x 309.15424pt.
+[35]
+Underfull \vbox (badness 2582) has occurred while \output is active []
 
-[36 <./main_document_files/figure-latex/der-fig2-1.pdf>] [37] [38] [39] [40]
-Underfull \vbox (badness 2384) has occurred while \output is active []
+[36 <./main_document_files/figure-latex/der-fig2-1.pdf>]
+Underfull \vbox (badness 1360) has occurred while \output is active []
 
-[41] [42] [43]
-Underfull \vbox (badness 4752) has occurred while \output is active []
-
-[44] [45]
+[37] [38] [39]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
-[46] [47] [48] [49] [50] [51] AED endfloat: Processing end Figures and Tables [
-52]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 778.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 778.
+[40]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+[41]
+Underfull \vbox (badness 4752) has occurred while \output is active []
+
+[42] [43] [44] [45] [46] [47] [48] [49] [50] [51] [52]pdfTeX warning (ext4): de
+stination with the same identifier (name{ref-bergelson2016bergelson}) has been 
+already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.808 ...hypertarget{ref-bergelson2016bergelson}{}
+                                                  %pdfTeX warning (ext4): desti
+nation with the same identifier (name{ref-bergelson2019north}) has been already
+ used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.811 ...ode\hypertarget{ref-bergelson2019north}{}
+                                                  %pdfTeX warning (ext4): desti
+nation with the same identifier (name{ref-bergelson2017}) has been already used
+, duplicate ignored
+<to be read again> 
+                   \relax 
+l.814 \leavevmode\hypertarget{ref-bergelson2017}{}
+                                                  %pdfTeX warning (ext4): desti
+nation with the same identifier (name{ref-bredin2017pyannote}) has been already
+ used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.817 ...ode\hypertarget{ref-bredin2017pyannote}{}
+                                                  %pdfTeX warning (ext4): desti
+nation with the same identifier (name{ref-bulgarelli2019}) has been already use
+d, duplicate ignored
+<to be read again> 
+                   \relax 
+l.820 ...vevmode\hypertarget{ref-bulgarelli2019}{}
+                                                  %pdfTeX warning (ext4): desti
+nation with the same identifier (name{ref-Busch2018}) has been already used, du
+plicate ignored
+<to be read again> 
+                   \relax 
+l.823 \leavevmode\hypertarget{ref-Busch2018}{}
+                                              %pdfTeX warning (ext4): destinati
+on with the same identifier (name{ref-Canault2016}) has been already used, dupl
+icate ignored
+<to be read again> 
+                   \relax 
+l.826 \leavevmode\hypertarget{ref-Canault2016}{}
+                                                % [53]pdfTeX warning (ext4): de
+stination with the same identifier (name{ref-casillas2017a}) has been already u
+sed, duplicate ignored
+<to be read again> 
+                   \relax 
+l.829 \leavevmode\hypertarget{ref-casillas2017a}{}
+                                                  %pdfTeX warning (ext4): desti
+nation with the same identifier (name{ref-Cristia}) has been already used, dupl
+icate ignored
+<to be read again> 
+                   \relax 
+l.832 \leavevmode\hypertarget{ref-Cristia}{}
+                                            %pdfTeX warning (ext4): destination
+ with the same identifier (name{ref-d2019naturalistic}) has been already used, 
+duplicate ignored
+<to be read again> 
+                   \relax 
+l.835 ...mode\hypertarget{ref-d2019naturalistic}{}
+                                                  %pdfTeX warning (ext4): desti
+nation with the same identifier (name{ref-Elo}) has been already used, duplicat
+e ignored
+<to be read again> 
+                   \relax 
+l.838 \leavevmode\hypertarget{ref-Elo}{}
+                                        %pdfTeX warning (ext4): destination wit
+h the same identifier (name{ref-ganek2018concise}) has been already used, dupli
+cate ignored
+<to be read again> 
+                   \relax 
+l.841 ...vmode\hypertarget{ref-ganek2018concise}{}
+                                                  %pdfTeX warning (ext4): desti
+nation with the same identifier (name{ref-Gilkerson2008ltr6}) has been already 
+used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.844 ...mode\hypertarget{ref-Gilkerson2008ltr6}{}
+                                                  %pdfTeX warning (ext4): desti
+nation with the same identifier (name{ref-gilkerson2008lena}) has been already 
+used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.847 ...mode\hypertarget{ref-gilkerson2008lena}{}
+                                                  %pdfTeX warning (ext4): desti
+nation with the same identifier (name{ref-Gilkerson2017}) has been already used
+, duplicate ignored
+<to be read again> 
+                   \relax 
+l.850 \leavevmode\hypertarget{ref-Gilkerson2017}{}
+                                                  %pdfTeX warning (ext4): desti
+nation with the same identifier (name{ref-Gilkerson2016}) has been already used
+, duplicate ignored
+<to be read again> 
+                   \relax 
+l.853 \leavevmode\hypertarget{ref-Gilkerson2016}{}
+                                                  % [54]pdfTeX warning (ext4): 
+destination with the same identifier (name{ref-goh2008burstiness}) has been alr
+eady used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.856 ...mode\hypertarget{ref-goh2008burstiness}{}
+                                                  %pdfTeX warning (ext4): desti
+nation with the same identifier (name{ref-Greenwood2011}) has been already used
+, duplicate ignored
+<to be read again> 
+                   \relax 
+l.859 \leavevmode\hypertarget{ref-Greenwood2011}{}
+                                                  %pdfTeX warning (ext4): desti
+nation with the same identifier (name{ref-lamere2003cmu}) has been already used
+, duplicate ignored
+<to be read again> 
+                   \relax 
+l.862 \leavevmode\hypertarget{ref-lamere2003cmu}{}
+                                                  %pdfTeX warning (ext4): desti
+nation with the same identifier (name{ref-le2018aclew}) has been already used, 
+duplicate ignored
+<to be read again> 
+                   \relax 
+l.865 \leavevmode\hypertarget{ref-le2018aclew}{}
+                                                %pdfTeX warning (ext4): destina
+tion with the same identifier (name{ref-Lehet2018}) has been already used, dupl
+icate ignored
+<to be read again> 
+                   \relax 
+l.868 \leavevmode\hypertarget{ref-Lehet2018}{}
+                                              %pdfTeX warning (ext4): destinati
+on with the same identifier (name{ref-macwhinney2017tools}) has been already us
+ed, duplicate ignored
+<to be read again> 
+                   \relax 
+l.871 ...de\hypertarget{ref-macwhinney2017tools}{}
+                                                  %pdfTeX warning (ext4): desti
+nation with the same identifier (name{ref-mcdivitt2016mcdivitt}) has been alrea
+dy used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.874 ...e\hypertarget{ref-mcdivitt2016mcdivitt}{}
+                                                  %pdfTeX warning (ext4): desti
+nation with the same identifier (name{ref-Oller}) has been already used, duplic
+ate ignored
+<to be read again> 
+                   \relax 
+l.877 \leavevmode\hypertarget{ref-Oller}{}
+                                          % [55]pdfTeX warning (ext4): destinat
+ion with the same identifier (name{ref-orena_2019}) has been already used, dupl
+icate ignored
+<to be read again> 
+                   \relax 
+l.880 \leavevmode\hypertarget{ref-orena_2019}{}
+                                               %pdfTeX warning (ext4): destinat
+ion with the same identifier (name{ref-rowland2018}) has been already used, dup
+licate ignored
+<to be read again> 
+                   \relax 
+l.883 \leavevmode\hypertarget{ref-rowland2018}{}
+                                                %pdfTeX warning (ext4): destina
+tion with the same identifier (name{ref-ryant2019second}) has been already used
+, duplicate ignored
+<to be read again> 
+                   \relax 
+l.886 ...evmode\hypertarget{ref-ryant2019second}{}
+                                                  %pdfTeX warning (ext4): desti
+nation with the same identifier (name{ref-scaff}) has been already used, duplic
+ate ignored
+<to be read again> 
+                   \relax 
+l.889 \leavevmode\hypertarget{ref-scaff}{}
+                                          %pdfTeX warning (ext4): destination w
+ith the same identifier (name{ref-Seidl2018}) has been already used, duplicate 
+ignored
+<to be read again> 
+                   \relax 
+l.892 \leavevmode\hypertarget{ref-Seidl2018}{}
+                                              %pdfTeX warning (ext4): destinati
+on with the same identifier (name{ref-soderstrom}) has been already used, dupli
+cate ignored
+<to be read again> 
+                   \relax 
+l.895 \leavevmode\hypertarget{ref-soderstrom}{}
+                                               %pdfTeX warning (ext4): destinat
+ion with the same identifier (name{ref-VanDam2018}) has been already used, dupl
+icate ignored
+<to be read again> 
+                   \relax 
+l.898 \leavevmode\hypertarget{ref-VanDam2018}{}
+                                               %pdfTeX warning (ext4): destinat
+ion with the same identifier (name{ref-vandam2016homebank}) has been already us
+ed, duplicate ignored
+<to be read again> 
+                   \relax 
+l.901 ...ode\hypertarget{ref-vandam2016homebank}{}
+                                                  % [56]pdfTeX warning (ext4): 
+destination with the same identifier (name{ref-warlaumont2016warlaumont}) has b
+een already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.904 ...pertarget{ref-warlaumont2016warlaumont}{}
+                                                  %pdfTeX warning (ext4): desti
+nation with the same identifier (name{ref-Weisleder2013a}) has been already use
+d, duplicate ignored
+<to be read again> 
+                   \relax 
+l.907 ...vevmode\hypertarget{ref-Weisleder2013a}{}
+                                                  %pdfTeX warning (ext4): desti
+nation with the same identifier (name{ref-Xu2009a}) has been already used, dupl
+icate ignored
+<to be read again> 
+                   \relax 
+l.910 \leavevmode\hypertarget{ref-Xu2009a}{}
+                                            %pdfTeX warning (ext4): destination
+ with the same identifier (name{ref-zimmerman2009}) has been already used, dupl
+icate ignored
+<to be read again> 
+                   \relax 
+l.913 \leavevmode\hypertarget{ref-zimmerman2009}{}
+                                                  % AED endfloat: Processing en
+d Figures and Tables [57]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 916.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 916.
 (./main_document.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 778.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 778.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 916.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 916.
 Package rerunfilecheck Info: File `main_document.out' has not changed.
-(rerunfilecheck)             Checksum: 9D8C7283B3EFDEF3E6E95130D5726ED6;5376.
+(rerunfilecheck)             Checksum: E1FA4A0B7C0EE7C545BAD3D3FA8FAEEF;5291.
  ) 
 Here is how much of TeX's memory you used:
- 16235 strings out of 492995
- 240405 string characters out of 6132704
- 366332 words of memory out of 5000000
- 19214 multiletter control sequences out of 15000+600000
- 89531 words of font info for 132 fonts, out of 8000000 for 9000
+ 16242 strings out of 492995
+ 240453 string characters out of 6132704
+ 367664 words of memory out of 5000000
+ 19212 multiletter control sequences out of 15000+600000
+ 89713 words of font info for 134 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 43i,11n,47p,1713b,482s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 43i,11n,47p,2252b,482s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2017/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/usr/local
 /texlive/2017/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}</usr/local/texlive/2017/
 texmf-dist/fonts/type1/public/lm/lmbx12.pfb></usr/local/texlive/2017/texmf-dist
@@ -1321,10 +1556,10 @@ lm/lmr10.pfb></usr/local/texlive/2017/texmf-dist/fonts/type1/public/lm/lmr12.pf
 b></usr/local/texlive/2017/texmf-dist/fonts/type1/public/lm/lmr7.pfb></usr/loca
 l/texlive/2017/texmf-dist/fonts/type1/public/lm/lmr8.pfb></usr/local/texlive/20
 17/texmf-dist/fonts/type1/public/lm/lmri12.pfb>
-Output written on main_document.pdf (52 pages, 411256 bytes).
+Output written on main_document.pdf (57 pages, 416362 bytes).
 PDF statistics:
- 612 PDF objects out of 1000 (max. 8388607)
- 520 compressed objects within 6 object streams
- 180 named destinations out of 1000 (max. 500000)
- 10476 words of extra memory for PDF output out of 12000 (max. 10000000)
+ 640 PDF objects out of 1000 (max. 8388607)
+ 543 compressed objects within 6 object streams
+ 185 named destinations out of 1000 (max. 500000)
+ 10468 words of extra memory for PDF output out of 12000 (max. 10000000)
 
