@@ -1,0 +1,81 @@
+---
+title: "DIHARD_comparison"
+author: "EB"
+date: "1/5/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(skimr)
+```
+
+Looking at the DIHARD2 data that Neville sent along to Alex to add to eval.
+(I wasn't sure if this data was okay for public facing purposes so i just put it in a dropbox folder, but can move to github, just lmk. I.e. this won't knit for you if you don't also put the data from neville in that path)
+
+Just looking at track 1 and 2 since it was single channel 
+
+* Track 1 – single channel audio using reference SAD 
+* Track 2 – single channel audio using system SAD
+
+
+
+
+```{r read_in_data}
+
+track1 <- read_tsv("~/Dropbox/dihard_lena_eval/dihard2_scoring/data/track1/scores_by_domain.tsv") %>% 
+  filter(Domain=="CHILD" & IsFinal==T) %>% 
+  mutate(track = "track1")
+track2 <-read_tsv("~/Dropbox/dihard_lena_eval/dihard2_scoring/data/track2/scores_by_domain.tsv") %>% 
+  filter(Domain=="CHILD" & IsFinal==T) %>% 
+  mutate(track = "track2")
+
+track1_2 <- bind_rows(track1, track2)
+#View(track1)
+#View(track2)
+```
+
+# Initial look
+
+* any other filtering i should be doing?
+```{r initial_look}
+summary(track1_2)
+glimpse(track1_2)
+skim(track1_2)
+```
+
+## Boxplot 
+but the value's here don't look exactly the same as his CHILD boxplot in this folder: is2019_dihard2_figures
+for DIHARD2 track 1 or track 2 DER
+
+* maybe he used different filtering on the data?
+* maybe i shouldn't allow multiples per User/team?
+```{r boxplot_data}
+ggplot(track1_2, aes(Domain, DER))+geom_boxplot()+
+  facet_wrap(~track)
+
+```
+
+## Summary descriptives
+(mean, median, min, max DER)
+
+```{r summary_stats}
+track1_2 %>% 
+  summarise(mean(DER),
+            median(DER),
+            min(DER),
+            max(DER)
+            )
+
+track1_2 %>% 
+  group_by(track) %>% 
+  summarise(mean(DER),
+            median(DER),
+            min(DER),
+            max(DER)
+            )
+
+
+```
+

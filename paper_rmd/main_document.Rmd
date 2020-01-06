@@ -200,7 +200,7 @@ The original coding was converted using custom-written python scripts into a sta
 * **F**alse **A**larm rate = FA/T (T=**T**otal # of frames that contain talk),
 * **M**iss rate = M/T,
 * **C**onfusion rate = C/T,
-* **ID**entification **E**rror **R**ate (DER) = (FA+M+C)/T
+* **ID**entification **E**rror **R**ate (IDER) = (FA+M+C)/T
 
 In the human annotation, there is no class representing overlapping speech as such. For the sake of completeness and full comparison with the LENA^®^ model, if two or more different speech sources were active at the same time according to the human annotators, these frames have been mapped to the class "overlap" post hoc. This allows us to compare this Overlap class to the LENA^®^ system's OLN (and, for the precision/recall analysis introduced next, OLF). Therefore, in the most complete analysis, the confusion rate is computed based on the human-LENA^®^ matches in Table 3.
 
@@ -633,7 +633,7 @@ abline(lm(gold~LENA,data=awc,subset=c(awc$gold>0 & awc$LENA>0)),lty=2)
 ```
 
 
-The association between clip-level LENA^®^ and human AWC in the four English-spoken corpora was strong (Figure 6): the Pearson correlation between the two was r=`r round(cor.awc.all$estimate,3)` (p=`r signif(cor.awc.all$p.value,3)`) when all clips were taken into account, and r=`r round(cor.awc.noZeros$estimate,3)` (p=`r signif(cor.awc.noZeros$p.value,3)`)  when only clips with some adult speech (i.e., excluding `r sum(awc$gold>0 & awc$LENA>0)` clips with 0 counts in both LENA^®^ and human annotations) were considered. This suggests that the LENA^®^ system captures  differences in terms of number of adult word counts across clips well. 
+The association between clip-level LENA^®^ and human AWC in the four English-spoken corpora was strong (Figure 6): the Pearson correlation between the two was r=`r round(cor.awc.all$estimate,3)` (p=`r printp(cor.awc.all$p.value)`) when all clips were taken into account, and r=`r round(cor.awc.noZeros$estimate,3)` (p=`r printp(cor.awc.noZeros$p.value)`)  when only clips with some adult speech (i.e., excluding `r sum(awc$gold>0 & awc$LENA>0)` clips with 0 counts in both LENA^®^ and human annotations) were considered. This suggests that the LENA^®^ system captures  differences in terms of number of adult word counts across clips well. 
 
 The *absolute error rate* ranged from `r min(aer)`% to `r max(aer)`%, with a mean of `r mean(aer)`% and a median of `r median(aer)`%. Excluding clips where both human and LENA^®^ counts were zero, 
 the mean was `r mean(aer_no_zeros)`% and the median was `r median(aer_no_zeros)`%. As for CVC and CTC, calculating *relative error rates* necessitated removing the `r sum(awc$gold>0)` clips in which the human annotator said there were no adult words whatsoever. The mean relative error rate ranged from `r min(rer)`% to `r max(rer)`%, with a mean of `r mean(rer)`% and a median of `r median(rer)`%. Finally, the *absolute relative error* rate ranged from `r min(arer)`% to `r max(arer)`%, with a mean of `r mean(arer)`% and a median of `r median(arer)`%. 
