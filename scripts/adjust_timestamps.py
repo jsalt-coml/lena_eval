@@ -174,9 +174,13 @@ def write_rttm(output, rttm_path, annotations):
 
     with open(os.path.join(output, rttm_path), 'w') as fout:
         rttm_name = rttm_path.split('.')[0]
-        for name, t0, length, transcript, vcm_xds, participant in annotations:
-            fout.write(u"SPEAKER\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format
-                       (rttm_name, 1, "%.2f" %t0, "%.2f" %length, transcript, vcm_xds, participant, "<NA>"))
+
+        if not (len(annotations) == 1 and annotations[0][1:] == (-1, -1, -1, -1, -1)):
+            for name, t0, length, transcript, vcm_xds, participant in annotations:
+                fout.write(u"SPEAKER\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format
+                           (rttm_name, 1, "%.2f" %t0, "%.2f" %length, transcript, vcm_xds, participant, "<NA>"))
+
+
 
 def get_all_on_offs(eaf):
     """ 
@@ -255,12 +259,14 @@ def extract_from_rttm(on_offs, rttm):
     # create dict { (annotated segments) -> [annotation] }
     extract_rttm = defaultdict(list)
     for on, off in on_offs:
+        at_least_one = False
         for name, t0, length, transcript, xds_vcm, participant in sorted_rttm:
             end = t0 + length
             if (on <= t0 < off) or (on <= end < off):
                 # if the current annotation is (at least partially)
                 # contained in the current segment, append it.
                 # Adjust the segment to strictly fit in on-off
+                at_least_one = True
                 t0 = max(t0, on)
                 end = min(end, off)
                 length = end - t0
@@ -268,6 +274,7 @@ def extract_from_rttm(on_offs, rttm):
                                                 length,
                                                 transcript, xds_vcm, participant))
             elif (on > t0) and (end >= off):
+                at_least_one = True
                 # if the current annotation completely contains the annotated
                 # segment, add it also. This shouldn't happen, so print a 
                 # warning also.
@@ -283,6 +290,9 @@ def extract_from_rttm(on_offs, rttm):
             elif (t0 >= off):
                 # no point in continuing further since the rttm is sorted.
                 break
+        if not at_least_one:
+            extract_rttm[(on,off)].append((name, -1, -1, -1, -1, -1))
+
     return extract_rttm
 
 def main():
@@ -330,6 +340,7 @@ def main():
 
     if len(extract_rttm) == 0:
         raise ValueError("No chunks have been found ! Check if on_offs or code tier are present in the eaf")
+
     # write one rttm file per on_off/code segment
     for key in extract_rttm:
         base = os.path.basename(args.eaf)
