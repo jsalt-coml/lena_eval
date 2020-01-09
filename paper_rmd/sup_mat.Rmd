@@ -355,6 +355,23 @@ for(dv in mydv){
 rownames(anovatab)<-rownames(mycols)
 
 ```
+
+There is a 2-way interaction between age and corpus for confusion. To investigate this we fit the same regression within each corpus.
+
+```{r confusion-followup, echo=F}
+mymodels2<- list()
+myANOVAs2<- list()
+for(thiscor in levels(py$cor)){ 
+  print(thiscor)
+ mymodels2[[thiscor]]<-lmer(py[,"confusion.."]~age + (1|child), data=py,subset=c(cor==thiscor))
+ print(mymodels2[[thiscor]])
+ myANOVAs2[[thiscor]]<-Anova(mymodels2[[thiscor]],type="III")
+ print(myANOVAs2[[thiscor]])
+}
+
+```
+
+
 \newpage
 
 ### CVC
