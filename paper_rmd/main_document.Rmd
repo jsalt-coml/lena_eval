@@ -143,7 +143,7 @@ Finally, the present study relies on a collaborative effort across several labs.
 
 ## Methods
 
-This paper was written using RMarkDown [@baumer2014r] in R [@team2013r] running on Rstudio [@rstudio]. It can be downloaded and reproduced using the data also available from the Open Science Framework, https://osf.io/zdg6s. These online supplementary materials also include a document with additional analyses. 
+This paper was written using RMarkDown [@baumer2014r] in R [@team2013r] running on Rstudio [@rstudio]. It can be downloaded and reproduced using the data also available from the Open Science Framework, https://osf.io/zdg6s. These online Supplementary Materials also include a document with the full output of all models discussed here as well as additional analyses. 
 
 
 ### Corpora
@@ -251,7 +251,7 @@ Finally, the *absolute error rate* is calculated with the formula abs(NL-NH)/NL,
 
 For the AWC portion of this evaluation, we could only use transcriptions from the four ACLEW corpora, since the TSI corpus has not been transcribed (and thus lacks word counts). Annotators for the four ACLEW corpora were proficient in the language spoken in the daylong recording, and transcribed all adult speech based using canonical lexical forms (e.g. 'wanna', not 'want to') in keeping with minCHAT format [@macwhinney2017tools]. 
 
-Reference adult word counts were determined by counting all unambiguously transcribed words spoken by adult talkers. This was achieved by first discarding all non-lexical transcript entries such as non-linguistic communicative sounds, paralinguistic markers, and markers indicating incomprehensible speech. In addition, all utterances from the key child and other children were omitted from the Adult Word Count(AWC). The remaining orthographic entries separated by whitespaces were then counted as gold standard target words for LENA^®^ to detect.\footnote{It turned out that one child in the (otherwise English) SOD corpus was learning French. Given our definition of orthographic words which is not language-specific processing, we have included this child to increase power, but results without them are nearly identical. See online Supplementary Materials for analyses excluding this child.}  
+Reference adult word counts were determined by counting all unambiguously transcribed words spoken by adult talkers. This was achieved by first discarding all non-lexical transcript entries such as non-linguistic communicative sounds, paralinguistic markers, and markers indicating incomprehensible speech. In addition, all utterances from the key child and other children were omitted from the Adult Word Count(AWC). The remaining orthographic entries separated by whitespaces were then counted as gold standard target words for LENA^®^ to detect.
 
 For the LENA^®^ Adult Word Counts, the regions sampled for manual annotation were not guaranteed to perfectly align with LENA^®^ segments. Of all LENA^®^ segments found within the extracted clips, 14% straddled a clip boundary (i.e., the segment began before the clip started; or it ended after the extracted clip ended). To match LENA^®^ AWCs with the annotated word counts, words from these straddling LENA^®^ segments were included in proportion to the length of the LENA^®^ segment included in the clip (e.g., if 10% of the duration of a LENA^®^ segment fell within a clip, 10% of the LENA^®^ AWC estimate for that segment was included in the LENA^®^ word count estimate for that clip). AWC was evaluated using Pearson correlations and error analyses, similarly to CVC and CTC.
 
@@ -474,7 +474,7 @@ allpearsons["CVC","r"]<-round(cor.cvc.noZeros$estimate,3)
 
 We extracted Child Vocalizaton Counts from LENA^®^'s output and contrasted them with clip-level counts of linguistic vocalizations by the key child in the human annotation.[^3] As shown in Figure 4, there is a strong association between clip-level counts estimated via the LENA^®^ system and those found in the human annotations: the Pearson correlation between the two was r = `r round(cor.cvc.all$estimate,3)` (p = `r printp(cor.cvc.all$p.value)`) when all clips were taken into account, and r = `r round(cor.cvc.noZeros$estimate,3)` (p = `r printp(cor.cvc.noZeros$p.value)`)  when only clips with some child speech (i.e., excluding clips with 0 counts in both LENA^®^ and human annotations) were considered (see Table 6 for correlation results of CVC, CTC, and AWC analyses). This suggests that the LENA^®^ system captures  differences in terms of number of child vocalizations across clips rather well.
 
-[^3]: In a previous version of this analysis, we had calculated CVC as the number of CHN segments in LENA^®^, and the number of vocalizations classified as linguistic by human annotators. Further inspection of LENA^®^ documentation revealed this decision was incorrect, since LENA^®^ counts linguistic utterances (and not non-linguistic vocalizations); it can count several of these within the same CHN segment; and it even includes such utterances when part of a CHF segment. Given the inaccuracy of CHF, the latter decision seems potentially problematic. The same issue affected our CTC analyses. We now present in the main paper analyses that respect LENA^®^'s reported CVC and CTC, because that is what our colleagues are using. In Supplementary Materials, we show results of the correlations and error analyses when CVCs are calculated as the number of CHN/CHI segments instead, which are identical, and CTC derived from CHN/CHI segments, which yield slightly worse results than those reported on here. 
+[^3]: In a previous version of this analysis, we had calculated CVC as the number of CHN segments in LENA^®^, and the number of vocalizations classified as linguistic by human annotators. Further inspection of LENA^®^ documentation revealed this decision was incorrect, since LENA^®^ counts linguistic utterances (and not non-linguistic vocalizations); it can count several of these within the same CHN segment; and it even includes such utterances when part of a CHF segment. Given the inaccuracy of CHF, the latter decision seems potentially problematic. The same issue affected our CTC analyses. We now present in the main paper analyses that respect LENA^®^'s reported CVC and CTC, because that is what our colleagues are using. In Supplementary Materials (https://osf.io/zdg6s), we show results of the correlations and error analyses when CVCs are calculated as the number of CHN/CHI segments instead, which are identical, and CTC derived from CHN/CHI segments, which yield slightly worse results than those reported on here. 
 
 <!-- eb: #same value with and without speech clips?? ac2eb the code is correct-->
 
@@ -583,7 +583,20 @@ Error analyses can be found on Table 7. Inspection of errors and error rates rev
 
 ### Adult Word Counts accuracy 
 
+One child in the (otherwise English) SOD corpus was learning French. Given our definition of orthographic words which is not language-specific processing, we have included this child to increase power, but results without them are nearly identical. See online Supplementary Materials, https://osf.io/zdg6s, for analyses excluding this child. In addition, a total of nine clips from three different WAR children contained some Spanish. Since we are uncertain of how accurate the transcriptions are for Spanish sentences, these clips were removed from consideration altogether.
+
 ```{r awc, echo=F}
+exclude=c('WAR_3090_043920_044040', #WAR_3090_043920_044040
+'WAR_3090_048720_048840',
+'WAR_3090_055920_056040',
+'WAR_3528_003060_003180',
+'WAR_5613_020040_020160',
+'WAR_5613_034620_034740',
+'WAR_5613_038820_038940',
+'WAR_5613_044400_044520',
+'WAR_5613_053760_053880')
+
+awc=awc[!(as.character(awc$filename) %in% exclude),]
 
 cor.awc.all= cor.test(awc$gold,awc$LENA)
 cor.awc.noZeros= cor.test(awc$gold[awc$gold>0 & awc$LENA>0],awc$LENA[awc$gold>0 & awc$LENA>0])
@@ -656,7 +669,7 @@ apa_table(aller,caption="Mean (range) for each type of error estimate for CVC, C
 
 ### Effects of age and differences across corpora 
 
-The preceding sections include overall results, with all but AWC conducted over all corpora. However, it is possible that performance would be higher for the corpora collected in North America (BER, WAR, SOD) than those collected in other English-speaking countries (L05) or non-English speaking populations (TSI). Additionally, our age ranges are wide, and in the case of TSI children, some of the children are older than the oldest children in the LENA^®^ training set. To assess whether accuracy varies as a function of corpora and child age, we fit mixed models. We report on key results here; for the full model output and additional analyses, please refer to our online supplementary materials (https://osf.io/zdg6s).
+The preceding sections include overall results, with all but AWC conducted over all corpora. However, it is possible that performance would be higher for the corpora collected in North America (BER, WAR, SOD) than those collected in other English-speaking countries (L05) or non-English speaking populations (TSI). Additionally, our age ranges are wide, and in the case of TSI children, some of the children are older than the oldest children in the LENA^®^ training set. To assess whether accuracy varies as a function of corpora and child age, we fit mixed models. We report on key results here; for the full model output and additional analyses, please refer to our online Supplementary Materials (https://osf.io/zdg6s).
 <!-- eb: still need to add actual model tables to output or minimally SI ac2eb they are in supplementary materials, adding a sentence that full info can be found there-->
 
 #### Are there differences in false alarm, miss, and confusion rates as a function of corpus and child age? 
@@ -709,16 +722,16 @@ rownames(anovatab)<-rownames(mycols)
 #there is a 2-way interaction between age and corpus for confusion
 # to investigate this we fit the same reg within corpus
 
-mymodels2<- list()
-myANOVAs2<- list()
+mymodels_c<- list()
+myANOVAs_c<- list()
 maxChiSq=0
 minp=1
 for(thiscor in levels(py$cor)){ 
   #print(thiscor)
- mymodels2[[thiscor]]<-lmer(py[,"confusion.."]~age + (1|child), data=py,subset=c(cor==thiscor))
- myANOVAs2[[thiscor]]<-Anova(mymodels2[[thiscor]],type="III")
- maxChiSq=max(maxChiSq,myANOVAs2[[thiscor]][,1][2])
-if(thiscor!="SOD")  minp=min(minp,myANOVAs2[[thiscor]][,3][2])
+ mymodels_c[[thiscor]]<-lmer(py[,"confusion.."]~age + (1|child), data=py,subset=c(cor==thiscor))
+ myANOVAs_c[[thiscor]]<-Anova(mymodels_c[[thiscor]],type="III")
+ maxChiSq=max(maxChiSq,myANOVAs_c[[thiscor]][,1][2])
+if(thiscor!="SOD")  minp=min(minp,myANOVAs_c[[thiscor]][,3][2])
 }
 
 ```
@@ -731,7 +744,7 @@ apa_table(anovatab,caption="Results of Type III ANOVAs on false alarms (FA), mis
 ```
 
 
-Across all analyses, corpus, child age, and their interaction were never significant, with the exception of confusion, where the interaction between corpus and age was significant at alpha=.05. To investigate this effect further, we fit a mixed model predicting confusion rates from child age as fixed and child ID as random effects on each corpus separately. This revealed a main effect of age for SOD only (Chisq (`r myANOVAs2[["SOD"]][,2][2]`) = `r round(myANOVAs2[["SOD"]][,1][2],2)`, p = `r printp(myANOVAs2[["SOD"]][,3][2])`; all other chi-squares were smaller than `r round(maxChisSq,2)`, p > `r printp(minp)`).
+Across all analyses, corpus, child age, and their interaction were never significant, with the exception of confusion, where the interaction between corpus and age was significant at alpha=.05. To investigate this effect further, we fit a mixed model predicting confusion rates from child age as fixed and child ID as random effects on each corpus separately. This revealed a main effect of age for SOD only (Chisq (`r myANOVAs_c[["SOD"]][,2][2]`) = `r round(myANOVAs_c[["SOD"]][,1][2],2)`, p = `r printp(myANOVAs_c[["SOD"]][,3][2])`; all other chi-squares were smaller than `r round(maxChiSq,2)`, p > `r printp(minp)`).
 
 
 #### Are there differences in CVC accuracy as a function of corpus and child age?
@@ -750,24 +763,13 @@ myAnova<-Anova(mymodel,type="III")
 mycols=cbind(round(myAnova$Chisq,2),round(myAnova$Df),round(myAnova["Pr(>Chisq)"],2))
 anovatab[,"CVC"]<-paste0(mycols[,1]," (",mycols[,2],")",ifelse(mycols[,3]<.05," *",""))
 
-#there is a 3-way interaction between age, corpus, and the predictive value of the LENA^®^ system's  counts with respect to the gold counts
-# to investigate this we fit the same reg within corpus
-
-mymodels<- list()
-myANOVAs<- list()
-for(thiscor in levels(as.factor(cvtc$cor))){ 
-  #print(thiscor)
- mymodels[[thiscor]]<-lmer(gold_CV_count~lena_CV_count + (1|child), data=cvtc,subset=c(cor==thiscor))
- myANOVAs[[thiscor]]<-Anova(mymodels[[thiscor]],type="III")
-}
+#main effect of LENA_CV_count, no sig interactions
 ```
 
 
 #### Are there differences in CTC accuracy as a function of corpus and child age?
 
-For CTC, we fit a mixed model where CTC according to the human was predicted from CTC according to LENA^®^, in interaction with corpus and age, as fixed factors, declaring child ID as a random effect. This time our Type III ANOVA found a main effect of the LENA^®^ CTC estimates and a main effect of corpus, but no significant interactions. 
-<!-- eb: how about adding "i.e., there were different quantities of CTC across corpora, but human CTC was not differentially predicted by system CTC" -->
-
+For CTC, we fit a mixed model where CTC according to the human was predicted from CTC according to LENA^®^, in interaction with corpus and age, as fixed factors, declaring child ID as a random effect. This time our Type III ANOVA found a main effect of the LENA^®^ CTC estimates, as well as an interaction between this factor and corpus. We followed up on this by fitting a model where CTC according to the human was predicted from CTC according to LENA^®^ as fixed and child ID as random factor, for each corpus separately. 
 
 ```{r ctc-age, echo=F}
 
@@ -778,7 +780,15 @@ myAnova<-Anova(mymodel,type="III")
 mycols=cbind(round(myAnova$Chisq,2),round(myAnova$Df),round(myAnova["Pr(>Chisq)"],2))
 anovatab[,"CTC"]<-paste0(mycols[,1]," (",mycols[,2],")",ifelse(mycols[,3]<.05," *",""))
 
+mymodels_ctc<- list()
+myANOVAs_ctc<- list()
+for(thiscor in levels(factor(cvtc$cor))){
+ mymodels_ctc[[thiscor]]<-lmer(gold_CTC_count~lena_CTC_count + (1|child), data=cvtc,subset=c(cor==thiscor))
+ myANOVAs_ctc[[thiscor]]<-Anova(mymodels_ctc[[thiscor]],type="III")
+}
 ```
+
+Inspection of these results (full output available from the Supplementary Materials, https://osf.io/zdg6s) suggests that the interaction emerged because the predictive value of LENA^®^'s CTC with respect to human counts was stronger for some corpora (Chi-squares for ROW `r round(myANOVAs_ctc[["ROW"]][,1][2],2)`,  BER `r round(myANOVAs_ctc[["BER"]][,1][2],2)`, and TSI  `r round(myANOVAs_ctc[["TSI"]][,1][2],2)`) than others (Chi-squares for WAR `r round(myANOVAs_ctc[["WAR"]][,1][2],2)`, and SOD `r round(myANOVAs_ctc[["SOD"]][,1][2],2)`; all degrees of freedom are 1, and p < .001).
 
 #### Are there differences in AWC accuracy as a function of corpus and child age?
 
