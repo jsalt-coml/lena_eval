@@ -442,7 +442,7 @@ Anova(mymodel,type="III")
 ```
 
 
-There is a 3-way interaction between age, corpus, and the predictive value of the LENA^®^ system's  counts with respect to the gold counts. To investigate this we fit the same regression within each corpus.
+There is a 3-way and both 2-way interactions between age, corpus, and the predictive value of the LENA^®^ system's  counts with respect to the gold counts. To investigate this we fit the same regression within each corpus.
 
 
 ```{r 3way-awc,echo=F}
