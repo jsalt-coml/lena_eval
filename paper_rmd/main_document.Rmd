@@ -629,10 +629,6 @@ apa_table(allpearsons,caption="Number of clips (N) and corresponding Pearson r c
 
 
 
-```{r awc-fig, ig.pos = "T!", fig.width=3.5, fig.height=3.5, fig.cap="Adult Word Counts (AWC) according to LENA (x axis) and humans (y axis). Each point represents the AWC totaled within a clip. The solid line corresponds to a linear regression fit to data from all clips; the dashed line corresponds to an analysis excluding clips where both the human and LENA^®^ said there were no adult words. The x and y ranges have been adjusted to be equal regardless of the data distribution for ease of visual comparison."}
-
-```
-
 
 The association between clip-level LENA^®^ and human AWC in the four English-spoken corpora was strong, even when only clips with some adult speech (i.e., excluding `r sum(awc$gold>0 & awc$LENA>0)` clips with 0 counts in both LENA^®^ and human annotations) were considered. This suggests that the LENA^®^ system captures  differences in terms of number of AWC across clips well. Error analyses for AWC  reveal a different pattern from before, as the system exhibits a slight tendency to over-estimate AWC. However, this trend was inconsistent, leading to the highest  absolute error rate metric among the three derived counts. 
 
@@ -664,7 +660,7 @@ The preceding sections include overall results collapsing across corpora. Howeve
  
 
 
-```{r der-fig2, fig.cap="Identification error rate as a function of corpus and child age. Each point represents the median over all clips extracted from the data of one child. Color and shape indicates corpus: BER in blue circles, L05 is green triangles, SOD in black squares, TSI in gray pluses, and WAR in purple crossed squares. A number of the children had a median identification error rate of zero due to the fact that they had many clips in which there was no speech, and LENA^®^ had no false alarms, pulling the median to zero."}
+```{r der-fig2, out.width = "\\textwidth", fig.pos = "!h", fig.cap="Identification error rate as a function of corpus and child age. Each point represents the median over all clips extracted from the data of one child. Color and shape indicates corpus: BER in blue circles, L05 is green triangles, SOD in black squares, TSI in gray pluses, and WAR in purple crossed squares. A number of the children had a median identification error rate of zero due to the fact that they had many clips in which there was no speech, and LENA had no false alarms, pulling the median to zero."}
 #use median for the central tendency, interquartile range for the variance
 
 bychild=aggregate(py$identification.error.rate..,list(py$child,py$cor,py$age),median,na.rm=T)
@@ -678,7 +674,7 @@ bychild %>%
          `Identification error rate` = x) %>% as.data.frame() %>% 
 ggplot(aes(`Age in months`, `Identification error rate`, color = corpus, shape = corpus))+
   geom_point()+
-  theme_bw(base_size = 18)+
+  theme_bw(base_size = 12)+
   scale_color_manual(values = mycols)+
   scale_shape( solid = FALSE)
 ```
