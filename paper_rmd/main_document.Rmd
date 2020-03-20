@@ -61,7 +61,7 @@ header-includes:
   - \usepackage{array}
   - \usepackage{float}
 
-output            : papaja::apa6_pdf
+output            : papaja::apa6_word
 
 ---
 
@@ -240,7 +240,7 @@ Human <- c("CHI", "OCH", "FEM", "MAL", "ELE*", "OVL")
 Talker <- c("Key Child","Other Child", "Female Adult","Male Adult", "Electronics","Overlap")
 
 cor_tsi <- data.frame(Talker, LENA, Human)
-kable(cor_tsi, "latex", caption = "Correspondances between LENA and our human annotation tags for each talker type. Additional analyses remove one or both of the last two rows. *Electronic voices were only annotated in the ACLEW dataset. N.B. Although some Tsimane' families listen to the radio, radio speech was not annotated in the TSI corpus.", booktabs = T) %>%
+kable(cor_tsi, "latex", caption = "Correspondences between LENA and our human annotation tags for each talker type. Additional analyses remove one or both of the last two rows. *Electronic voices were only annotated in the ACLEW dataset. N.B. Although some Tsimane' families listen to the radio, radio speech was not annotated in the TSI corpus.", booktabs = T) %>%
 #  kable_styling(latex_options = "striped", position = "center",full_width = F)  %>%
   column_spec(1, width = "4cm") %>% 
   column_spec(2, width = "2cm") %>%
@@ -250,7 +250,7 @@ kable(cor_tsi, "latex", caption = "Correspondances between LENA and our human an
 ```
 
 
-However, our overlap category is not defined identically to the LENA^®^ overlap category. For LENA^®^, overlap between any two categories is labeled OLN -- i.e., Noise + CHN would be counted towards overlap as would FAN+FAN; whereas for us, only overlap between two sources (e.g., key child and female adult, key child and electronic speech; but not key child + noise since noise was not coded) counts as overlap. Similarly, the TVN LENA^®^ class is not equivalent to the electronic speech tag in the ACLEW coding, because the former also includes music, singing, crowd noise and any other sound coming from a TV or another electronic source, whereas the latter only includes speech from an electronic source. Therefore, Table 3 mentions some correspondances, but since these are not perfect, additional analyses map overlap and electronic classes onto "Other" post hoc, so as to not penalize LENA^®^ due to a divergence in coding criteria.
+However, our overlap category is not defined identically to the LENA^®^ overlap category. For LENA^®^, overlap between any two categories is labeled OLN -- i.e., Noise + CHN would be counted towards overlap as would FAN+FAN; whereas for us, only overlap between two sources (e.g., key child and female adult, key child and electronic speech; but not key child + noise since noise was not coded) counts as overlap. Similarly, the TVN LENA^®^ class is not equivalent to the electronic speech tag in the ACLEW coding, because the former also includes music, singing, crowd noise and any other sound coming from a TV or another electronic source, whereas the latter only includes speech from an electronic source. Therefore, Table 3 mentions some correspondances, but since these are not perfect, additional analyses map overlap and electronic classes onto "Other" post hoc, so as to not penalize LENA^®^ due to a divergence in coding criteria. Table 4 shows the prevalence of the different classes.
 
 
 #### Precision and recall
@@ -291,9 +291,9 @@ The 1- or 2-minute clips sampled for manual annotation were not guaranteed to pe
 ```{r tabprops, echo=F}
 tab=matrix(nrow=7,ncol=3)
 tab[,1]=rbind(sum(sumref[grep("CHI",rownames(all))]),
-      sum(sumref[grep("FEM",rownames(all))]),
+       sum(sumref[grep("OCH",rownames(all))]),
+     sum(sumref[grep("FEM",rownames(all))]),
       sum(sumref[grep("MAL",rownames(all))]),
-      sum(sumref[grep("OCH",rownames(all))]),
       sum(sumref[grep("OVL",rownames(all))]),
       sum(sumref[grep("ELE",rownames(all))]),
       sum(sumref[grep("SIL",rownames(all))])
@@ -301,7 +301,7 @@ tab[,1]=rbind(sum(sumref[grep("CHI",rownames(all))]),
 tab[,2]=round(tab[,1]/sum(sumref)*100)
 tab[,3]=round(tab[,1]/100/60)
 colnames(tab)<-c("Frames","Percentage","Minutes")
-rownames(tab)<-c("CHI","FEM","MAL","OCH","OVL","ELE","Other")
+rownames(tab)<-c("CHI","OCH","FEM","MAL","OVL","ELE","Other")
 #k,f,m,oc,o,e,s
 apa_table(tab,caption="Number of frames, percentage of frames, and number of minutes attributed to each category by the human annotators.",digits=0)
 ```
@@ -315,7 +315,7 @@ Before starting, we provide some general observations based on the manual human 
 ### LENA^®^ classification accuracy: False alarm, miss, confusion rates
 
 
-The analysis that yields the best LENA^®^ performance (Table 5, Speakers) focuses on the clean human speaker categories while mapping electronic voices and overlap in the human annotation onto Other, so that the categories considered in the human annotation are FEM, MAL, CHI, OCH, alongside using only CHN, FAN, MAN, and CXN as speakers in the LENA^®^ annotation, (with all "far" categories, TVN, and OLN all mapped onto Other; see Tables 1 and 3). 
+The analysis that yields the best LENA^®^ performance (Table 2, Speakers) focuses on the clean human speaker categories while mapping electronic voices and overlap in the human annotation onto Other, so that the categories considered in the human annotation are FEM, MAL, CHI, OCH, alongside using only CHN, FAN, MAN, and CXN as speakers in the LENA^®^ annotation, (with all "far" categories, TVN, and OLN all mapped onto Other; see Tables 1 and 3). 
 Calculated in this way, LENA^®^'s *false alarm* rate (i.e., tagging a speech category when there was none) and *confusion* rate (i.e., providing the wrong label) were lowest. Notably, however, the *miss* rate (i.e., the system returns a judgment that no sound label is activated) was double that found with the other analysis alternatives.
 
 In the second-best performing case (Table 5, +Electronic), overlap found in the human annotation is still mapped onto Other but Electronic voices are not, so that the human categories considered were CHI, FEM, MAL, OCH, and ELE; and the LENA^®^ categories considered were CHN, FAN, MAN, CXN, and TVN (with all "far" classes and OLN mapped onto Other). 
@@ -682,7 +682,7 @@ ggplot(aes(`Age in months`, `Identification error rate`, color = corpus, shape =
 ```
 
 
-Figure 5 represents identification error rate as a function of age and corpus for individual children. To test the possible impact of age and corpus statistically, we predicted false alarm, miss, and confusion rates in the analysis with all "Far" categories, TVN/ELE, and OLN/OVL mapped onto Other (which yielded the best results in Section "False alarms, misses, confusion" above.) Our predictors were corpus, child age, and their interaction as fixed effects, and child ID as a random effect. We followed up with a Type III ANOVA to assess significance.
+Figure 6 represents identification error rate as a function of age and corpus for individual children. To test the possible impact of age and corpus statistically, we predicted false alarm, miss, and confusion rates in the analysis with all "Far" categories, TVN/ELE, and OLN/OVL mapped onto Other (which yielded the best results in Section "False alarms, misses, confusion" above.) Our predictors were corpus, child age, and their interaction as fixed effects, and child ID as a random effect. We followed up with a Type III ANOVA to assess significance  (see Table 8).
 
 
 ```{r lmer-dm, echo=F}

@@ -1,7 +1,7 @@
-"FAN, MAN, CHN, CXN"	"Basic “meaningful speech” (near and clear speech) categories used by LENA for further processing: Female Adult Near, Male Adult Near, Key Child Near and Other Child Near categories respectively."
-"NON, TVN, OLN, SIL"	"Basic non-speech categories: Noise Near,  Television Near, Overlap Near, Silence."
-"FAF, MAF, etc."	“Far” (low probability) versions of each "Near" category.
+FAN, MAN, CHN, CXN	Basic meaningful speech (near and clear speech) categories used by LENA for further processing: Female Adult Near, Male Adult Near, Key Child Near and Other Child Near categories respectively.
+NON, TVN, OLN, SIL	Basic non-speech categories: Noise Near,  Television Near, Overlap Near, Silence.
+FAF, MAF, etc.	Far (low probability) versions of each Near category.
 Key child	Child wearing recorder
 AWC	Adult Word Count (estimated within FAN and MAN vocalizations)
-CVC	"Child Vocalization Count (estimated for non-cry, non-vegetative portions of CHN)"
+CVC	Child Vocalization Count (estimated for non-cry, non-vegetative portions of CHN)
 CTC	Conversational Turn Count (estimated for turns between FAN or MAN and CHN)
