@@ -116,7 +116,7 @@ awc=awc[!(as.character(awc$filename) %in% exclude),]
 
 While nearly all humans eventually become competent users of their language(s), documenting the experiential context of early acquisition is crucial for both theoretical and applied reasons. Regarding theory, there are many open questions about what kinds of experiences and interactions are necessary, sufficient, or optimal for supporting language development. Moreover, the ability to accurately and quickly assess an infant's state of development at a given point in time is of central importance for clinical purposes, both for children with known risks of language delays and disorders, and those who might not be identified based on risk factors. Reliable assessments are also crucial for measuring intervention efficacy. 
 
-One approach that has been making its way into the mainstream literature across basic and applied  research on language and cognition relies on day-long recordings gathered with a LENA^®^ audiorecorder [e.g., @Greenwood2011; @Oller; @Gilkerson2017; @VanDam2018], and further analyzed using automated, closed-source algorithms. As we summarize below, this approach has many advantages, which may explain its expanding popularity. While over a hundred papers over the past two decades have used the output automatically provided by LENA^®^, only a handful include validity estimates [e.g., @Weisleder2013a; @zimmerman2009; @d2019naturalistic], even fewer where validity estimation was the primary focus of the paper [e.g., @Busch2018; @Canault2016; @ganek2018concise; @bulgarelli2019; @Lehet2018]. As a result, few studies report sufficient details about validation accuracy for one or more metrics, limiting the interpretability of the results of a meta-analytic assessment [cf. @Cristia].
+One approach that has been making its way into the mainstream literature across basic and applied  research on language and cognition relies on day-long recordings gathered with a LENA^®^ audiorecorder [e.g., @Gilkerson2017; @Greenwood2011; @Oller; @VanDam2018], and further analyzed using automated, closed-source algorithms. As we summarize below, this approach has many advantages, which may explain its expanding popularity. While over a hundred papers over the past two decades have used the output automatically provided by LENA^®^, only a handful include validity estimates [e.g., @d2019naturalistic; @Weisleder2013a; @zimmerman2009], even fewer where validity estimation was the primary focus of the paper [e.g. @bulgarelli2019; @Busch2018; @Canault2016; @ganek2018concise; @Lehet2018]. As a result, few studies report sufficient details about validation accuracy for one or more metrics, limiting the interpretability of the results of a meta-analytic assessment [cf. @Cristia].
 The work undertaken thus far also has some limitations, which are described further in the "Previous Validation" section below. Bearing these in mind, we endeavored to conduct an evaluation that is fully independent of the LENA^®^ algorithms' automated  assessment, permitting a systematic, extensive, and independent evaluation of its key metrics, in a large sample of diverse infants, including (a) a sample of children similar to the LENA^®^ training set (i.e. infants and toddlers, growing up in North American English-speaking homes, and aged 3-36 months), (b) a group of similarly aged children learning a different dialect (UK English); and (c) slightly older children learning a different language in a very different socio-cultural setting (Tsimane'-learning children in rural Bolivia). 
 
 
@@ -219,7 +219,7 @@ Given that there need not be a one-to-one correspondence between LENA^®^ segmen
 Our first  goal was to establish LENA^®^ talker tag accuracy, particularly for the four broad LENA^®^ talker categories (key child, other child, female adult, male adult; or CHN, CXN, FAN, MAN), while taking into account other categories (with some limitations on their interpretation clarified below). We calculated accuracy in two complementary ways. First, we used three frame-based standard metrics of speech and talker segmentation to allow direct comparison with other systems in the speech technology literature (False Alarm Rate, Miss Rate, Confusion Rate). We also use Identification Error Rate, which is derived by summing the first three metrics; together these provide a stringent and standard test of accuracy. Second, we used frame-based precision and recall of each category to provide an intuitive representation of the error patterns shown by this system. 
 
 Since these metrics establish errors relative to speech quantity, a problem emerges when there is no speech whatsoever in a given file. This is never discussed in the speech technology literature, because most researchers working on this are basing their analyses on files that have been selected to contain speech (e.g., recorded in a meeting, or during a phone conversation). We still wanted to take into account clips with no speech because this was central for our research goals: We need systems that can deal well with long stretches of Other (i.e., non-speech or silence), because we want to measure in an unbiased manner how much speech (and silence!) children hear. Unfortunately, in the `r round(sum(is.na(py$confusion..))/dim(py)[1]*100)`% of  clips that had no speech whatsoever, the false alarm, miss, and confusion rates are all undefined, because the denominator is zero. 
-  To be able to take clips with no speech into account, we defined the following rules. First, if a clip had no speech according to the human annotator, while LENA said there was speech, then the false alarm rate was 100%, and the miss and confusion rates were zero. Second, if on the contrary,  both the human annotator and LENA said there was no speech, then all the error rates were zero. Notice that in some cases there was just a little speech; in this case, the denominator was very small, and therefore the ratio for these two metrics ended up being a very large number, resulting in what may be outliers. 
+  To be able to take clips with no speech into account, we defined the following rules. First, if a clip had no speech according to the human annotator, while LENA said there was speech, then the false alarm rate was 100%, and the miss and confusion rates were zero. Second, if on the contrary,  both the human annotator and LENA said there was no speech, then all the error rates were zero. Notice that when the the denominator is very small because there is very little speech, the ratio for these two metrics ended up being a very large number, resulting in what may be outliers. 
   
 #### Speech and talker segmentation metrics
 
@@ -320,7 +320,7 @@ Calculated in this way, LENA^®^'s *false alarm* rate (i.e., tagging a speech ca
 
 In the second-best performing case (Table 5, +Electronic), overlap found in the human annotation is still mapped onto Other but Electronic voices are not, so that the human categories considered were CHI, FEM, MAL, OCH, and ELE; and the LENA^®^ categories considered were CHN, FAN, MAN, CXN, and TVN (with all "far" classes and OLN mapped onto Other). 
 
-Finally, performance was worst when included also overlapping regions (Table 5, +Overlap), such that the human categories considered were CHI, FEM, MAL, OCH, overlap, and electronic; and the LENA^®^ categories considered were CHN, FAN, MAN,  CXN, OLN, and TVN. It is likely that these differences are partially due to OLN and TVN not being defined similarly across the LENA^®^ system and human annotators. 
+Finally, performance was worst when we included also overlapping regions (Table 5, +Overlap), such that the human categories considered were CHI, FEM, MAL, OCH, overlap, and electronic; and the LENA^®^ categories considered were CHN, FAN, MAN,  CXN, OLN, and TVN. It is likely that these differences are partially due to OLN and TVN not being defined similarly across the LENA^®^ system and human annotators. 
 
 
 
@@ -334,7 +334,7 @@ mytab=cbind(mytab,aggregate(allpy[allpy$item!="TOTAL",c("false.alarm..","missed.
 colnames(mytab)<-c("FAR","MR","CR","IDER","FAR","MR","CR","IDER","FAR","MR","CR","IDER")
 rownames(mytab)<-c("Speakers","+ Electronic","+ Overlap")
 
-apa_table(mytab,caption="False Alarm Rate (FAR), Miss Rate (MR), Confusion Rate, and total Identification Error Rate (IDER, sum of the medians of the other three categories), as a function of which categories are considered. Speakers indicates that only speaker categories are considers (all others are mapped onto Other); + Electronic that also electronic was scored; + Overlap that electronic and overlap in both human and LENA annotation were also scored. To be maximally informative, we report results in three ways: (1) *weighted by speech*: Overall false alarm, miss, and confusion rates over all clips together, thus giving more weight to clips with more speech; (2) *equal weight per clip*: means across clips, which represent central tendency when giving equal weight to clips with more versus less or no speech; and (3) *accounting for potential outliers*: since means are not robust to outliers, we also report the median across all clips.", digits=0,col_spanners=list(`Overall`=c(2,5),`Mean`=c(6,9),`Median`=c(10,13)))
+apa_table(mytab,caption="False Alarm Rate (FAR), Miss Rate (MR), Confusion Rate, and total Identification Error Rate (IDER, sum of the medians of the other three categories), as a function of which categories are considered. Speakers indicates that only speaker categories are considered (all others are mapped onto Other); + Electronic that also electronic was scored; + Overlap that electronic and overlap in both human and LENA annotations were also scored. To be maximally informative, we report results in three ways: (1) weighted by speech: Overall false alarm, miss, and confusion rates over all clips together, thus giving more weight to clips with more speech; (2) equal weight per clip: means across clips, which represent central tendency when giving equal weight to clips with more versus less or no speech; and (3) accounting for potential outliers: since means are not robust to outliers, we also report the median across all clips.", digits=0,col_spanners=list(`Overall`=c(2,5),`Mean`=c(6,9),`Median`=c(10,13)))
 ```
 
 
@@ -365,7 +365,8 @@ ggplot(data = stall, mapping = aes(y = stall$human, x=stall$LENA)) +
  geom_tile(aes(fill= rescale(stall$pr)), colour = "white") +
   geom_text(aes(label = paste(round(stall$pr),"%")), vjust = -1,size=2) +
   geom_text(aes(label = stall$n), vjust = 1,size=2) +
-  scale_fill_gradient(low = "white", high = "red", name = "Proportion") +
+  scale_fill_gradient(low = "white", high = "red", name = "Percentage") +
+     theme(legend.position = "none") +
   xlab("LENA(TM)") + ylab("Human")
 
 rownames(all_far)[rownames(all_far)=="Other"]<-"SIL"
@@ -410,7 +411,8 @@ ggplot(data = stall, mapping = aes(y = stall$human, x=stall$LENA)) +
   geom_tile(aes(fill= rescale(stall$rec)), colour = "white") +
   geom_text(aes(label = paste(round(stall$rec),"%")), vjust = -1,size=2) + 
   geom_text(aes(label = stall$n), vjust = 1,size=2) + 
-  scale_fill_gradient(low = "white", high = "darkgreen", name = "Proportion") +
+  scale_fill_gradient(low = "white", high = "darkgreen", name = "Percentage") +
+     theme(legend.position = "none") +
   xlab("LENA(TM)") + ylab("Human")
 
 rownames(all_far)[rownames(all_far)=="Other"]<-"SIL"
@@ -475,7 +477,7 @@ allpearsons["CVC","r"]<-round(cor.cvc.noZeros$estimate,3)
 
 The accuracy of derived counts (CVC, CTC, AWC) is represented graphically in Figure 4, statistics are provided in Table 6, and error metrics in Table 7.
 
-For CVC, there is a strong association between clip-level counts estimated via the LENA^®^ system and those found in the human annotation, which is not much affected when only clips with some child speech (i.e., excluding `r sum(cvtc$lena_CV_count>0 & cvtc$gold_CV_count>0)` clips with 0 counts in both LENA^®^ and human annotations) were considered. This suggests that the LENA^®^ system captures  differences in terms of number of child vocalizations across clips rather well. The error analyses reveal that, generally speaking, LENA^®^ has a slight tendency to underestimate vocalization counts, particularly when only clips with some child speech are considered. This understimation, however, is not systematic, and cumulating errors using the absolute error rate suggests that the deviation from the actual counts might be quite significant.
+For CVC, there is a strong association between clip-level counts estimated via the LENA^®^ system and those found in the human annotation, which is not much affected when only clips with some child speech (i.e., excluding `r sum(cvtc$lena_CV_count>0 & cvtc$gold_CV_count>0)` clips with 0 counts in both LENA^®^ and human annotations) were considered. This suggests that the LENA^®^ system captures  differences in terms of number of child vocalizations across clips rather well. The error analyses reveal that, generally speaking, LENA^®^ has a slight tendency to underestimate vocalization counts. This understimation, however, is not systematic, and cumulating errors using the absolute error rate suggests that the deviation from the actual counts might be quite significant.
 
 
 
@@ -486,20 +488,20 @@ layout(matrix(c(1:3),1,3))
 
 #CVC
 myrange=range(cvtc[,c("gold_CV_count","lena_CV_count")],na.rm=T)
-plot(gold_CV_count~lena_CV_count,data=cvtc,pch=20,col=alpha("black",.2),xlab="LENA CVC",ylab="Human CVC",xlim=myrange,ylim=myrange, main="CVC")
+plot(gold_CV_count~lena_CV_count,data=cvtc,pch=20,col=alpha("orange",.2),xlab="LENA CVC",ylab="Human CVC",xlim=myrange,ylim=myrange, main="CVC")
 abline(lm(gold_CV_count~lena_CV_count,data=cvtc))
 abline(lm(gold_CV_count~lena_CV_count,data=cvtc,subset=c(cvtc$lena_CV_count>0 & cvtc$gold_CV_count>0)),lty=2)
 
 #CTC
 myrange=range(cvtc[,c("gold_CTC_count","lena_CTC_count")],na.rm = T)
-plot(gold_CTC_count~lena_CTC_count,data=cvtc,pch=20,col=alpha("blue",.2),xlab="LENA CTC",ylab="Human CTC",xlim=myrange,ylim=myrange, main="CTC")
+plot(gold_CTC_count~lena_CTC_count,data=cvtc,pch=20,col=alpha("lightgoldenrod4",.2),xlab="LENA CTC",ylab="Human CTC",xlim=myrange,ylim=myrange, main="CTC")
 abline(lm(gold_CTC_count~lena_CTC_count,data=cvtc))
 abline(lm(gold_CTC_count~lena_CTC_count,data=cvtc,subset=c(cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0)),lty=2)
 
 #AWC
 myrange=range(awc[,c("gold","LENA")],na.rm = T)
 
-plot(gold~LENA,data=awc,pch=20,main="AWC",col=alpha("orange",.2),xlab="LENA AWC",ylab="Human AWC",xlim=myrange,ylim=myrange)
+plot(gold~LENA,data=awc,pch=20,main="AWC",col=alpha("lightblue3",.2),xlab="LENA AWC",ylab="Human AWC",xlim=myrange,ylim=myrange)
 abline(lm(gold~LENA,data=awc))
 abline(lm(gold~LENA,data=awc,subset=c(awc$gold>0 & awc$LENA>0)),lty=2)
 ```
@@ -583,7 +585,7 @@ aller["CTC",]<-cbind(mean(aer),min(aer),max(aer),
 ```
 
 
-As for CTC, the association between clip-level LENA^®^ and human CTC was weaker than that found for CVC, particularly when only clips with some child speech (i.e., excluding `r sum(cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0)` clips with 0 counts in both LENA^®^ and human annotations) were considered.   Inspection of errors and error rates reveals that LENA^®^ tends to underestimate turn counts, which is particularly clear when excluding clips with no turns. As with CVC, the bias varied across clips leading to a substantial cumulative absolute error rate. 
+As for CTC, the association between clip-level LENA^®^ and human CTC was weaker than that found for CVC, particularly when only clips with some child speech (i.e., excluding `r sum(cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0)` clips with 0 counts in both LENA^®^ and human annotations) were considered.   Inspection of errors and error rates reveals that LENA^®^ tends to underestimate turn counts. As with CVC, the bias varied across clips leading to a substantial cumulative absolute error rate. 
 
 
 
@@ -811,7 +813,7 @@ apa_table(anovatab,caption="Results of Type III ANOVAs when predicting human cou
 The aim of the present study was to assess LENA^®^ accuracy across key outcome measures: speaker classification accuracy, Child Vocalization Counts (CVC),  Conversational Turn Counts (CTC), and Adult Word Counts (AWC).  We did this using an approach that sought to avoid inflating accuracy estimates in several ways. Methodologically, we used random or periodic sampling to select portions of the files for manual annotation, and our human annotators did not see the LENA^®^ segmentation. Analytically, we considered both speech and non-speech classes (including electronic sounds and silence/Other). This permitted a systematic, extensive, and independent evaluation of LENA^®^'s key automated metrics. We also tested generalizability by analyzing LENA^®^'s performance across five different corpora: three based on the same population, language, dialect, and age group that LENA^®^ was established for, and trained on (North American English); one that allowed us to test how accurately it captured a different dialect of English (UK English); and one that tested its performance in a totally different recording situation (a rural setting with large families and many children present, speaking a linguistically unrelated language, and where the key children were, on average, somewhat older). We begin by recapping our key results.
 
 
-Our first set of analyses tested overall accuracy, using established speech and talker segmentation metrics (false alarm rate, miss rate, confusion rate, and the composite identification error rate), and evaluated the pattern of errors in more detail, by assessing how LENA^®^ and human annotators agreed (precision and recall).  The identification error rate was relatively high (global `r round(allpy[allpy$item=="TOTAL","identification.error.rate.."])`%), mainly due to a high miss rate (missing or excluding speech that was there; `r round(allpy[allpy$item=="TOTAL","missed.detection.."])`%). The false alarm rate (identifying non-speech/silence as speech; `r round(allpy[allpy$item=="TOTAL","false.alarm.."])`%) and confusion rate (identifying voice type; `r round(allpy[allpy$item=="TOTAL","confusion.."])`%) were low. 
+Our first set of analyses tested overall accuracy, using established speech and talker segmentation metrics (false alarm rate, miss rate, confusion rate, and the composite identification error rate), and evaluated the pattern of errors in more detail, by assessing how LENA^®^ and human annotators agreed (precision and recall).  We observed a rather high miss rate (missing or excluding speech that was there; `r round(allpy[allpy$item=="TOTAL","missed.detection.."])`%). The false alarm rate (identifying non-speech/silence as speech; `r round(allpy[allpy$item=="TOTAL","false.alarm.."])`%) and confusion rate (identifying voice type; `r round(allpy[allpy$item=="TOTAL","confusion.."])`%) were low. The overall identification error rate (which sums across the three error rates) was relatively high (global `r round(allpy[allpy$item=="TOTAL","identification.error.rate.."])`%).
 
 
 
@@ -867,7 +869,7 @@ First, we recommend a literature search [starting from  @Cristia's  a systematic
 
 One issue that may arise is whether data should be sampled differently to, for example, make sure every class is represented the same amount of time and/or a minimum of time. Our understanding is that class imbalance and data scarceness is an important issue for training, and directly affects algorithm accuracy [this is a general problem, but to cite just one example on GMMs, @garcia2011data]. However, it does not pose the same kind of problem for evaluation. That is, if there are no samples of a given category, then accuracy cannot be evaluated; if there are only a few, then it is possible that these are special in some way and accuracy estimates may not generalize well to others. Thus, it would indeed be desirable to have enough samples of a given label to reduce the impact of each individual instance, in case they are outliers. That said, almost any strategy that attempts to boost the frequency of specific categories risks worsening  non-generalizability concerns. For instance, if one were to over-sample regions tagged by LENA^®^ as MAN in the hopes of having more male samples, one may only be capturing certain types of male speech or acoustic properties. To take this example further, notice that male speech is our smallest category, representing 3% of the data. Since we sampled randomly or periodically, this represents the prevalence of male speech and the samples that are included are unlikely to be acoustically biased.
 
-Separately, researchers should reflect about the accuracy needed for their question of interest. For instance, suppose we have an evaluation of an intervention where we expect treatment children to hear 20% more speech than controls, or an individual difference study where we expect that the lower fifth of the children hear 20% less speech than the top fifth. If the intended measure used to compare groups has an error rate larger than the effect predicted (such as the the CTC error rate we find here), a different algorithm or outcome metric would be wise.
+Separately, researchers should reflect on the accuracy needed for their question of interest. For instance, suppose we have an evaluation of an intervention where we expect treatment children to hear 20% more speech than controls, or an individual difference study where we expect that the lower fifth of the children hear 20% less speech than the top fifth. If the intended measure used to compare groups has an error rate larger than the effect predicted (such as the the CTC error rate we find here), a different algorithm or outcome metric would be wise.
 
 ## Conclusions
 
@@ -878,7 +880,7 @@ There are, however, a number of areas of research that we have not addressed.  F
 
 Even if it turns out that LENA^®^ is not accurate enough to classify children precisely for a given ability or diagnosis, it may be accurate enough to capture the rank order of individual children's language growth, which can provide useful information about the relative language level of children in a sample or population [see, e.g., @Gilkerson2017]. Similarly, LENA^®^ may not accurately capture the precise number of child vocalisations produced over time, but it may track developmental trajectory (e.g., the slope of growth) relatively well. Finally, although our results suggest that aspects of the system's output may be relatively robust to differences across languages and dialects, we need more evidence of how it fares across mono- and multi-lingual language environments [cf. @orena_2019]. 
 
-It is undeniable that children learn language from the world around them. Naturalistic daylong recordings offer an important avenue to examine this uniquely human development, alongside other fundamental questions about human interaction, linguistic typology, psychology, and sociology. Tools and approaches that allow us to tap such recordings' contents stand to contribute deeply to our understanding of these processes. We look forward to further work that addresses the many remaining questions within this area.
+It is undeniable that children learn language from the world around them. Naturalistic daylong recordings offer an important avenue to examine this uniquely human development, alongside other fundamental questions about human interaction, linguistic typology, psychology, and sociology. Tools and approaches that allow us to tap into such recordings' contents stand to contribute deeply to our understanding of these processes. We look forward to further work that addresses the many remaining questions within this area.
 
 
 ## Acknowledgments
