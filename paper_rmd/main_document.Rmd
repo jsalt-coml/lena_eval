@@ -61,7 +61,7 @@ header-includes:
   - \usepackage{array}
   - \usepackage{float}
 
-output            : papaja::apa6_word
+output            : papaja::apa6_pdf
 
 ---
 
@@ -245,7 +245,7 @@ kable(cor_tsi, "latex", caption = "Correspondences between LENA and our human an
   column_spec(1, width = "4cm") %>% 
   column_spec(2, width = "2cm") %>%
   column_spec(3, width = "2cm") 
-#apa_table(cor_tsi, note = "Electronic voices were only annotated in the ACLEW dataset. \n Although some Tsimane' families listen to the radio, radio speech was not annotated in the TSI corpus.", caption = "Correspondances between LENA^®^ and our human annotation."  )
+
 
 ```
 

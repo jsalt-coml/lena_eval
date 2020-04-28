@@ -287,7 +287,7 @@ get_stats_its <- function(its_data){
                                        sum(durCry13 < 0.6 & durCry13 != 0))
                                                       
   CTC = its_data %>% dplyr::group_by(filename) %>% 
-    dplyr::summarise(CTC_count = sum(convTurnType != "NT", na.rm=TRUE))
+    dplyr::summarise(CTC_count = sum(convTurnType %in% c("TIMR","TIFR"), na.rm=TRUE))
 
   stats = merge(counts, short_counts, all=TRUE)
   stats = merge(stats, means, all=TRUE)
