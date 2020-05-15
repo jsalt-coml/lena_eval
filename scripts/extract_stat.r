@@ -304,7 +304,6 @@ lena_its_folder = "data/its/lena"
 gold_data_folder = "data/gold"
 its_data <- read_its(lena_its_folder, gold_data_folder)
 
-gold_data_folder = "data/gold"
 gold_data <- read_rttm(gold_data_folder)
 
 # Optional : Just log some info !

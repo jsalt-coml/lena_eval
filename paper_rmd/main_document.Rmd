@@ -468,16 +468,16 @@ colnames(allpearsons)<-c("N all","r all","N","r")
 cor.cvc.all= cor.test(cvtc$lena_CV_count,cvtc$gold_CV_count)
 cor.cvc.noZeros= cor.test(cvtc$lena_CV_count[cvtc$lena_CV_count>0 & cvtc$gold_CV_count>0],cvtc$gold_CV_count[cvtc$lena_CV_count>0 & cvtc$gold_CV_count>0])
 
-allpearsons["CVC","N all"]<-round(cor.cvc.all$parameter)
+allpearsons["CVC","N all"]<-sum(!is.na(cvtc$lena_CV_count) & !is.na(cvtc$gold_CV_count))
 allpearsons["CVC","r all"]<-round(cor.cvc.all$estimate,3)
-allpearsons["CVC","N"]<-round(cor.cvc.noZeros$parameter)
+allpearsons["CVC","N"]<-sum(!is.na(cvtc$lena_CV_count) & !is.na(cvtc$gold_CV_count) & cvtc$lena_CV_count>0 & cvtc$gold_CV_count)
 allpearsons["CVC","r"]<-round(cor.cvc.noZeros$estimate,3)
 
 ```
 
 The accuracy of derived counts (CVC, CTC, AWC) is represented graphically in Figure 4, statistics are provided in Table 6, and error metrics in Table 7.
 
-For CVC, there is a strong association between clip-level counts estimated via the LENA^®^ system and those found in the human annotation, which is not much affected when only clips with some child speech (i.e., excluding `r sum(cvtc$lena_CV_count>0 & cvtc$gold_CV_count>0)` clips with 0 counts in both LENA^®^ and human annotations) were considered. This suggests that the LENA^®^ system captures  differences in terms of number of child vocalizations across clips rather well. The error analyses reveal that, generally speaking, LENA^®^ has a slight tendency to underestimate vocalization counts. This understimation, however, is not systematic, and cumulating errors using the absolute error rate suggests that the deviation from the actual counts might be quite significant.
+For CVC, there is a strong association between clip-level counts estimated via the LENA^®^ system and those found in the human annotation, which is not much affected when only clips with some child speech (i.e., excluding `r sum(cvtc$lena_CV_count==0 | cvtc$gold_CV_count==0)` clips with 0 counts in the LENA^®^ and/or human annotations) were considered. This suggests that the LENA^®^ system captures  differences in terms of number of child vocalizations across clips rather well. The error analyses reveal that, generally speaking, LENA^®^ has a slight tendency to underestimate vocalization counts. This understimation, however, is not systematic, and cumulating errors using the absolute error rate suggests that the deviation from the actual counts might be quite significant.
 
 
 
@@ -557,9 +557,9 @@ cor.ctc.all=cor.test(cvtc$lena_CTC_count,cvtc$gold_CTC_count)
 cor.ctc.noZeros=cor.test(cvtc$lena_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0],cvtc$gold_CTC_count[cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0])
 
 
-allpearsons["CTC","N all"]<-round(cor.ctc.all$parameter)
+allpearsons["CTC","N all"]<-sum(!is.na(cvtc$lena_CTC_count) & !is.na(cvtc$gold_CTC_count))
 allpearsons["CTC","r all"]<-round(cor.ctc.all$estimate,3)
-allpearsons["CTC","N"]<-round(cor.ctc.noZeros$parameter)
+allpearsons["CTC","N"]<-sum(!is.na(cvtc$lena_CTC_count) & !is.na(cvtc$gold_CTC_count) & cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count)
 allpearsons["CTC","r"]<-round(cor.ctc.noZeros$estimate,3)
 
 # ER against human
@@ -585,7 +585,7 @@ aller["CTC",]<-cbind(mean(aer),min(aer),max(aer),
 ```
 
 
-As for CTC, the association between clip-level LENA^®^ and human CTC was weaker than that found for CVC, particularly when only clips with some child speech (i.e., excluding `r sum(cvtc$lena_CTC_count>0 & cvtc$gold_CTC_count>0)` clips with 0 counts in both LENA^®^ and human annotations) were considered.   Inspection of errors and error rates reveals that LENA^®^ tends to underestimate turn counts. As with CVC, the bias varied across clips leading to a substantial cumulative absolute error rate. 
+As for CTC, the association between clip-level LENA^®^ and human CTC was weaker than that found for CVC, particularly when only clips with some child speech (i.e., excluding `r sum(cvtc$lena_CTC_count==0 | cvtc$gold_CTC_count==0)` clips with 0 counts in the LENA^®^ and/or human annotations) were considered.   Inspection of errors and error rates reveals that LENA^®^ tends to underestimate turn counts. As with CVC, the bias varied across clips leading to a substantial cumulative absolute error rate. 
 
 
 
@@ -597,9 +597,9 @@ cor.awc.all= cor.test(awc$gold,awc$LENA)
 cor.awc.noZeros= cor.test(awc$gold[awc$gold>0 & awc$LENA>0],awc$LENA[awc$gold>0 & awc$LENA>0])
 
 
-allpearsons["AWC","N all"]<-round(cor.awc.all$parameter)
+allpearsons["AWC","N all"]<-sum(!is.na(awc$gold) & !is.na(awc$LENA))
 allpearsons["AWC","r all"]<-round(cor.awc.all$estimate,3)
-allpearsons["AWC","N"]<-round(cor.awc.noZeros$parameter)
+allpearsons["AWC","N"]<-sum(!is.na(awc$gold) & !is.na(awc$LENA) & awc$gold>0 & awc$LENA >0)
 allpearsons["AWC","r"]<-round(cor.awc.noZeros$estimate,3)
 
 # ER against human
@@ -632,7 +632,7 @@ apa_table(allpearsons,caption="Number of clips (N) and corresponding Pearson r c
 
 
 
-The association between clip-level LENA^®^ and human AWC in the four English-spoken corpora was strong, even when only clips with some adult speech (i.e., excluding `r sum(awc$gold>0 & awc$LENA>0)` clips with 0 counts in both LENA^®^ and human annotations) were considered. This suggests that the LENA^®^ system captures  differences in terms of number of AWC across clips well. Error analyses for AWC  reveal a different pattern from before, as the system exhibits a slight tendency to over-estimate AWC. However, this trend was inconsistent, leading to the highest  absolute error rate metric among the three derived counts. 
+The association between clip-level LENA^®^ and human AWC in the four English-spoken corpora was strong, even when only clips with some adult speech (i.e., excluding `r sum(awc$gold==0 | awc$LENA==0)` clips with 0 counts in the LENA^®^ and/or human annotations) were considered. This suggests that the LENA^®^ system captures  differences in terms of number of AWC across clips well. Error analyses for AWC  reveal a different pattern from before, as the system exhibits a slight tendency to over-estimate AWC. However, this trend was inconsistent, leading to the highest  absolute error rate metric among the three derived counts. 
 
 
 ```{r tabrers, echo=F}
