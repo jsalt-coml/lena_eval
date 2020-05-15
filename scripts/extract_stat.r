@@ -370,6 +370,6 @@ all$gold_CV_mean = all$gold_CV_cum_dur / all$gold_CV_count
 all$gold_CNV_mean = all$gold_CNV_cum_dur / all$gold_CNV_count
 all$lena_CV_mean = all$lena_CV_cum_dur/ all$lena_CV_count
 all$lena_CNV_mean = all$lena_CNV_cum_dur / all$lena_CNV_count
-write.table(format(as.data.frame(child),digits=3), sep=' ', quote=FALSE, file=paste(output_folder, "key_child_voc_child_level.csv", sep="/"), row.names=FALSE)
+write.table(format(as.data.frame(child),digits=3,trim=TRUE), sep=' ', quote=FALSE, file=paste(output_folder, "key_child_voc_child_level.csv", sep="/"), row.names=FALSE)
 write.table(format(file,digits=3,trim=TRUE), sep=' ', quote=FALSE,file=paste(output_folder, "key_child_voc_file_level.csv", sep="/"), row.names=FALSE)
 write.table(format(all,digits=3,trim=TRUE), sep=' ', quote=FALSE,file=paste(output_folder, "key_child_voc_corpora_level.csv", sep="/"), row.names=FALSE)
