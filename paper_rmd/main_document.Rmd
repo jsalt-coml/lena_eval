@@ -11,30 +11,36 @@ author:
   - name: Marvin Lavechin
     affiliation: "1"
   - name: Camila Scaff
-    affiliation: "1"
-  - name: Melanie Soderstrom
     affiliation: "2"
-  - name: Caroline Rowland
+  - name: Melanie Soderstrom
     affiliation: "3"
-  - name: Okko Räsänen
+  - name: Caroline Rowland
     affiliation: "4,5"
+  - name: Okko Räsänen
+    affiliation: "6,7"
   - name: John Bunce
-    affiliation: "2,"
+    affiliation: "8,"
   - name: Elika Bergelson
-    affiliation: "6"
+    affiliation: "9"
 
 affiliation:
   - id            : "1"
-    institution   : "Laboratoire de Sciences Cognitives et de Psycholinguistique, Département d’études cognitives, ENS, EHESS, CNRS, PSL University"
-  - id: "2"
-    institution: "Department of Psychology, University of Manitoba, Canada"
+    institution   : "Laboratoire de Sciences Cognitives et de Psycholinguistique, Département d’études cognitives, ENS, EHESS, CNRS, PSL University, France"
+  - id            : "2"
+    institution   : "Institute of Evolutionary Medicine, University of Zurich, Switzerland"
   - id: "3"
-    institution: "Max Planck Institute for Psycholinguistics, Netherlands"
+    institution: "Department of Psychology, University of Manitoba, Canada"
   - id: "4"
-    institution: "Unit of Computing Sciences, Tampere University, Finland"
+    institution: "Max Planck Institute for Psycholinguistics, Netherlands"
   - id: "5"
-    institution: "Department of Signal Processing and Acoustics, Aalto University, Finland"
+    institution: "Donders Centre for Brain, Cognition and Behaviour, Radboud University, Netherlands"
   - id: "6"
+    institution: "Unit of Computing Sciences, Tampere University, Finland"
+  - id: "7"
+    institution: "Department of Signal Processing and Acoustics, Aalto University, Finland"
+  - id: "8"
+    institution: "California State University East Bay, USA"
+  - id: "9"
     institution: "Psychology & Neuroscience, Duke University, Durham, North Carolina, USA"
 
 
