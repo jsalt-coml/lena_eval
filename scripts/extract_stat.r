@@ -304,7 +304,6 @@ lena_its_folder = "data/its/lena"
 gold_data_folder = "data/gold"
 its_data <- read_its(lena_its_folder, gold_data_folder)
 
-gold_data_folder = "data/gold"
 gold_data <- read_rttm(gold_data_folder)
 
 # Optional : Just log some info !
@@ -369,8 +368,8 @@ all = colSums(all)
 all = data.frame(as.list(all))
 all$gold_CV_mean = all$gold_CV_cum_dur / all$gold_CV_count
 all$gold_CNV_mean = all$gold_CNV_cum_dur / all$gold_CNV_count
-all$lena_CV_mean = all$lena_CV_cum_dur / all$lena_CV_count
+all$lena_CV_mean = all$lena_CV_cum_dur/ all$lena_CV_count
 all$lena_CNV_mean = all$lena_CNV_cum_dur / all$lena_CNV_count
-write.table(child, file=paste(output_folder, "key_child_voc_child_level.csv", sep="/"), row.names=FALSE)
-write.table(file, file=paste(output_folder, "key_child_voc_file_level.csv", sep="/"), row.names=FALSE)
-write.table(all, file=paste(output_folder, "key_child_voc_corpora_level.csv", sep="/"), row.names=FALSE)
+write.table(format(as.data.frame(child),digits=3,trim=TRUE), sep=' ', quote=FALSE, file=paste(output_folder, "key_child_voc_child_level.csv", sep="/"), row.names=FALSE)
+write.table(format(file,digits=3,trim=TRUE), sep=' ', quote=FALSE,file=paste(output_folder, "key_child_voc_file_level.csv", sep="/"), row.names=FALSE)
+write.table(format(all,digits=3,trim=TRUE), sep=' ', quote=FALSE,file=paste(output_folder, "key_child_voc_corpora_level.csv", sep="/"), row.names=FALSE)

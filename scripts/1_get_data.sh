@@ -8,6 +8,8 @@ fi
 
 # Download ACLEW data
 echo "Download ACLEW gold files"
+rm -rf data
+mkdir data
 cd data
 rm -f *.eaf
 git clone git@github.com:aclew/raw_SOD.git
