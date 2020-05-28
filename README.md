@@ -50,7 +50,7 @@ which will tell you either what's missing if something's missing or if everythin
 
 ## Get the data 
 
-REMEMBER, only possible if you are an ACLEW member with access to habilis and oberon!
+REMEMBER, only possible if you are an ACLEW member with access to habilis and to the ACLEW project in github.
 
 To download necessary data, you can launch:
 
@@ -62,6 +62,23 @@ where <habilis_username> is the username of your habilis account.
 The script will ask you to type your password.
 
 This will download ACLEW and Tsimane files:  all the GOLD rttms, all the LENA its files (in their full length, as well as in the chunked format). GOLD are the human-made annotations; the lena-made annotations are .its. Both of these have been converted into .rttm in a process not covered here (see historians section at bottom of this file).
+
+You can check that you downloaded all the files by typing :
+
+```bash
+ls data/{gold,lena}/*.rttm | wc -l
+```
+
+which will count the number of files in the **data/gold** and **data/lena** folders and should return **1744** = (600 aclew files + 272 tsimane files) * 2.
+
+You can also count the number of its files by typing : 
+
+```bash
+ls data/its/lena/*.its | wc -l
+```
+
+which should return **57** = 40 aclew files + 17 tsimane files.
+If you don't have the right number of files, you should check that you have access to the git ACLEW repos, and to oberon.
 
 ## Run the evaluations
 
