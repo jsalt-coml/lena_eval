@@ -24,7 +24,6 @@ LENA_eval_201906/tsi_key_info_r.csv
 
 paper_rmd/*log
 paper_rmd/*tex
-paper_rmd/*files/
 
 
 .DS_Store
