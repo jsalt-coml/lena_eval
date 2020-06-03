@@ -1,10 +1,19 @@
 # LENA evaluation
 
-This github accompanies "A thorough evaluation of the Language Environment Analysis(LENA) system", published in Behavior Research Methods in 2020.
+This github accompanies "A thorough evaluation of the Language Environment Analysis
+(LENA) system", published in Behavior Research Methods in 2020.
 
 ## Contents
 
-- AWC: record of the system needed to go from the raw files (not shared here) to the AWC lena & gold estimates (contact Okko Räsänen for more details)- data: data necessary to reproduce our analyses from scratch- DIHARD_comparison: file used to generate numbers from the dihard 2019 challenge reported on in the paper- evaluations: intermediate files produced while reproducing the paper from scratch, these are all that is needed to reproduce the manuscript itself- LENA_AWC_rel_v1_June.txt: AWC lena & gold estimates- paper_rmd: contains the r markdown version of the paper- README.md: the present file- reliability_evaluations: file used to generate numbers from the ACLEW reliability reported on in the paper- scripts: scripts needed to go from the raw files (not shared here) to the data in data/ (contact Alejandrina Cristia or Marvin Lavechin for more details)
+- AWC: record of the system needed to go from the raw files (not shared here) to the AWC lena & gold estimates (contact Okko Räsänen for more details)
+- data: data necessary to reproduce our analyses from scratch
+- DIHARD_comparison: file used to generate numbers from the dihard 2019 challenge reported on in the paper
+- evaluations: intermediate files produced while reproducing the paper from scratch, these are all that is needed to reproduce the manuscript itself
+- LENA_AWC_rel_v1_June.txt: AWC lena & gold estimates
+- paper_rmd: contains the r markdown version of the paper
+- README.md: the present file
+- reliability_evaluations: file used to generate numbers from the ACLEW reliability reported on in the paper
+- scripts: scripts needed to go from the raw files (not shared here) to the data in data/ (contact Alejandrina Cristia or Marvin Lavechin for more details)
 
 ## Reproduction instructions
 
@@ -35,19 +44,17 @@ Make sure that [pip](https://pypi.org/project/pip/), [conda](https://docs.conda.
 Once everything has been installed, we can create the [conda](https://docs.conda.io/en/latest/) environment containing all the necessary python packages.
 
 ```bash
-# Create environment
-conda create --name lena_eval python=3.6
+# Create environment called "lena_eval" contaning necessary R & python packages
+conda env create -f env.yml
 
 # Activate the environment (this command should be run each time you open a new terminal !)
 # might be *source activate lena_eval* depending on how you set up conda
 conda activate lena_eval
 
-# Install necessary packages
-pip install pyannote-metrics
-pip install pympi-ling ipdb
+# Install rlena, a github R package 
+R -e "Sys.setenv(TAR='/bin/tar'); devtools::install_github('HomeBankCode/rlena', dependencies = TRUE)"
 ```
 
-You must also verify that [R](https://www.r-project.org/) is installed and have the following packages: dplyr, magrittr, stringr, stringi, and [rlena](https://github.com/HomeBankCode/rlena).
 Once you installed everything, you can check that everything went well by launching:
 
 ```bash
