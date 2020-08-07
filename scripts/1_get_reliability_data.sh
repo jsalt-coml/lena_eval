@@ -20,6 +20,15 @@ git clone git@github.com:aclew/BER_rely.git
 # Fix folder name
 mv raw_LUC raw_ROW
 
+# Move {SOD,WAR,LUC,ROW}_rely/Random_Sampling to {SOD,WAR,LUC,ROW}/
+# (to go back to previous repository organisation)
+for eaf in *_rely/Random_Sampling/*.eaf; do
+    dirname=$(dirname $(dirname $eaf))
+    basename=$(basename $eaf)
+    mv $eaf $dirname/$basename
+done;
+
+
 # Rename something.eaf into corpora_something.eaf
 for eaf in */*.eaf; do
     dirname=$(dirname $eaf)

@@ -17,6 +17,9 @@ for index in ${indices[*]}; do
     done;
 done;
 
+# Remove wrong rttm because of corrupted eaf file stored in the git
+rm data/reliability/gold2/rttm/ROW_rely_9801_000000_000001.rttm
+
 # Prepare reliability
 python scripts/prepare_reliability.py
 
@@ -28,6 +31,7 @@ for rttm in data/reliability/gold2/rttm/*.rttm; do
 
     cp $rttm $new_path
 done
+
 
 
 ############################

@@ -119,7 +119,7 @@ def eaf2rttm(path_to_eaf):
             print("Warning continue for %s" % participant)
             continue
 
-        i=0
+        counter_sub_anno = {"vcm@":0, "xds@":0, "lex@":0, "mwu@":0}
         participant_anno = sorted(EAF.tiers[participant][0].items(), key=get_right_key)
 
         for _, val in participant_anno:
@@ -138,23 +138,26 @@ def eaf2rttm(path_to_eaf):
             sub_anno_lst = []
 
             for sub_annotation in sub_annotations:
+                i = counter_sub_anno[sub_annotation]
                 if sub_annotation + participant in child_tier_anno.keys() and len(child_tier_anno[sub_annotation + participant]) != 0:
                     if len(child_tier_anno[sub_annotation + participant]) > i and child_tier_anno[sub_annotation + participant][i][0] == _:
                         sub_anno_txt = "{" + sub_annotation + ' ' + child_tier_anno[sub_annotation + participant][i][1]+"}"
                         sub_anno_lst.append(sub_anno_txt)
+                        counter_sub_anno[sub_annotation] += 1
                     else:
-                        i -= 1
-                        print(
-                            participant + " and " + sub_annotation + participant + " annotation ids don't match. Check the eaf. Incriminated annotation :\n" +
-                                                                                   participant + " : " + _ + "\n" +
-                                                                                    sub_annotation + participant + " : " + child_tier_anno[sub_annotation+participant][i][0])
+                        if counter_sub_anno[sub_annotation] > len(child_tier_anno[sub_annotation + participant]):
+                            # No more annotation for this subtier will be found
+                            continue
+                        # print(
+                        #     participant + " and " + sub_annotation + participant + " annotation ids don't match. Check the eaf. Incriminated annotation :\n" +
+                        #                                                            participant + " : " + _ + "\n" +
+                        #                                                             sub_annotation + participant + " : " + child_tier_anno[sub_annotation+participant][i][0])
 
-            sub_anno_lst = '\t'.join(sub_anno_lst)
+            sub_anno_lst = '_'.join(sub_anno_lst)
             if sub_anno_lst == "":
                 sub_anno_lst = "<NA>"
 
             rttm.append((name, t0, length, transcript, sub_anno_lst, participant))
-            i += 1
 
     # Last we check that list of participants match with what we have in the rttm
     rttm_participants = np.unique([participant for (name, t0, length, transcript, sub_anno_lst, participant) in rttm])
@@ -330,7 +333,7 @@ def main():
 
     #print('cutting audio')
     # We don't want to cut audio here
-    # cut_audio(on_offs, args.wav, output)
+    wav_path = os.path.basename(args.eaf.replace(".eaf", ".wav"))
 
     # store in dict the annotations to write in rttm format
     #print('extracting rttm')
